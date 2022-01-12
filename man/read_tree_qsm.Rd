@@ -11,12 +11,12 @@ read_tree_qsm(path)
 produced with version 2.4.0 of TreeQSM (https://github.com/InverseTampere/TreeQSM) in matlab.}
 }
 \value{
-reads the QSM (tree) and its' components (qsm, cylinder, branch and treedata) into the global environement.
+reads the QSM (tree) and its' components (qsm, cylinder, branch, treedata and triangulation) into the global environment.
 }
 \description{
 Read a TreeQSM
 }
 \examples{
 #QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm <- function(QSM_path)
+#read_tree_qsm(QSM_path)
 }
