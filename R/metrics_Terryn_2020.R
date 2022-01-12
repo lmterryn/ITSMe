@@ -241,3 +241,222 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation="no") {
   }
   return(sbd)
 }
+
+#' Calculate DBH-tree height ratio from a TreeQSM
+#'
+#' @param treedata Treedata field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return DBH divided by the tree height.
+#'
+#' @references
+#' Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+#'
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' ratio_height <- dbh_height_ratio_qsm(treedata)
+dbh_height_ratio_qsm <- function(treedata){
+  dbh <- treedata$DBHqsm[1]
+  tree_height <- treedata$TreeHeight[1]
+  return(dbh/tree_height)
+}
+
+#' Calculate DBH-tree volume ratio from a TreeQSM
+#'
+#' @param treedata Treedata field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return DBH divided by the tree volume (trunk plus branches).
+#'
+#' @references
+#' Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+#'
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' ratio_vol <- dbh_volume_ratio_qsm(treedata)
+dbh_volume_ratio_qsm <- function(treedata){
+  dbh <- treedata$DBHqsm[1]
+  volume <- tree_volume_qsm(treedata)
+  return(dbh/volume)
+}
+
+#' Calculate the volume below 55% from a TreeQSM
+#'
+#' @param cylinder Cylinder field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#' @param treedata Treedata field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return The volume below 55 defined as "the relative branch volume below
+#' 55% of tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
+#'
+#' @references
+#' Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+#'
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' vol_55 <- volume_below_55_qsm(cylinder, treedata)
+volume_below_55_qsm <- function(cylinder, treedata){
+  tree_height <- treedata$TreeHeight[1]
+  volume_branches <- treedata$BranchVolume[1]
+  height_at_55 <- tree_height*0.55+min(cylinder$start[,3])
+  indices_branch_cylinders_under_55 <- which(cylinder$start[,3] < height_at_55 & cylinder$BranchOrder != 0)
+  volumes_branch_cylinders_under_55 <- cylinder$length[indices_branch_cylinders_under_55]*pi%*%cylinder$radius[indices_branch_cylinders_under_55]**2
+  vb55 <- sum(volumes_branch_cylinders_under_55)/volume_branches
+  return(vb55)
+}
+
+#' Calculate the cylinder length volume ratio from a TreeQSM
+#'
+#' @param treedata Treedata field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return The cylinder length volume ratio defined as "the ratio between total
+#' length and volume of the branch cylinders" (Akerblom et al., 2017 & Terryn et al., 2020).
+#'
+#' @references
+#' Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+#'
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' len_vol_ratio <- cylinder_length_volume_ratio_qsm(treedata)
+cylinder_length_volume_ratio_qsm <- function(treedata){
+  total_branch_volume <- treedata$BranchVolume[1]
+  total_branch_length <- treedata$BranchLength[1]
+  return(total_branch_length/total_branch_volume)
+}
+
+#' Calculate shedding ratio from a TreeQSM
+#'
+#' @param branch Branch field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#' @param treedata Treedata field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return The shedding ratio defined as "The number of stem branches without children
+#' divided by the number of all branches in the bottom third" (Akerblom et al., 2017 & Terryn et al., 2020).
+#'
+#' @references
+#' Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+#'
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' shed_ratio <- shedding_ratio_qsm(branch, treedata)
+shedding_ratio_qsm <- function(branch,treedata){
+  indices_stem_branches <- which(branch$order == 1)
+  tree_height <- treedata$TreeHeight[1]
+  if(length(indices_stem_branches) > 0){
+    indices_stem_branches_under_third <- which(branch$height < tree_height/3 & branch$order == 1)
+    if (rapportools::is.empty(indices_stem_branches_under_third)){
+      sr <- 0
+    } else {
+      number_stem_branches_under_third <- length(indices_stem_branches_under_third)
+      number_without_children <- 0
+      for(i in 1:number_stem_branches_under_third){
+        number_children <- sum(branch$parent == indices_stem_branches_under_third[i])
+        if(number_children == 0){
+          number_without_children <- number_without_children + 1
+        }
+      }
+      if(number_without_children > 0){
+        sr <- number_without_children/number_stem_branches_under_third
+      } else {
+        sr <- 0
+      }
+    }
+  } else {
+    sr <- NaN
+  }
+  return(sr)
+}
+
+#' Calculate branch angle ratio from a TreeQSM
+#'
+#' @param branch Branch field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return The branch angle ratio defined as "Ratio of the medians of the branching
+#' angles of the 1st order branches and 2nd order branches" (Terryn et al., 2020).
+#'
+#' @references
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' ba_ratio <- branch_angle_ratio_qsm(branch)
+branch_angle_ratio_qsm <- function(branch){
+  indices_first_order_branches <- which(branch$order == 1)
+  indices_second_order_branches <- which(branch$order == 2)
+  angle_first_order_branches <- branch$angle[indices_first_order_branches]
+  angle_second_order_branches <- branch$angle[indices_second_order_branches]
+  return(stats::median(angle_first_order_branches)/stats::median(angle_second_order_branches))
+}
+
+#' Calculate the relative volume ratio from a TreeQSM
+#'
+#' @param cylinder Cylinder field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#' @param treedata Treedata field of a TreeQSM which is imported in the
+#' global environment with the read_tree_qsm function.
+#'
+#' @return The relative volume ratio defined as "Ratio of the percentage volume
+#' within 80 to 90% of the tree height and the percentage volume within 0 to 10%
+#' of the tree height" (Terryn et al., 2020).
+#'
+#' @references
+#' Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' relvol_ratio <- relative_volume_ratio(cylinder, treedata)
+relative_volume_ratio <- function(cylinder,treedata){
+  tree_height <- treedata$TreeHeight[1]
+  volume <- treedata$TotalVolume[1]
+  number <- 10
+  interval <- tree_height/number
+  cylinder_z_coordinates <- cylinder$start[,3]
+  minimum_z_coordinate <- min(cylinder_z_coordinates)
+  volume_distribution <- integer(1)
+  for(i in 0:number){
+    interval_start <- minimum_z_coordinate + i*interval
+    interval_end <- interval_start + interval
+    indices_cylinders_in_interval <- which(cylinder_z_coordinates >= interval_start & cylinder_z_coordinates < interval_end)
+    volume_cylinders_in_interval <- sum(cylinder$length[indices_cylinders_in_interval]*pi%*%cylinder$radius[indices_cylinders_in_interval]**2)
+    volume_distribution <- append(volume_distribution,volume_cylinders_in_interval)
+  }
+  relative_volume_distribution <- volume_distribution/volume
+  return(relative_volume_distribution[10]/relative_volume_distribution[2])
+}
+
+

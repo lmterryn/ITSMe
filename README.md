@@ -26,6 +26,12 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(StructMetQSM)
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm <- function(QSM_path)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm <- function(QSM_path)
+pos <- tree_position_qsm(cylinder)
+#sba <- stem_branch_angle_qsm(branch)
+#sbcs <- stem_branch_cluster_size_qsm(cylinder)
+#sbr_th <- stem_branch_radius_qsm(cylinder, treedata, "treeheight")
+#sbl_dbh <- stem_branch_length_qsm(branch, treedata, "dbh")
+#sbd_dbh <- stem_branch_distance_qsm(cylinder, treedata, "dbh")
 ```
