@@ -19,7 +19,7 @@ the volume of the stem cylinder (top) and the volume of the branch cylinders.
 Extract the total tree volume from the treedata of a TreeQSM
 }
 \examples{
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm(QSM_path)
-#totvol <- tree_volume_qsm(treedata)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm(QSM_path)
+totvol <- tree_volume_qsm(treedata)
 }

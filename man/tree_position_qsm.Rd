@@ -17,7 +17,7 @@ The XY coordinates (location) of the tree stem.
 Determine the position of a treeQSM
 }
 \examples{
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm(QSM_path)
-#pos <- tree_position_qsm(cylinder)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm(QSM_path)
+pos <- tree_position_qsm(cylinder)
 }

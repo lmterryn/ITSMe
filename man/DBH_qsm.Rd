@@ -17,7 +17,7 @@ The DBH in m of the TreeQSM.
 Extract the DBH from the treedata of a TreeQSM
 }
 \examples{
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm(QSM_path)
-#dbh <- DBH_qsm(treedata)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm(QSM_path)
+dbh <- DBH_qsm(treedata)
 }

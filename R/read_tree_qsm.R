@@ -7,8 +7,8 @@
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
 read_tree_qsm <- function(path) {
   tree <- R.matlab::readMat(path)
   names(tree) <- c("qsm")

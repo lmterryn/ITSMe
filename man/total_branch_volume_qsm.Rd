@@ -17,7 +17,7 @@ The total branch volume in L of the TreeQSM.
 Extract the total branch volume from the treedata of a TreeQSM
 }
 \examples{
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm(QSM_path)
-#branchvol <- total_branch_volume_qsm(treedata)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm(QSM_path)
+branchvol <- total_branch_volume_qsm(treedata)
 }

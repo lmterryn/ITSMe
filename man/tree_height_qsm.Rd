@@ -17,7 +17,7 @@ The tree height in m of the TreeQSM.
 Extract the tree height from the treedata of a TreeQSM
 }
 \examples{
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm(QSM_path)
-#height <- tree_height_qsm(treedata)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm(QSM_path)
+height <- tree_height_qsm(treedata)
 }

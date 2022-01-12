@@ -7,9 +7,9 @@
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #pos <- tree_position_qsm(cylinder)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' pos <- tree_position_qsm(cylinder)
 tree_position_qsm <- function(cylinder) {
   j <- 0
   while (sum(cylinder$length[1:(j+1)]) < 1.3)
@@ -31,9 +31,9 @@ tree_position_qsm <- function(cylinder) {
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #cyllen <- total_cyl_length_qsm(treedata)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' cyllen <- total_cyl_length_qsm(treedata)
 total_cyl_length_qsm <- function(treedata) {
   return(treedata$TotalLength[1])
 }
@@ -49,9 +49,9 @@ total_cyl_length_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #totvol <- tree_volume_qsm(treedata)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' totvol <- tree_volume_qsm(treedata)
 tree_volume_qsm <- function(treedata) {
   if (length(treedata) > 83){
     volume <- treedata$MixTotalVolume[1]
@@ -72,9 +72,9 @@ tree_volume_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #trunkvol <- trunk_volume_qsm(treedata)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' trunkvol <- trunk_volume_qsm(treedata)
 trunk_volume_qsm <- function(treedata) {
   if (length(treedata) > 83){
     volume <- treedata$MixTrunkVolume[1]
@@ -93,9 +93,9 @@ trunk_volume_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #branchvol <- total_branch_volume_qsm(treedata)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' branchvol <- total_branch_volume_qsm(treedata)
 total_branch_volume_qsm  <- function(treedata) {
   return(treedata$BranchVolume[1])
 }
@@ -109,9 +109,9 @@ total_branch_volume_qsm  <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #height <- tree_height_qsm(treedata)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' height <- tree_height_qsm(treedata)
 tree_height_qsm <- function(treedata) {
   return(treedata$TreeHeight[1])
 }
@@ -125,9 +125,9 @@ tree_height_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' #QSM_path <- "path/to/test_qsm.txt"
-#' #read_tree_qsm(QSM_path)
-#' #dbh <- DBH_qsm(treedata)
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' read_tree_qsm(QSM_path)
+#' dbh <- DBH_qsm(treedata)
 DBH_qsm <- function(treedata) {
   return(treedata$DBHqsm[1])
 }

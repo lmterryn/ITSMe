@@ -2,6 +2,11 @@
 
 export(DBH_qsm)
 export(read_tree_qsm)
+export(stem_branch_angle_qsm)
+export(stem_branch_cluster_size_qsm)
+export(stem_branch_distance_qsm)
+export(stem_branch_length_qsm)
+export(stem_branch_radius_qsm)
 export(total_branch_volume_qsm)
 export(total_cyl_length_qsm)
 export(tree_height_qsm)

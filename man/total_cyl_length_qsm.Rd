@@ -17,7 +17,7 @@ The total length of all the cylinders (branch and trunk) in m of a TreeQSM.
 Extract the total cylinder length from the treedata of a TreeQSM
 }
 \examples{
-#QSM_path <- "path/to/test_qsm.txt"
-#read_tree_qsm(QSM_path)
-#cyllen <- total_cyl_length_qsm(treedata)
+QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+read_tree_qsm(QSM_path)
+cyllen <- total_cyl_length_qsm(treedata)
 }
