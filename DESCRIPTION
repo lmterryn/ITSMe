@@ -1,10 +1,10 @@
 Package: StructMetQSM
-Title: Functions to obtain structural metrics from treeQSMs
+Title: Obtain structural metrics from quantitative structure models
 Version: 0.0.0.9000
 Authors@R: 
     person("Louise", "Terryn", , "terrynlouise@outlook.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8405-2788"))
-Description: With this package you can read treeQSM files and determine
+Description: With this package you can read quantitative structure models (treeQSM) files and determine
             structural metrics from these quantitative structure models.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -14,3 +14,5 @@ Imports:
     R.matlab,
     rapportools,
     stats
+URL: https://github.com/lmterryn/StructMetQSM
+BugReports: https://github.com/lmterryn/StructMetQSM/issues 

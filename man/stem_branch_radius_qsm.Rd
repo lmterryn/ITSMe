@@ -2,42 +2,51 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{stem_branch_radius_qsm}
 \alias{stem_branch_radius_qsm}
-\title{Calculate the stem branch radius from a TreeQSM}
+\title{Stem branch radius TreeQSM}
 \usage{
 stem_branch_radius_qsm(cylinder, treedata, normalisation = "no")
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 
-\item{normalisation}{Can be either "treeheight" or "parentcylinder".
-In case of "treeheight" the mean radius of the 10 biggest branches is divided
-by the tree height (Terryn et al., 2020). In case of "parentcylinder" the mean
-is taken of the ratios of the radius of the 10 biggest branches and the radius of
-their parent cylinders (Akerblom et al., 2017). When something different than
-"treeheight" or "parentcylinder" is given, no normalisation is done. Default
-is no normalisation.}
+\item{normalisation}{Can be either "treeheight" or "parentcylinder". In case
+of "treeheight" the mean radius of the 10 biggest branches is divided by
+the tree height (Terryn et al., 2020). In case of "parentcylinder" the mean
+is taken of the ratios of the radius of the 10 biggest branches and the
+radius of their parent cylinders (Akerblom et al., 2017). When something
+different than "treeheight" or "parentcylinder" is given, no normalisation
+is done. Default is no normalisation.}
 }
 \value{
-The stem branch radius defined as "Mean of the 10 largest
-1st order branches measured at the base. Can be normalised by the tree height or
-the the stem radius at respective height" (Akerblom et al., 2017 & Terryn et al., 2020).
+The stem branch radius.
 }
 \description{
-Calculate the stem branch radius from a TreeQSM
+Calculates the stem branch radius from a TreeQSM.
+}
+\details{
+The stem branch radius is defined as "Mean of the 10 largest 1st order
+branches measured at the base. Can be normalised by the tree height or the
+the stem radius at respective height" (Akerblom et al., 2017 & Terryn et al.,
+2020).
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-sbr_th <- stem_branch_radius_qsm(cylinder, treedata, "treeheight")
-sbr_pc <- stem_branch_radius_qsm(cylinder, treedata, "parentcylinder")
-sbr_nn <- stem_branch_radius_qsm(cylinder, treedata, "no")
+qsm <- read_tree_qsm(QSM_path)
+sbr_th <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight")
+sbr_pc <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "parentcylinder")
+sbr_nn <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "no")
 }
 \references{
-Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+(2017). Automatic tree species recognition with quantitative structure
+models. Remote Sensing of Environment, 191, 1-12.
 
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+& Verbeeck, H. (2020). Tree species classification using structural
+features derived from terrestrial laser scanning. ISPRS Journal of
+Photogrammetry and Remote Sensing, 168, 170-181.
 }

@@ -2,24 +2,25 @@
 % Please edit documentation in R/basic_structural_metrics.R
 \name{tree_volume_qsm}
 \alias{tree_volume_qsm}
-\title{Extract the total tree volume from the treedata of a TreeQSM}
+\title{Total tree volume TreeQSM}
 \usage{
 tree_volume_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The total volume in L of the TreeQSM. If the trunk was modelled with triangulation
-the total volume is the sum of the triangulated volume of the stem (bottom),
-the volume of the stem cylinder (top) and the volume of the branch cylinders.
+The total volume of the TreeQSM in liters. If the trunk was modeled
+with triangulation the total volume is the sum of the triangulated volume
+of the stem (bottom), the volume of the stem cylinder (top) and the volume
+of the branch cylinders.
 }
 \description{
-Extract the total tree volume from the treedata of a TreeQSM
+Extracts the total tree volume from the treedata of a TreeQSM.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-totvol <- tree_volume_qsm(treedata)
+qsm <- read_tree_qsm(QSM_path)
+totvol <- tree_volume_qsm(qsm$treedata)
 }

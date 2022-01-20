@@ -2,22 +2,23 @@
 % Please edit documentation in R/basic_structural_metrics.R
 \name{tree_position_qsm}
 \alias{tree_position_qsm}
-\title{Determine the position of a treeQSM}
+\title{TreeQSM position}
 \usage{
 tree_position_qsm(cylinder)
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
 The XY coordinates (location) of the tree stem.
 }
 \description{
-Determine the position of a treeQSM
+Returns the position of a treeQSM based on the start position of the first
+cylinder that is higher than 1.3 m above ground.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-pos <- tree_position_qsm(cylinder)
+qsm <- read_tree_qsm(QSM_path)
+pos <- tree_position_qsm(qsm$cylinder)
 }

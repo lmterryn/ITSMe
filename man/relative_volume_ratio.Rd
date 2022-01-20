@@ -2,30 +2,36 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{relative_volume_ratio}
 \alias{relative_volume_ratio}
-\title{Calculate the relative volume ratio from a TreeQSM}
+\title{Relative volume ratio TreeQSM}
 \usage{
 relative_volume_ratio(cylinder, treedata)
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The relative volume ratio defined as "Ratio of the percentage volume
+The relative volume ratio.
+}
+\description{
+Calculates the relative volume ratio from a TreeQSM.
+}
+\details{
+The relative volume ratio is defined as "Ratio of the percentage volume
 within 80 to 90\% of the tree height and the percentage volume within 0 to 10\%
 of the tree height" (Terryn et al., 2020).
 }
-\description{
-Calculate the relative volume ratio from a TreeQSM
-}
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-relvol_ratio <- relative_volume_ratio(cylinder, treedata)
+qsm <- read_tree_qsm(QSM_path)
+relvol_ratio <- relative_volume_ratio(qsm$cylinder, qsm$treedata)
 }
 \references{
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,
+Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using
+structural features derived from terrestrial laser scanning. ISPRS Journal
+of Photogrammetry and Remote Sensing, 168, 170-181.
 }

@@ -2,26 +2,33 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{branch_angle_ratio_qsm}
 \alias{branch_angle_ratio_qsm}
-\title{Calculate branch angle ratio from a TreeQSM}
+\title{Branch angle ratio TreeQSM}
 \usage{
 branch_angle_ratio_qsm(branch)
 }
 \arguments{
-\item{branch}{Branch field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{branch}{Branch field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The branch angle ratio defined as "Ratio of the medians of the branching
-angles of the 1st order branches and 2nd order branches" (Terryn et al., 2020).
+The branch angle ratio
 }
 \description{
-Calculate branch angle ratio from a TreeQSM
+Calculates the branch angle ratio from a TreeQSM.
+}
+\details{
+The branch angle ratio is defined as "Ratio of the medians of the branching
+angles of the 1st order branches and 2nd order branches" (Terryn et al.,
+2020).
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-ba_ratio <- branch_angle_ratio_qsm(branch)
+qsm <- read_tree_qsm(QSM_path)
+ba_ratio <- branch_angle_ratio_qsm(qsm$branch)
 }
 \references{
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,
+Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using
+structural features derived from terrestrial laser scanning. ISPRS Journal
+of Photogrammetry and Remote Sensing, 168, 170-181.
 }

@@ -1,15 +1,26 @@
 #' Read a TreeQSM
 #'
-#' @param path The path to the TreeQSM mat file. This file contains 1 QSM
-#' produced with version 2.4.0 of TreeQSM (https://github.com/InverseTampere/TreeQSM) in matlab.
+#' Reads a TreeQSM matlab file (.mat) and returns its' components in a list and
+#' optionally saves the TreeQSM components into the global environment.
 #'
-#' @return reads the QSM (tree) and its' components (qsm, cylinder, branch, treedata and triangulation) into the global environment.
+#' Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
+#'
+#' @param path The path to the TreeQSM mat file. This file contains 1 QSM
+#'   produced with version 2.4.0 of TreeQSM
+#'   \url{https://github.com/InverseTampere/TreeQSM} in matlab.
+#' @param global Logical (default=FALSE), indicates if TreeQSM components should
+#'   be read into the global environment.
+#'
+#' @return Returns a list with the TreeQSM components (cylinder, branch,
+#'   treedata and triangulation) and optionally (global=TRUE) saves them into
+#'   the global environment.
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-read_tree_qsm <- function(path) {
+#' qsm <- read_tree_qsm(QSM_path)
+read_tree_qsm <- function(path,global=FALSE) {
   tree <- R.matlab::readMat(path)
   names(tree) <- c("qsm")
   qsm <- tree$qsm
@@ -22,7 +33,13 @@ read_tree_qsm <- function(path) {
   names(treedata) <- rownames(treedata)
   triangulation <- qsm$triangulation
   names(triangulation) <- rownames(triangulation)
-  out <- list(tree,qsm,cylinder,branch,treedata,triangulation)
-  list2env(stats::setNames(out, c("tree", "qsm", "cylinder", "branch", "treedata","triangulation")), envir = .GlobalEnv)
-  return(print("QSM has been read"))
+  out <- list(cylinder=cylinder,branch=branch,
+              treedata=treedata,triangulation=triangulation)
+  if (global){
+    list2env(out, envir = .GlobalEnv)
+    r <- print("QSM has been read")
+  } else {
+    r <- out
+  }
+  return(r)
 }

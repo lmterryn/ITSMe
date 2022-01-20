@@ -2,29 +2,37 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{stem_branch_angle_qsm}
 \alias{stem_branch_angle_qsm}
-\title{Calculate the stem branch angle from a TreeQSM}
+\title{Stem branch angle TreeQSM}
 \usage{
 stem_branch_angle_qsm(branch)
 }
 \arguments{
-\item{branch}{Branch field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{branch}{Branch field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The stem branch angle defined as "the median of the branching angles
-of the 1st order branches in degrees. 0 is upwards and 180 downwards
-(parallel with the trunk)" (Akerblom et al., 2017 & Terryn et al., 2020).
+The stem branch angle.
 }
 \description{
-Calculate the stem branch angle from a TreeQSM
+Calculates the stem branch angle from a TreeQSM.
+}
+\details{
+The stem branch angle is defined as "the median of the branching angles of
+the 1st order branches in degrees. 0 is upwards and 180 downwards (parallel
+with the trunk)" (Akerblom et al., 2017 & Terryn et al., 2020).
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-sba <- stem_branch_angle_qsm(branch)
+qsm <- read_tree_qsm(QSM_path)
+sba <- stem_branch_angle_qsm(qsm$branch)
 }
 \references{
-Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+(2017). Automatic tree species recognition with quantitative structure
+models. Remote Sensing of Environment, 191, 1-12.
 
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+& Verbeeck, H. (2020). Tree species classification using structural
+features derived from terrestrial laser scanning. ISPRS Journal of
+Photogrammetry and Remote Sensing, 168, 170-181.
 }

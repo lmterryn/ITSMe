@@ -4,19 +4,29 @@
 \alias{read_tree_qsm}
 \title{Read a TreeQSM}
 \usage{
-read_tree_qsm(path)
+read_tree_qsm(path, global = FALSE)
 }
 \arguments{
 \item{path}{The path to the TreeQSM mat file. This file contains 1 QSM
-produced with version 2.4.0 of TreeQSM (https://github.com/InverseTampere/TreeQSM) in matlab.}
+produced with version 2.4.0 of TreeQSM
+\url{https://github.com/InverseTampere/TreeQSM} in matlab.}
+
+\item{global}{Logical (default=FALSE), indicates if TreeQSM components should
+be read into the global environment.}
 }
 \value{
-reads the QSM (tree) and its' components (qsm, cylinder, branch, treedata and triangulation) into the global environment.
+Returns a list with the TreeQSM components (cylinder, branch,
+treedata and triangulation) and optionally (global=TRUE) saves them into
+the global environment.
 }
 \description{
-Read a TreeQSM
+Reads a TreeQSM matlab file (.mat) and returns its' components in a list and
+optionally saves the TreeQSM components into the global environment.
+}
+\details{
+Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
+qsm <- read_tree_qsm(QSM_path)
 }

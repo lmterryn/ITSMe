@@ -2,22 +2,23 @@
 % Please edit documentation in R/basic_structural_metrics.R
 \name{total_cyl_length_qsm}
 \alias{total_cyl_length_qsm}
-\title{Extract the total cylinder length from the treedata of a TreeQSM}
+\title{Total cylinder length TreeQSM}
 \usage{
 total_cyl_length_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The total length of all the cylinders (branch and trunk) in m of a TreeQSM.
+The total length of all the cylinders (branch and trunk) of
+a TreeQSM in meters.
 }
 \description{
-Extract the total cylinder length from the treedata of a TreeQSM
+Extracts the total cylinder length from the treedata of a TreeQSM.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-cyllen <- total_cyl_length_qsm(treedata)
+qsm <- read_tree_qsm(QSM_path)
+cyllen <- total_cyl_length_qsm(qsm$treedata)
 }

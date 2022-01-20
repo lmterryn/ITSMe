@@ -2,38 +2,47 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{stem_branch_distance_qsm}
 \alias{stem_branch_distance_qsm}
-\title{Calculate the stem branch distance from a TreeQSM}
+\title{Stem branch distance TreeQSM}
 \usage{
 stem_branch_distance_qsm(cylinder, treedata, normalisation = "no")
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 
-\item{normalisation}{Can either be "dbh" or nothing. In case of "dbh" the average
-distance is divided by the DBH (Akerblom et al., 2017).}
+\item{normalisation}{Can either be "dbh" or nothing. In case of "dbh" the
+average distance is divided by the DBH (Akerblom et al., 2017).}
 }
 \value{
-The stem branch distance defined as "Average distance between 1st order
-branches computed using a moving average with a window width 1 m. If window is
-empty average distance in window is set as half of window width. Can be normalised by
-the DBH" (Akerblom et al., 2017 & Terryn et al., 2020). When something different
-than "dbh" is given, no normalisation is done. Default is no normalisation.
+The stem branch distance.
 }
 \description{
-Calculate the stem branch distance from a TreeQSM
+Calculates the stem branch distance from a TreeQSM.
+}
+\details{
+The stem branch distance is defined as "Average distance between 1st order
+branches computed using a moving average with a window width 1 m. If window
+is empty average distance in window is set as half of window width. Can be
+normalised by the DBH" (Akerblom et al., 2017 & Terryn et al., 2020). When
+something different than "dbh" is given, no normalisation is done. Default is
+no normalisation.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-sbd_dbh <- stem_branch_distance_qsm(cylinder, treedata, "dbh")
-sbd_nn <- stem_branch_distance_qsm(cylinder, treedata, "no")
+qsm <- read_tree_qsm(QSM_path)
+sbd_dbh <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh")
+sbd_nn <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "no")
 }
 \references{
-Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+(2017). Automatic tree species recognition with quantitative structure
+models. Remote Sensing of Environment, 191, 1-12.
 
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+& Verbeeck, H. (2020). Tree species classification using structural
+features derived from terrestrial laser scanning. ISPRS Journal of
+Photogrammetry and Remote Sensing, 168, 170-181.
 }

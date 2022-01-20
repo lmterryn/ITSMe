@@ -2,27 +2,32 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{dbh_volume_ratio_qsm}
 \alias{dbh_volume_ratio_qsm}
-\title{Calculate DBH-tree volume ratio from a TreeQSM}
+\title{DBH-tree volume ratio TreeQSM}
 \usage{
 dbh_volume_ratio_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
 DBH divided by the tree volume (trunk plus branches).
 }
 \description{
-Calculate DBH-tree volume ratio from a TreeQSM
+Calculates DBH-tree volume ratio from a TreeQSM.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-ratio_vol <- dbh_volume_ratio_qsm(treedata)
+qsm <- read_tree_qsm(QSM_path)
+ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata)
 }
 \references{
-Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+(2017). Automatic tree species recognition with quantitative structure
+models. Remote Sensing of Environment, 191, 1-12.
 
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+& Verbeeck, H. (2020). Tree species classification using structural
+features derived from terrestrial laser scanning. ISPRS Journal of
+Photogrammetry and Remote Sensing, 168, 170-181.
 }

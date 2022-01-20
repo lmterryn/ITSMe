@@ -2,31 +2,39 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{volume_below_55_qsm}
 \alias{volume_below_55_qsm}
-\title{Calculate the volume below 55\% from a TreeQSM}
+\title{Volume below 55 TreeQSM}
 \usage{
 volume_below_55_qsm(cylinder, treedata)
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The volume below 55 defined as "the relative branch volume below
-55\% of tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
+The volume below 55.
 }
 \description{
-Calculate the volume below 55\% from a TreeQSM
+Calculates the volume below 55\% from a TreeQSM.
+}
+\details{
+The volume below 55 is defined as "the relative branch volume below 55\% of
+tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-vol_55 <- volume_below_55_qsm(cylinder, treedata)
+qsm <- read_tree_qsm(QSM_path)
+vol_55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
 }
 \references{
-Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M. (2017). Automatic tree species recognition with quantitative structure models. Remote Sensing of Environment, 191, 1-12.
+Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+(2017). Automatic tree species recognition with quantitative structure
+models. Remote Sensing of Environment, 191, 1-12.
 
-Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using structural features derived from terrestrial laser scanning. ISPRS Journal of Photogrammetry and Remote Sensing, 168, 170-181.
+Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+& Verbeeck, H. (2020). Tree species classification using structural
+features derived from terrestrial laser scanning. ISPRS Journal of
+Photogrammetry and Remote Sensing, 168, 170-181.
 }

@@ -1,57 +1,67 @@
-#' Determine the position of a treeQSM
+#' TreeQSM position
 #'
-#' @param cylinder Cylinder field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Returns the position of a treeQSM based on the start position of the first
+#' cylinder that is higher than 1.3 m above ground.
+#'
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
 #'
 #' @return The XY coordinates (location) of the tree stem.
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' pos <- tree_position_qsm(cylinder)
+#' qsm <- read_tree_qsm(QSM_path)
+#' pos <- tree_position_qsm(qsm$cylinder)
 tree_position_qsm <- function(cylinder) {
   j <- 0
   while (sum(cylinder$length[1:(j+1)]) < 1.3)
   {
     j <- j+1
   }
-
   x_location <- cylinder$start[j+1,1]
   y_location <- cylinder$start[j+1,2]
   return(c(x_location,y_location))
 }
 
-#'Extract the total cylinder length from the treedata of a TreeQSM
+#' Total cylinder length TreeQSM
 #'
-#' @param treedata Treedata field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Extracts the total cylinder length from the treedata of a TreeQSM.
 #'
-#' @return The total length of all the cylinders (branch and trunk) in m of a TreeQSM.
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The total length of all the cylinders (branch and trunk) of
+#'   a TreeQSM in meters.
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' cyllen <- total_cyl_length_qsm(treedata)
+#' qsm <- read_tree_qsm(QSM_path)
+#' cyllen <- total_cyl_length_qsm(qsm$treedata)
 total_cyl_length_qsm <- function(treedata) {
   return(treedata$TotalLength[1])
 }
 
-#' Extract the total tree volume from the treedata of a TreeQSM
+#' Total tree volume TreeQSM
 #'
-#' @param treedata Treedata field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Extracts the total tree volume from the treedata of a TreeQSM.
 #'
-#' @return The total volume in L of the TreeQSM. If the trunk was modelled with triangulation
-#' the total volume is the sum of the triangulated volume of the stem (bottom),
-#' the volume of the stem cylinder (top) and the volume of the branch cylinders.
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The total volume of the TreeQSM in liters. If the trunk was modeled
+#'   with triangulation the total volume is the sum of the triangulated volume
+#'   of the stem (bottom), the volume of the stem cylinder (top) and the volume
+#'   of the branch cylinders.
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' totvol <- tree_volume_qsm(treedata)
+#' qsm <- read_tree_qsm(QSM_path)
+#' totvol <- tree_volume_qsm(qsm$treedata)
 tree_volume_qsm <- function(treedata) {
   if (length(treedata) > 83){
     volume <- treedata$MixTotalVolume[1]
@@ -61,20 +71,23 @@ tree_volume_qsm <- function(treedata) {
   return(volume)
 }
 
-#' Extract the total trunk volume from the treedata of a TreeQSM
+#' Total trunk volume TreeQSM
 #'
-#' @param treedata Treedata field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Extracts the total trunk volume from the treedata of a TreeQSM.
 #'
-#' @return The total trunk volume in L of the TreeQSM. If the trunk was modelled with triangulation
-#' the total volume is the sum of the triangulated volume of the stem (bottom) and
-#' the volume of the stem cylinder (top).
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The total trunk volume of the TreeQSM in liters. If the trunk was
+#'   modelled with triangulation the total volume is the sum of the triangulated
+#'   volume of the stem (bottom) and the volume of the stem cylinder (top).
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' trunkvol <- trunk_volume_qsm(treedata)
+#' qsm <- read_tree_qsm(QSM_path)
+#' trunkvol <- trunk_volume_qsm(qsm$treedata)
 trunk_volume_qsm <- function(treedata) {
   if (length(treedata) > 83){
     volume <- treedata$MixTrunkVolume[1]
@@ -84,50 +97,59 @@ trunk_volume_qsm <- function(treedata) {
   return(volume)
 }
 
-#' Extract the total branch volume from the treedata of a TreeQSM
+#' Total branch volume TreeQSM
 #'
-#' @param treedata Treedata field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Extracts the total branch volume from the treedata of a TreeQSM.
 #'
-#' @return The total branch volume in L of the TreeQSM.
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The total branch volume of the TreeQSM in liters.
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' branchvol <- total_branch_volume_qsm(treedata)
+#' qsm <- read_tree_qsm(QSM_path)
+#' branchvol <- total_branch_volume_qsm(qsm$treedata)
 total_branch_volume_qsm  <- function(treedata) {
   return(treedata$BranchVolume[1])
 }
 
-#' Extract the tree height from the treedata of a TreeQSM
+#' Tree height TreeQSM
 #'
-#' @param treedata Treedata field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Extracts the tree height from the treedata of a TreeQSM.
 #'
-#' @return The tree height in m of the TreeQSM.
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The tree height of the TreeQSM in meters.
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' height <- tree_height_qsm(treedata)
+#' qsm <- read_tree_qsm(QSM_path)
+#' height <- tree_height_qsm(qsm$treedata)
 tree_height_qsm <- function(treedata) {
   return(treedata$TreeHeight[1])
 }
 
-#' Extract the DBH from the treedata of a TreeQSM
+#' Diameter at breast height TreeQSM
 #'
-#' @param treedata Treedata field of a TreeQSM which is imported in the
-#' global environment with the read_tree_qsm function.
+#' Extracts the DBH from the treedata of a TreeQSM.
 #'
-#' @return The DBH in m of the TreeQSM.
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The DBH of the TreeQSM in meters.
+#'
 #' @export
 #'
 #' @examples
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-#' read_tree_qsm(QSM_path)
-#' dbh <- DBH_qsm(treedata)
+#' qsm <- read_tree_qsm(QSM_path)
+#' dbh <- DBH_qsm(qsm$treedata)
 DBH_qsm <- function(treedata) {
   return(treedata$DBHqsm[1])
 }

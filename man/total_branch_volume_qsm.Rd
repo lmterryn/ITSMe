@@ -2,22 +2,22 @@
 % Please edit documentation in R/basic_structural_metrics.R
 \name{total_branch_volume_qsm}
 \alias{total_branch_volume_qsm}
-\title{Extract the total branch volume from the treedata of a TreeQSM}
+\title{Total branch volume TreeQSM}
 \usage{
 total_branch_volume_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The total branch volume in L of the TreeQSM.
+The total branch volume of the TreeQSM in liters.
 }
 \description{
-Extract the total branch volume from the treedata of a TreeQSM
+Extracts the total branch volume from the treedata of a TreeQSM.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-branchvol <- total_branch_volume_qsm(treedata)
+qsm <- read_tree_qsm(QSM_path)
+branchvol <- total_branch_volume_qsm(qsm$treedata)
 }

@@ -2,22 +2,22 @@
 % Please edit documentation in R/basic_structural_metrics.R
 \name{tree_height_qsm}
 \alias{tree_height_qsm}
-\title{Extract the tree height from the treedata of a TreeQSM}
+\title{Tree height TreeQSM}
 \usage{
 tree_height_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM which is imported in the
-global environment with the read_tree_qsm function.}
+\item{treedata}{Treedata field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
 }
 \value{
-The tree height in m of the TreeQSM.
+The tree height of the TreeQSM in meters.
 }
 \description{
-Extract the tree height from the treedata of a TreeQSM
+Extracts the tree height from the treedata of a TreeQSM.
 }
 \examples{
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
-read_tree_qsm(QSM_path)
-height <- tree_height_qsm(treedata)
+qsm <- read_tree_qsm(QSM_path)
+height <- tree_height_qsm(qsm$treedata)
 }
