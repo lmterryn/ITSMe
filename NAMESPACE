@@ -2,6 +2,10 @@
 
 export(DBH_qsm)
 export(branch_angle_ratio_qsm)
+export(crown_evenness)
+export(crown_height)
+export(crown_start_height)
+export(crownset)
 export(cylinder_length_volume_ratio_qsm)
 export(dbh_height_ratio_qsm)
 export(dbh_volume_ratio_qsm)

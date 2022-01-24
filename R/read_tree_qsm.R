@@ -22,7 +22,9 @@
 #' qsm <- read_tree_qsm(QSM_path)
 read_tree_qsm <- function(path,global=FALSE) {
   tree <- R.matlab::readMat(path)
-  names(tree) <- c("qsm")
+  if (length(tree)==1){
+    names(tree) <- c("qsm")
+  }
   qsm <- tree$qsm
   names(qsm) <- rownames(qsm)
   cylinder <- qsm$cylinder

@@ -37,7 +37,6 @@ the stem radius at respective height" (Akerblom et al., 2017 & Terryn et al.,
 QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 sbr_th <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight")
-sbr_pc <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "parentcylinder")
 sbr_nn <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "no")
 }
 \references{

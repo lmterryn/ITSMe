@@ -127,7 +127,6 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
 #' sbr_th <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight")
-#' sbr_pc <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "parentcylinder")
 #' sbr_nn <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "no")
 stem_branch_radius_qsm <- function(cylinder, treedata, normalisation="no") {
   indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
@@ -391,7 +390,8 @@ volume_below_55_qsm <- function(cylinder, treedata){
   indices_branch_cylinders_under_55 <- which(cylinder$start[,3]
                                              < height_at_55
                                              & cylinder$BranchOrder != 0)
-  volumes_branch_cylinders_under_55 <- cylinder$length[indices_branch_cylinders_under_55]*
+  volumes_branch_cylinders_under_55 <- cylinder$length[
+    indices_branch_cylinders_under_55]*
     pi%*%cylinder$radius[indices_branch_cylinders_under_55]**2
   vb55 <- sum(volumes_branch_cylinders_under_55)/volume_branches
   return(vb55)
@@ -470,7 +470,8 @@ shedding_ratio_qsm <- function(branch,treedata){
     if (rapportools::is.empty(indices_stem_branches_under_third)){
       sr <- 0
     } else {
-      number_stem_branches_under_third <- length(indices_stem_branches_under_third)
+      number_stem_branches_under_third <- length(
+        indices_stem_branches_under_third)
       number_without_children <- 0
       for(i in 1:number_stem_branches_under_third){
         number_children <- sum(branch$parent ==
@@ -565,12 +566,237 @@ relative_volume_ratio <- function(cylinder,treedata){
                                              interval_start
                                            & cylinder_z_coordinates <
                                              interval_end)
-    volume_cylinders_in_interval <- sum(cylinder$length[indices_cylinders_in_interval]*
-                                          pi%*%cylinder$radius[indices_cylinders_in_interval]**2)
-    volume_distribution <- append(volume_distribution,volume_cylinders_in_interval)
+    volume_cylinders_in_interval <- sum(cylinder$length
+                                        [indices_cylinders_in_interval]*
+                                          pi%*%cylinder$radius
+                                        [indices_cylinders_in_interval]**2)
+    volume_distribution <- append(volume_distribution,
+                                  volume_cylinders_in_interval)
   }
   relative_volume_distribution <- volume_distribution/volume
   return(relative_volume_distribution[10]/relative_volume_distribution[2])
 }
 
+#' Crownset TreeQSM
+#'
+#' Returns the indices of the cylinders belonging to the crown of the treeQSM.
+#'
+#' The crownset is determined based on four steps (that are designed to exclude
+#' dead branches at the bottom of the stem) according to Akerblom et al. (2017).
+#' STEP 1: Initialize the crown set as cylinders that have a branching order
+#' higher than three. If the initial set is empty, the minimum order is lowered
+#' until the set becomes non-empty. STEP 2: As long as the crown set extends,
+#' append the parent cylinders of the crown set that are not part of the stem.
+#' STEP 3: Append to the crown set cylinders that are not part of the stem but
+#' whose start point is higher than the lowest starting point of crown cylinders
+#' connected to the stem. STEP 4: As long as the crown set extends, append the
+#' child cylinders of the crown set.
+#'
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return An integer containing the indices of the cylinders belonging to the
+#'   crownset.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' crown <- crownset(qsm$cylinder)
+crownset <- function(cylinder){
+  children <- c()
+  for(i in 1:length(cylinder$parent)){
+    c <- list(which(cylinder$parent == i))
+    children <- append(children,c)
+  }
+  #STEP 1
+  order <- 3
+  crownset <- which(cylinder$BranchOrder >= order)
+  while(length(crownset)==0 & order>1){
+    order <- order - 1
+    crownset <- which(cylinder$BranchOrder == order)
+  }
+  if(length(crownset)>0){
+    #STEp 2
+    parents <- unique(cylinder$parent[crownset])
+    parents <- parents[cylinder$BranchOrder[parents]>0]
+    while(length(parents)>0){
+      crownset <- unique(append(crownset,parents))
+      newparents <- unique(cylinder$parent[parents])
+      newparents <- newparents[cylinder$BranchOrder[newparents]>0]
+      parents <- newparents
+    }
+    #STEP 3
+    crownset_parent0 <- crownset[cylinder$BranchOrder
+                                 [cylinder$parent[crownset]]==0]
+    min_height <- min(cylinder$start[crownset_parent0,3])
+    crownset <- unique(append(crownset,which(cylinder$start[,3]>min_height
+                                             & cylinder$BranchOrder>0)))
+    #STEP 4
+    init_length <- 0
+    while (length(crownset)>init_length){
+      init_length <- length(crownset)
+      for (i in 1:length(children[crownset])){
+        crownset <- unique(append(crownset,children[crownset][[i]]))
+      }
+    }
+  }
+  return(crownset)
+}
 
+#' Crown start height TreeQSM
+#'
+#' Calculates the crown start height from a TreeQSM.
+#'
+#' The crown start height is defined as "The height of the first stem branch in
+#' the tree crown relative to the tree height" (Akerblom et al., 2017 & Terryn
+#' et al., 2020).
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param crownset  An integer containing the indices of the cylinders belonging
+#'   to the crownset which is returned by \code{\link{crownset}}.
+#'
+#' @return The crown start height.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#'   Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+#'   & Verbeeck, H. (2020). Tree species classification using structural
+#'   features derived from terrestrial laser scanning. ISPRS Journal of
+#'   Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' crown <- crownset(qsm$cylinder)
+#' csh <- crown_start_height(qsm$treedata,qsm$cylinder,crown)
+crown_start_height <- function(treedata,cylinder,crownset){
+  tree_height <- treedata$TreeHeight[1]
+  crownset_parent0 <- crownset[cylinder$BranchOrder
+                               [cylinder$parent[crownset]]==0]
+  min_height <- min(cylinder$start[crownset_parent0,3])
+  if(length(crownset)>0){
+    sh <- (min_height-min(cylinder$start[,3]))/tree_height
+  } else {
+    sh <- NaN
+  }
+  return(sh)
+}
+
+#' Crown height TreeQSM
+#'
+#' Calculates the crown height from a TreeQSM.
+#'
+#' The crown height is defined as "the vertical distance between the highest and
+#' the lowest crown cylinder relative to the tree height" (Akerblom et al., 2017
+#' & Terryn et al., 2020).
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param crownset An integer containing the indices of the cylinders belonging
+#'   to the crownset which is returned by \code{\link{crownset}}.
+#'
+#' @return The crown height.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#'   Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+#'   & Verbeeck, H. (2020). Tree species classification using structural
+#'   features derived from terrestrial laser scanning. ISPRS Journal of
+#'   Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' crown <- crownset(qsm$cylinder)
+#' ch <- crown_height(qsm$treedata,qsm$cylinder,crown)
+crown_height <- function(treedata,cylinder,crownset){
+  tree_height <- treedata$TreeHeight[1]
+  if(length(crownset)>0){
+    minz_crown <- min(cylinder$start[crownset,3])
+    maxz_crown <- max(cylinder$start[crownset,3])
+    x <- which(cylinder$start[,3]==maxz_crown)
+    maxz_crown <- maxz_crown+cylinder$length[x]*cylinder$axis[x,3]
+    ch <- (maxz_crown-minz_crown)/tree_height
+  } else {
+    ch <- NaN
+  }
+  return(ch)
+}
+
+#' Crown evenness TreeQSM
+#'
+#' Calculates the crown evenness from a TreeQSM.
+#'
+#' The crown evenness is defined as "The crown cylinders divided into 8 angular
+#' bins. Ratio between the minimum heights of the highest and lowest bin."
+#' (Akerblom et al., 2017 & Terryn et al., 2020).
+#'
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param crownset An integer containing the indices of the cylinders belonging
+#'   to the crownset which is returned by \code{\link{crownset}}.
+#'
+#' @return The crown evenness.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#'   Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+#'   & Verbeeck, H. (2020). Tree species classification using structural
+#'   features derived from terrestrial laser scanning. ISPRS Journal of
+#'   Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' crown <- crownset(qsm$cylinder)
+#' ce <- crown_evenness(qsm$cylinder,crown)
+crown_evenness <- function(cylinder,crownset){
+  if(length(crownset)>0){
+    bins <- c(0*2*pi/8-pi,1*2*pi/8-pi,2*2*pi/8-pi,3*2*pi/8-pi,4*2*pi/8-pi,5*2*pi/8-pi,
+              6*2*pi/8-pi,7*2*pi/8-pi,2*pi/1-pi)
+    crownset_bo1 <- crownset[cylinder$BranchOrder[crownset]==1]
+    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[cylinder$parent[crownset_bo1]]==0]
+    center_z <- min(cylinder$start[crownset_bo1_po0,3])
+    center <- crownset_bo1_po0[cylinder$start[crownset_bo1_po0,3] == center_z]
+    center_x <- cylinder$start[center,1]
+    center_y <- cylinder$start[center,2]
+    R <- sqrt(((cylinder$start[crownset,1]-center_x)^2+(cylinder$start[crownset,2]-center_y)^2))
+    theta <- atan2((cylinder$start[crownset,2]-center_y),(cylinder$start[crownset,1]-center_x))
+    minimums <- c()
+    for (i in 2:length(bins)){
+      indices_bin <- (theta < bins[i] & theta >= bins[(i-1)])
+      if(sum(indices_bin)>0){
+        minimums <- append(minimums,min(cylinder$start[crownset[indices_bin],3]))
+      }
+    }
+    if(length(minimums)==length(bins)){
+      ce <- (min(minimums)-min(cylinder$start[,3]))/(max(minimums)-min(cylinder$start[,3]))
+    } else {
+      ce <- 0
+    }
+  }
+  return(ce)
+}
