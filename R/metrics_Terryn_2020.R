@@ -800,3 +800,247 @@ crown_evenness <- function(cylinder,crownset){
   }
   return(ce)
 }
+
+#' Radii vertical bins TreeQSM
+#'
+#' Calculates the radii of the three vertical bins fitted to the TreeQSM
+#' cylinders.
+#'
+#' These radii are the radii of the cylinders whose axis are vertical and goes
+#' through the bin centre point, and which contains approximately 90% of the
+#' volume of the branch cylinders in that bin. The tree is divided into three
+#' vertical bins, and the centre point of each bin is defined as the average of
+#' mean points of stem cylinders in the bin. If the bin does not contain stem
+#' cylinders the centre of the previous bin is used (Akerblom et al., 2017 &
+#' Terryn et al., 2020).
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The radii of the three vertical bins.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#'   Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+#'   & Verbeeck, H. (2020). Tree species classification using structural
+#'   features derived from terrestrial laser scanning. ISPRS Journal of
+#'   Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' radii <- vertical_bin_radii(qsm$treedata,qsm$cylinder)
+vertical_bin_radii <- function(treedata,cylinder){
+  dbh <- treedata$DBHqsm[1]
+  sx <- cylinder$start[,1]
+  sy <- cylinder$start[,2]
+  sz <- cylinder$start[,3]
+  cx <- cylinder$length*cylinder$axis[,1]/2+cylinder$start[,1]
+  cy <- cylinder$length*cylinder$axis[,2]/2+cylinder$start[,2]
+  cz <- cylinder$length*cylinder$axis[,3]/2+cylinder$start[,3]
+  ex <- cylinder$length*cylinder$axis[,1]+cylinder$start[,1]
+  ey <- cylinder$length*cylinder$axis[,2]+cylinder$start[,2]
+  ez <- cylinder$length*cylinder$axis[,3]+cylinder$start[,3]
+  vol <- cylinder$length*cylinder$radius^2*pi
+  height <- max(ez)-min(sz)
+  bins <- c()
+  for (i in 1:length(ez)){
+    if (ez[i] <= min(sz)+height/3){
+      bins <- append(bins,1)
+    } else if(ez[i] <= min(sz)+height*2/3) {
+      bins <- append(bins,2)
+    } else {
+      bins <- append(bins,3)
+    }
+  }
+  bin1 <- which(bins==1)
+  bin2 <- which(bins==2)
+  bin3 <- which(bins==3)
+  stem <- which(cylinder$BranchOrder==0)
+  bin1_cx <- mean(cx[stem[stem %in% bin1]])
+  bin1_cy <- mean(cy[stem[stem %in% bin1]])
+  if(sum(stem %in% bin2)>0){
+    bin2_cx <- mean(cx[stem[stem %in% bin2]])
+    bin2_cy <- mean(cy[stem[stem %in% bin2]])
+    if(sum(stem %in% bin3)>0){
+      bin3_cx <- mean(cx[stem[stem %in% bin3]])
+      bin3_cy <- mean(cy[stem[stem %in% bin3]])
+    } else {
+      bin3_cx <- bin2_cx
+      bin3_cy <- bin2_cy
+    }
+  } else {
+    bin2_cx <- bin3_cx <-bin1_cx
+    bin2_cy <- bin3_cy <-bin1_cy
+  }
+  de_bin1 <- sqrt((ex[bin1]-bin1_cx)^2+(ey[bin1]-bin1_cy)^2)
+  de_bin2 <- sqrt((ex[bin2]-bin2_cx)^2+(ey[bin2]-bin2_cy)^2)
+  de_bin3 <- sqrt((ex[bin3]-bin3_cx)^2+(ey[bin3]-bin3_cy)^2)
+  ds_bin1 <- sqrt((sx[bin1]-bin1_cx)^2+(sy[bin1]-bin1_cy)^2)
+  ds_bin2 <- sqrt((sx[bin2]-bin2_cx)^2+(sy[bin2]-bin2_cy)^2)
+  ds_bin3 <- sqrt((sx[bin3]-bin3_cx)^2+(sy[bin3]-bin3_cy)^2)
+  if(sum(!(bin1 %in% stem))==0){
+    if(max(de_bin1)<=dbh/2){
+      r1 <- dbh
+    } else {
+      r1 <- max(de_bin1)
+    }
+  } else {
+    bin1_branch <- bin1[!(bin1 %in% stem)]
+    de_bin1_branch <- de_bin1[which(!(bin1 %in% stem))]
+    ds_bin1_branch <- ds_bin1[which(!(bin1 %in% stem))]
+    d_bin1_branch <- de_bin1_branch-ds_bin1_branch
+    p <- max(de_bin1_branch)
+    ratio <- 1
+    while(ratio > 0.9){
+      p <- p-0.01
+      v1 <- sum(vol[bin1_branch[de_bin1_branch <= p]])
+      v2 <- sum((p-ds_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p])/
+                  (d_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p])*
+                  vol[bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]])
+      vol_p <- v1+v2
+      ratio <- vol_p/sum(vol[bin1_branch])
+    }
+    r1 <- p+0.005
+  }
+  if(sum(!(bin2 %in% stem))==0){
+    if(max(de_bin2)<=max(cylinder$radius[bin2])){
+      r2 <- max(cylinder$radius[bin2])
+    } else {
+      r2 <- max(de_bin2)
+    }
+  } else {
+    bin2_branch <- bin2[!(bin2 %in% stem)]
+    de_bin2_branch <- de_bin2[which(!(bin2 %in% stem))]
+    ds_bin2_branch <- ds_bin2[which(!(bin2 %in% stem))]
+    d_bin2_branch <- de_bin2_branch-ds_bin2_branch
+    p <- max(de_bin2_branch)
+    ratio <- 1
+    while(ratio > 0.9){
+      p <- p-0.01
+      v1 <- sum(vol[bin2_branch[de_bin2_branch <= p]])
+      v2 <- sum((p-ds_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p])/
+                  (d_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p])*
+                  vol[bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]])
+      vol_p <- v1+v2
+      ratio <- vol_p/sum(vol[bin2_branch])
+    }
+    r2 <- p+0.005
+  }
+  if(sum(!(bin3 %in% stem))==0){
+    if(max(de_bin3)<=max(cylinder$radius[bin3])){
+      r3 <- max(cylinder$radius[bin3])
+    } else {
+      r3 <- max(de_bin3)
+    }
+  } else {
+    bin3_branch <- bin3[!(bin3 %in% stem)]
+    de_bin3_branch <- de_bin3[which(!(bin3 %in% stem))]
+    ds_bin3_branch <- ds_bin3[which(!(bin3 %in% stem))]
+    d_bin3_branch <- de_bin3_branch-ds_bin3_branch
+    p <- max(de_bin3_branch)
+    ratio <- 1
+    while(ratio > 0.9){
+      p <- p-0.01
+      v1 <- sum(vol[bin3_branch[de_bin3_branch <= p]])
+      v2 <- sum((p-ds_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p])/
+                  (d_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p])*
+                  vol[bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]])
+      vol_p <- v1+v2
+      ratio <- vol_p/sum(vol[bin3_branch])
+    }
+    r3 <- p+0.005
+  }
+  return(c(r1,r2,r3))
+}
+
+#' Crown diameter height ratio TreeQSM
+#'
+#' Calculates the ratio between the crown diameter and the crown height from a
+#' TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020).
+#'
+#' The crown diameter is the maximum radii of the vertical bin radius estimates
+#' that are calculated with \code{\link{vertical_bin_radii}}. The crown height
+#' is the vertical distance between the highest and the lowest crown cylinder
+#' and is obtained from \code{\link{crown_height}} multiplied with the dbh.
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param crownset An integer containing the indices of the cylinders belonging
+#'   to the crownset which is returned by \code{\link{crownset}}.
+#'
+#' @return The ratio of the crown diameter and crown height.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#'   Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+#'   & Verbeeck, H. (2020). Tree species classification using structural
+#'   features derived from terrestrial laser scanning. ISPRS Journal of
+#'   Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' crown <- crownset(qsm$cylinder)
+#' cdh_ratio <- crown_diameterheight_ratio(qsm$treedata,qsm$cylinder,crown)
+crown_diameterheight_ratio <- function(treedata,cylinder,crownset){
+  radii <- vertical_bin_radii(treedata,cylinder)
+  diameter <- max(radii)*2
+  ch  <- crown_height(treedata,cylinder,crownset)
+  tree_height <- treedata$TreeHeight[1]
+  height <- ch*tree_height
+  return(diameter/height)
+}
+
+#' DBH minimum tree radius ratio TreeQSM
+#'
+#' Calculates the ratio between the dbh and the minimum tree radius from a
+#' TreeQSM.
+#'
+#' This ratio is defined as "Ratio between the DBH and the minimum of the
+#' vertical bin radius estimates" (Akerblom et al., 2017 & Terryn et al., 2020).
+#' The vertical bin radius estimates are calculated with
+#' \code{\link{vertical_bin_radii}}.
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The ratio of the dbh and the minimum tree radius.
+#'
+#' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
+#'   (2017). Automatic tree species recognition with quantitative structure
+#'   models. Remote Sensing of Environment, 191, 1-12.
+#'
+#'   Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y., Newnham, G., ...
+#'   & Verbeeck, H. (2020). Tree species classification using structural
+#'   features derived from terrestrial laser scanning. ISPRS Journal of
+#'   Photogrammetry and Remote Sensing, 168, 170-181.
+#'
+#' @export
+#'
+#' @examples
+#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder)
+dbh_minradius_ratio <- function(treedata,cylinder){
+  radii <- vertical_bin_radii(treedata,cylinder)
+  diameter <- min(radii)*2
+  dbh <- treedata$DBHqsm[1]
+  return(dbh/diameter)
+}
+
+
