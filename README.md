@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# StructMetQSM
+# TreeSM
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -18,7 +18,7 @@ You can install the development version of TreeSM from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("lmterryn/StructMetQSM")
+devtools::install_github("lmterryn/TreeSM")
 ```
 
 ## Example

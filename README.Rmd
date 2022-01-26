@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# StructMetQSM
+# TreeSM
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -26,7 +26,7 @@ You can install the development version of TreeSM from [GitHub](https://github.c
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("lmterryn/StructMetQSM")
+devtools::install_github("lmterryn/TreeSM")
 ```
 
 ## Example

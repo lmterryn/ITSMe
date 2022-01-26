@@ -26,8 +26,8 @@ Imports:
     Rvcg,
     stats,
     utils
-URL: https://github.com/lmterryn/StructMetQSM
-BugReports: https://github.com/lmterryn/StructMetQSM/issues 
+URL: https://github.com/lmterryn/TreeSM
+BugReports: https://github.com/lmterryn/TreeSM/issues 
 Depends: 
     R (>= 2.10)
 LazyData: true
