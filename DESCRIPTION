@@ -1,11 +1,13 @@
-Package: StructMetQSM
-Title: Obtain structural metrics from quantitative structure models
+Package: TreeSM
+Title: Obtain TREE Structural Metrics 
 Version: 0.0.0.9000
 Authors@R: 
-    person("Louise", "Terryn", , "terrynlouise@outlook.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-8405-2788"))
-Description: With this package you can read quantitative structure models (treeQSM) files and determine
-            structural metrics from these quantitative structure models.
+    person("Louise", "Terryn", , "terrynlouise@outlook.com",
+     role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8405-2788"))
+    person("Kim", "Calders", ,"Kim.Calders@UGent.be", 
+     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4562-2538"))
+Description: With this package you can obtain structural metrics from tree point 
+  clouds and their respective quantitative structure models (treeQSM).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
