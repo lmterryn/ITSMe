@@ -6,6 +6,8 @@
 #' the 1st order branches in degrees. 0 is upwards and 180 downwards (parallel
 #' with the trunk)" (Akerblom et al., 2017 & Terryn et al., 2020).
 #'
+#' The calculation of the stem branch angle is based on
+#'
 #' @param branch Branch field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
