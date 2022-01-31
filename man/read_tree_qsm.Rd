@@ -27,6 +27,9 @@ optionally saves the TreeQSM components into the global environment.
 Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
+qsm <- read_tree_qsm(QSM_path,global=TRUE)
+}
 }

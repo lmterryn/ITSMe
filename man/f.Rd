@@ -26,5 +26,7 @@ Support function used to determine the DBH from a tree point cloud with the
 functions \code{\link{dbh_pc}} and \code{\link{dab_pc}}.
 }
 \examples{
-#center_estimate <- optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+\dontrun{
+center_estimate <- optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+}
 }

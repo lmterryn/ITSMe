@@ -4,22 +4,39 @@
 \alias{dbh_volume_ratio_qsm}
 \title{DBH-tree volume ratio TreeQSM}
 \usage{
-dbh_volume_ratio_qsm(treedata)
+dbh_volume_ratio_qsm(treedata, pc = "NA", buttress = FALSE)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
+
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available.}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses. Only relevant if pc is available.}
 }
 \value{
-DBH divided by the tree volume (trunk plus branches).
+DBH divided by the tree volume (trunk plus branches) in meters-2.
 }
 \description{
 Calculates DBH-tree volume ratio from a TreeQSM.
 }
+\details{
+DBH and tree volume are calculated with \code{\link{dbh}} and
+\code{\link{tree_volume_qsm}}.
+}
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata)
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc)
+ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc,TRUE)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

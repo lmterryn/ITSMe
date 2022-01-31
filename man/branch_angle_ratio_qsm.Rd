@@ -22,9 +22,10 @@ angles of the 1st order branches and 2nd order branches" (Terryn et al.,
 2020).
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-ba_ratio <- branch_angle_ratio_qsm(qsm$branch)
+ba_ratio <- branch_angle_ratio_qsm(qsm$branch)}
 }
 \references{
 Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,

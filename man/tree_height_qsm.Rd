@@ -17,7 +17,9 @@ The tree height of the TreeQSM in meters.
 Extracts the tree height from the treedata of a TreeQSM.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 height <- tree_height_qsm(qsm$treedata)
+}
 }

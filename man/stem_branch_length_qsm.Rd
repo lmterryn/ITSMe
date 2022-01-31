@@ -4,7 +4,13 @@
 \alias{stem_branch_length_qsm}
 \title{Stem branch length TreeQSM}
 \usage{
-stem_branch_length_qsm(branch, treedata, normalisation = "no")
+stem_branch_length_qsm(
+  branch,
+  treedata,
+  normalisation = "no",
+  pc = "NA",
+  buttress = FALSE
+)
 }
 \arguments{
 \item{branch}{Branch field of a TreeQSM that is returned by
@@ -19,9 +25,19 @@ the mean of the lengths of the stem branches are divided by the DBH
 tree height (Terryn et al., 2020). When something different than "dbh" or
 "treeheight" is given, no normalisation is done. Default is no
 normalisation.}
+
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available. Only relevant if normalisation equals "dbh" or
+"treeheight".}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses. Only relevant if pc is available and normalisation equals
+"dbh".}
 }
 \value{
-The stem branch length.
+The stem branch length. Unitless with normalisation, in meters
+without normalisation.
 }
 \description{
 Calculates the stem branch length from a TreeQSM.
@@ -29,14 +45,19 @@ Calculates the stem branch length from a TreeQSM.
 \details{
 The stem branch length is defined as "the average length of 1st order
 branches. Can be normalised by DBH or tree height" (Akerblom et al., 2017 &
-Terryn et al., 2020).
+Terryn et al., 2020). DBH and tree height are calculated with
+\code{\link{dbh}} and \code{\link{tree_height}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-sbl_dbh <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "dbh")
-sbl_th <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "treeheight")
-sbl_nn <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "no")
+sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata)
+sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "treeheight")
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "dbh", pc, TRUE)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

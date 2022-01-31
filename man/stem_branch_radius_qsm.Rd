@@ -4,7 +4,7 @@
 \alias{stem_branch_radius_qsm}
 \title{Stem branch radius TreeQSM}
 \usage{
-stem_branch_radius_qsm(cylinder, treedata, normalisation = "no")
+stem_branch_radius_qsm(cylinder, treedata, normalisation = "no", pc = "NA")
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
@@ -20,9 +20,14 @@ is taken of the ratios of the radius of the 10 biggest branches and the
 radius of their parent cylinders (Akerblom et al., 2017). When something
 different than "treeheight" or "parentcylinder" is given, no normalisation
 is done. Default is no normalisation.}
+
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available. Only relevant if normalisation equals "treeheight".}
 }
 \value{
-The stem branch radius.
+The stem branch radius. Unitless with normalisation, in meters
+without normalisation.
 }
 \description{
 Calculates the stem branch radius from a TreeQSM.
@@ -31,13 +36,18 @@ Calculates the stem branch radius from a TreeQSM.
 The stem branch radius is defined as "Mean of the 10 largest 1st order
 branches measured at the base. Can be normalised by the tree height or the
 the stem radius at respective height" (Akerblom et al., 2017 & Terryn et al.,
-2020).
+2020). Tree height is calculated with \code{\link{tree_height}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-sbr_th <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight")
-sbr_nn <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "no")
+sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "parentcyl")
+sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata)
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,"treeheight",pc)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

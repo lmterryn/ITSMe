@@ -20,7 +20,6 @@ Louise Terryn (Louise.Terryn@UGent.be)
 example_qsm
 }
 \description{
-A dataset containing the prices and other attributes of almost 54,000
-diamonds.
+An example TreeQSM (Raumonen et al., 2013, version 2.4.0).
 }
 \keyword{datasets}

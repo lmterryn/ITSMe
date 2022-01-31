@@ -27,6 +27,8 @@ Support function used to determine the DBH from a tree point cloud with
 \code{\link{dbh_pc}} and \code{\link{dab_pc}}.
 }
 \examples{
-#Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
-#R <- mean(Ri)
+\dontrun{
+Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
+R <- mean(Ri)
+}
 }

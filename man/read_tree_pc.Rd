@@ -33,7 +33,11 @@ Reading the txt, las and ply files is based on
 of points for quicker plotting.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-pc <- read_tree_pc(PC_path,1)
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
+PC_path <- "path/to/point_cloud.ply"
+PC_path <- "path/to/point_cloud.las"
+pc <- read_tree_pc(PC_path)
 pc <- read_tree_pc(PC_path,0.2)
+}
 }

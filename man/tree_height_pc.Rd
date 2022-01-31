@@ -2,7 +2,7 @@
 % Please edit documentation in R/basic_metrics_pc.R
 \name{tree_height_pc}
 \alias{tree_height_pc}
-\title{Tree height}
+\title{Tree height point cloud}
 \usage{
 tree_height_pc(pc)
 }
@@ -21,7 +21,9 @@ The tree height is measured as the difference between the Z-value of the
 highest and lowest point of the tree point cloud.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-pc <- read_tree_pc(PC_path,1)
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
 tree_height <- tree_height_pc(pc)
+}
 }

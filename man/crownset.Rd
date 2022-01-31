@@ -30,9 +30,11 @@ connected to the stem. STEP 4: As long as the crown set extends, append the
 child cylinders of the crown set.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 crown <- crownset(qsm$cylinder)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

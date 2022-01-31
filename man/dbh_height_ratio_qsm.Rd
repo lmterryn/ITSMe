@@ -4,11 +4,18 @@
 \alias{dbh_height_ratio_qsm}
 \title{DBH-tree height ratio TreeQSM}
 \usage{
-dbh_height_ratio_qsm(treedata)
+dbh_height_ratio_qsm(treedata, pc = "NA", buttress = FALSE)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
+
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available.}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses. Only relevant if pc is available.}
 }
 \value{
 DBH divided by the tree height.
@@ -16,10 +23,20 @@ DBH divided by the tree height.
 \description{
 Calculates DBH-tree height ratio from a TreeQSM.
 }
+\details{
+DBH and tree height are calculated with \code{\link{dbh}} and
+\code{\link{tree_height}}.
+}
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 ratio_height <- dbh_height_ratio_qsm(qsm$treedata)
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc)
+ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc, TRUE)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/basic_metrics_pc.R
 \name{volume_crown_pc}
 \alias{volume_crown_pc}
-\title{Crown volume}
+\title{Crown volume point cloud}
 \usage{
 volume_crown_pc(pc, alpha = 1, plot = FALSE)
 }
@@ -31,7 +31,11 @@ alpha-shape fitted to the crown points obtained with
 \code{\link{classify_crown_pc}}.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path,1)
-pca <- volume_crown_pc(pc,1,FALSE)
+vol_crown <- volume_crown_pc(pc)
+vol_crown <- volume_crown_pc(pc,0.3,FALSE)
+vol_crown <- volume_crown_pc(pc,1,TRUE)
+}
 }

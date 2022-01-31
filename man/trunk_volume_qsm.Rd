@@ -19,7 +19,9 @@ volume of the stem (bottom) and the volume of the stem cylinder (top).
 Extracts the total trunk volume from the treedata of a TreeQSM.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 trunkvol <- trunk_volume_qsm(qsm$treedata)
+}
 }

@@ -4,7 +4,13 @@
 \alias{stem_branch_distance_qsm}
 \title{Stem branch distance TreeQSM}
 \usage{
-stem_branch_distance_qsm(cylinder, treedata, normalisation = "no")
+stem_branch_distance_qsm(
+  cylinder,
+  treedata,
+  normalisation = "no",
+  pc = "NA",
+  buttress = FALSE
+)
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
@@ -15,9 +21,18 @@ stem_branch_distance_qsm(cylinder, treedata, normalisation = "no")
 
 \item{normalisation}{Can either be "dbh" or nothing. In case of "dbh" the
 average distance is divided by the DBH (Akerblom et al., 2017).}
+
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available. Only relevant if normalisation equals "dbh".}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses. Only relevant if pc is available and normalisation equals
+"dbh".}
 }
 \value{
-The stem branch distance.
+The stem branch distance. Unitless with normalisation, in meters
+without normalisation.
 }
 \description{
 Calculates the stem branch distance from a TreeQSM.
@@ -28,13 +43,18 @@ branches computed using a moving average with a window width 1 m. If window
 is empty average distance in window is set as half of window width. Can be
 normalised by the DBH" (Akerblom et al., 2017 & Terryn et al., 2020). When
 something different than "dbh" is given, no normalisation is done. Default is
-no normalisation.
+no normalisation. DBH is calculated with \code{\link{dbh}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-sbd_dbh <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh")
-sbd_nn <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "no")
+sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata)
+sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh")
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh", pc, TRUE)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

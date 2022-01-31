@@ -30,9 +30,11 @@ cylinders the centre of the previous bin is used (Akerblom et al., 2017 &
 Terryn et al., 2020).
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 radii <- vertical_bin_radii(qsm$treedata,qsm$cylinder)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

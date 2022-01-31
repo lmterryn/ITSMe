@@ -25,9 +25,11 @@ within 80 to 90\% of the tree height and the percentage volume within 0 to 10\%
 of the tree height" (Terryn et al., 2020).
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 relvol_ratio <- relative_volume_ratio(qsm$cylinder, qsm$treedata)
+}
 }
 \references{
 Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,

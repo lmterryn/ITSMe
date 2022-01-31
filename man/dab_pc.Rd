@@ -2,7 +2,7 @@
 % Please edit documentation in R/basic_metrics_pc.R
 \name{dab_pc}
 \alias{dab_pc}
-\title{Diameter above buttresses}
+\title{Diameter above buttresses point cloud}
 \usage{
 dab_pc(pc, thresholdbuttress = 0.001, maxbuttressheight = 9, plot = FALSE)
 }
@@ -51,7 +51,10 @@ iterative process is restarted with a "thresholdbuttress" increased with
 0.0005.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-pc <- read_tree_pc(PC_path,1)
-DAB <- dab_pc(pc,0.001,9,TRUE)
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+dab <- dab_pc(pc)
+dab <- dab_pc(pc,0.001,9,TRUE)
+}
 }

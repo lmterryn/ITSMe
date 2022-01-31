@@ -2,7 +2,7 @@
 % Please edit documentation in R/basic_metrics_pc.R
 \name{classify_crown_pc}
 \alias{classify_crown_pc}
-\title{Crown classification}
+\title{Crown classification point cloud}
 \usage{
 classify_crown_pc(pc, thresholdbranch = 1.5, minheight = 4, plot = FALSE)
 }
@@ -34,7 +34,10 @@ maximum X (and Y) coordinates of the tree points within a horizontal slice
 when the first branch is reached with increasing height.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-pc <- read_tree_pc(PC_path,1)
-crown_pc <- classify_crown_pc(pc,1.5,4,FALSE)
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+crown_pc <- classify_crown_pc(pc)
+crown_pc <- classify_crown_pc(pc,1.5,4,TRUE)
+}
 }

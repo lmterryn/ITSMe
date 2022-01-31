@@ -2,7 +2,7 @@
 % Please edit documentation in R/basic_metrics_pc.R
 \name{dbh_pc}
 \alias{dbh_pc}
-\title{Diameter at breast height}
+\title{Diameter at breast height point cloud}
 \usage{
 dbh_pc(pc, plot = FALSE)
 }
@@ -28,7 +28,10 @@ point). A least squares circle fitting algorithm was applied to find the
 optimal fit.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-pc <- read_tree_pc(PC_path,1)
-DBH <- dbh_pc(pc,TRUE)
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+dbh <- dbh_pc(pc)
+dbh <- dbh_pc(pc,TRUE)
+}
 }

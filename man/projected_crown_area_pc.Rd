@@ -2,34 +2,39 @@
 % Please edit documentation in R/basic_metrics_pc.R
 \name{projected_crown_area_pc}
 \alias{projected_crown_area_pc}
-\title{Projected crown area}
+\title{Projected crown area point cloud}
 \usage{
-projected_crown_area_pc(pc, alpha, plot = FALSE)
+projected_crown_area_pc(pc, concavity = 2, plot = FALSE)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}.}
 
-\item{alpha}{Numeric value (default=1) alpha for the computation of a
-alpha-convex hull based on \code{\link[alphahull]{ahull}}.}
+\item{concavity}{Numeric value (default=2) concavity for the computation of a
+concave hull based on \code{\link[concaveman]{concaveman}}.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
 }
 \value{
-The projected crown area (numeric value) as the area of the
-alpha-convex hull computed from the crown points of a tree point cloud.
+The projected crown area (numeric value) as the area of the concave
+hull computed from the crown points of a tree point cloud.
 }
 \description{
 Returns the projected crown area measured from a tree point cloud.
 }
 \details{
-This function uses \code{\link[alphahull]{ahull}} to calculate the area of
-the alpha-convex hull fitted to the crown points obtained with
+This function uses \code{\link[sf]{st_area}} and
+\code{\link[concaveman]{concaveman}} to calculate the area of the concave
+hull fitted to the crown points obtained with
 \code{\link{classify_crown_pc}}.
 }
 \examples{
-PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-pc <- read_tree_pc(PC_path,0.1)
-pca <- projected_crown_area_pc(pc,1,FALSE)
+\dontrun{
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+pca <- projected_crown_area_pc(pc)
+pca <- projected_crown_area_pc(pc,0.3,FALSE)
+pca <- projected_crown_area_pc(pc,1,TRUE)
+}
 }

@@ -4,7 +4,7 @@
 \alias{dbh_minradius_ratio}
 \title{DBH minimum tree radius ratio TreeQSM}
 \usage{
-dbh_minradius_ratio(treedata, cylinder)
+dbh_minradius_ratio(treedata, cylinder, pc = "NA", buttress = FALSE)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -12,6 +12,13 @@ dbh_minradius_ratio(treedata, cylinder)
 
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
+
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available.}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses. Only relevant if pc is available.}
 }
 \value{
 The ratio of the dbh and the minimum tree radius.
@@ -24,12 +31,18 @@ TreeQSM.
 This ratio is defined as "Ratio between the DBH and the minimum of the
 vertical bin radius estimates" (Akerblom et al., 2017 & Terryn et al., 2020).
 The vertical bin radius estimates are calculated with
-\code{\link{vertical_bin_radii}}.
+\code{\link{vertical_bin_radii}}. DBH is calculated with \code{\link{dbh}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder)
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder,pc)
+dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder,pc,TRUE)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

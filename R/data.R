@@ -1,7 +1,6 @@
 #' Example qsm
 #'
-#' A dataset containing the prices and other attributes of almost 54,000
-#' diamonds.
+#' An example TreeQSM (Raumonen et al., 2013, version 2.4.0).
 #'
 #' @format a list with four attributes (cylinder, branch, treedata, triangulation)
 #' \describe{

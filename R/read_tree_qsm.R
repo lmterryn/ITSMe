@@ -18,8 +18,11 @@
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
+#' qsm <- read_tree_qsm(QSM_path,global=TRUE)
+#' }
 read_tree_qsm <- function(path,global=FALSE) {
   tree <- R.matlab::readMat(path)
   if (length(tree)==1){

@@ -4,7 +4,7 @@
 \alias{crown_height}
 \title{Crown height TreeQSM}
 \usage{
-crown_height(treedata, cylinder, crownset)
+crown_height(treedata, cylinder, pc = "NA")
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -13,8 +13,9 @@ crown_height(treedata, cylinder, crownset)
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
 
-\item{crownset}{An integer containing the indices of the cylinders belonging
-to the crownset which is returned by \code{\link{crownset}}.}
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available.}
 }
 \value{
 The crown height.
@@ -25,13 +26,19 @@ Calculates the crown height from a TreeQSM.
 \details{
 The crown height is defined as "the vertical distance between the highest and
 the lowest crown cylinder relative to the tree height" (Akerblom et al., 2017
-& Terryn et al., 2020).
+& Terryn et al., 2020). The tree height is calculated with
+\code{\link{tree_height}}. Crown cylinders are determined with
+\code{\link{crownset}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-crown <- crownset(qsm$cylinder)
-ch <- crown_height(qsm$treedata,qsm$cylinder,crown)
+ch <- crown_height(qsm$treedata,qsm$cylinder)
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+ch <- crown_height(qsm$treedata,qsm$cylinder,pc)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

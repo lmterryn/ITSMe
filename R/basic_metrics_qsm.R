@@ -10,9 +10,11 @@
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
 #' pos <- tree_position_qsm(qsm$cylinder)
+#' }
 tree_position_qsm <- function(cylinder) {
   j <- 0
   while (sum(cylinder$length[1:(j+1)]) < 1.3)
@@ -37,9 +39,11 @@ tree_position_qsm <- function(cylinder) {
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' cyllen <- total_cyl_length_qsm(qsm$treedata)
+#' tot_len <- total_cyl_length_qsm(qsm$treedata)
+#' }
 total_cyl_length_qsm <- function(treedata) {
   return(treedata$TotalLength[1])
 }
@@ -59,9 +63,11 @@ total_cyl_length_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' totvol <- tree_volume_qsm(qsm$treedata)
+#' tot_vol <- tree_volume_qsm(qsm$treedata)
+#' }
 tree_volume_qsm <- function(treedata) {
   if (length(treedata) > 83){
     volume <- treedata$MixTotalVolume[1]
@@ -85,9 +91,11 @@ tree_volume_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
 #' trunkvol <- trunk_volume_qsm(qsm$treedata)
+#' }
 trunk_volume_qsm <- function(treedata) {
   if (length(treedata) > 83){
     volume <- treedata$MixTrunkVolume[1]
@@ -109,11 +117,34 @@ trunk_volume_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
 #' branchvol <- total_branch_volume_qsm(qsm$treedata)
+#' }
 total_branch_volume_qsm  <- function(treedata) {
   return(treedata$BranchVolume[1])
+}
+
+#' Total branch length TreeQSM
+#'
+#' Extracts the total branch length from the treedata of a TreeQSM.
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The total branch length of the TreeQSM in liters.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
+#' qsm <- read_tree_qsm(QSM_path)
+#' branchlen <- total_branch_length_qsm(qsm$treedata)
+#' }
+total_branch_length_qsm  <- function(treedata) {
+  return(treedata$BranchLength[1])
 }
 
 #' Tree height TreeQSM
@@ -128,16 +159,22 @@ total_branch_volume_qsm  <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
 #' height <- tree_height_qsm(qsm$treedata)
+#' }
 tree_height_qsm <- function(treedata) {
   return(treedata$TreeHeight[1])
 }
 
 #' Diameter at breast height TreeQSM
 #'
-#' Extracts the DBH from the treedata of a TreeQSM.
+#' Extracts the dbh from the treedata of a TreeQSM.
+#'
+#' The dbh is calculated as the diameter of the cylinder in the QSM at the right
+#' height (cylinder at 1.3 m). If the trunk was modeled with triangulation the
+#' dbh is calculated as mean length of the diagonals in the triangulation.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -147,9 +184,16 @@ tree_height_qsm <- function(treedata) {
 #' @export
 #'
 #' @examples
-#' QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+#' \dontrun{
+#' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' dbh <- DBH_qsm(qsm$treedata)
-DBH_qsm <- function(treedata) {
-  return(treedata$DBHqsm[1])
+#' dbh <- dbh_qsm(qsm$treedata)
+#' }
+dbh_qsm <- function(treedata) {
+  if (length(treedata) > 83){
+    dbh <- treedata$DBHtri[1]
+  } else {
+    dbh <- treedata$DBHqsm[1]
+  }
+  return(dbh)
 }

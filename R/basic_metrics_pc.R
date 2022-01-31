@@ -1,4 +1,4 @@
-#' Tree height
+#' Tree height point cloud
 #'
 #' Returns the tree height measured from a tree point cloud.
 #'
@@ -13,9 +13,11 @@
 #' @export
 #'
 #' @examples
-#' PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-#' pc <- read_tree_pc(PC_path,1)
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
 #' tree_height <- tree_height_pc(pc)
+#' }
 tree_height_pc <-function(pc) {
   return(max(pc$Z)-min(pc$Z))
 }
@@ -36,8 +38,10 @@ tree_height_pc <-function(pc) {
 #' @return The distance of 2D points to the center
 #'
 #' @examples
-#' #Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
-#' #R <- mean(Ri)
+#' \dontrun{
+#' Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
+#' R <- mean(Ri)
+#' }
 calc_r <- function(x, y, xc, yc){
   return(sqrt((x-xc)**2 + (y-yc)**2))
 }
@@ -58,13 +62,15 @@ calc_r <- function(x, y, xc, yc){
 #'   fitting.
 #'
 #' @examples
-#' #center_estimate <- optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+#' \dontrun{
+#' center_estimate <- optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+#' }
 f <- function(c, x, y){
   Ri <- calc_r(x, y, c[1], c[2])
   return(sum((Ri-mean(Ri))**2))
 }
 
-#' Diameter at breast height
+#' Diameter at breast height point cloud
 #'
 #' Returns the diameter at breast height (DBH) of a tree measured from a tree
 #' point cloud.
@@ -85,9 +91,12 @@ f <- function(c, x, y){
 #' @export
 #'
 #' @examples
-#' PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-#' pc <- read_tree_pc(PC_path,1)
-#' DBH <- dbh_pc(pc,TRUE)
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
+#' dbh <- dbh_pc(pc)
+#' dbh <- dbh_pc(pc,TRUE)
+#' }
 dbh_pc <-function(pc,plot=FALSE) {
   if(max(pc$Z)-min(pc$Z) > 1.3){
     pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33),]
@@ -122,7 +131,8 @@ dbh_pc <-function(pc,plot=FALSE) {
         ggforce::geom_circle(data=data_circle,
                              ggplot2::aes(x0 = x0, y0 = y0, r = r,
                                           color="fitted circle"),
-                             inherit.aes = FALSE, show.legend = FALSE)
+                             inherit.aes = FALSE, show.legend = FALSE) +
+        ggplot2::ggtitle(paste("DBH = ",as.character(round(2*R,2)),"m",sep = ""))
       print(plotDBH)
     }
     dbh <- 2*R
@@ -132,7 +142,7 @@ dbh_pc <-function(pc,plot=FALSE) {
   return(dbh)
 }
 
-#' Diameter above buttresses
+#' Diameter above buttresses point cloud
 #'
 #' Returns the diameter above buttresses (DAB) of a tree measured from a tree
 #' point cloud.
@@ -174,9 +184,12 @@ dbh_pc <-function(pc,plot=FALSE) {
 #' @export
 #'
 #' @examples
-#' PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-#' pc <- read_tree_pc(PC_path,1)
-#' DAB <- dab_pc(pc,0.001,9,TRUE)
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
+#' dab <- dab_pc(pc)
+#' dab <- dab_pc(pc,0.001,9,TRUE)
+#' }
 dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
                            plot=FALSE){
   lh <- 1.27
@@ -256,14 +269,16 @@ dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
       ggforce::geom_circle(data=data_circle,
                            ggplot2::aes(x0 = x0, y0 = y0, r = r,
                                         color="fitted circle"),
-                           inherit.aes = FALSE, show.legend = FALSE)
+                           inherit.aes = FALSE, show.legend = FALSE) +
+      ggplot2::ggtitle(paste("DAB = ",as.character(round(2*R,2)),"m at H = ",
+                             as.character(round((lh+uh)/2,2)),"m",sep = ""))
     print(plotDAB)
   }
   dbh <- 2*R
   return(dbh)
 }
 
-#' Crown classification
+#' Crown classification point cloud
 #'
 #' Returns the crown points from a tree point cloud.
 #'
@@ -288,9 +303,12 @@ dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
 #' @export
 #'
 #' @examples
-#' PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-#' pc <- read_tree_pc(PC_path,1)
-#' crown_pc <- classify_crown_pc(pc,1.5,4,FALSE)
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
+#' crown_pc <- classify_crown_pc(pc)
+#' crown_pc <- classify_crown_pc(pc,1.5,4,TRUE)
+#' }
 classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
                                       plot=FALSE){
   dab <- dab_pc(pc)
@@ -403,44 +421,47 @@ classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
   return(crown_pc)
 }
 
-#' Projected crown area
+#' Projected crown area point cloud
 #'
 #' Returns the projected crown area measured from a tree point cloud.
 #'
-#' This function uses \code{\link[alphahull]{ahull}} to calculate the area of
-#' the alpha-convex hull fitted to the crown points obtained with
+#' This function uses \code{\link[sf]{st_area}} and
+#' \code{\link[concaveman]{concaveman}} to calculate the area of the concave
+#' hull fitted to the crown points obtained with
 #' \code{\link{classify_crown_pc}}.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
-#' @param alpha Numeric value (default=1) alpha for the computation of a
-#'   alpha-convex hull based on \code{\link[alphahull]{ahull}}.
+#' @param concavity Numeric value (default=2) concavity for the computation of a
+#'   concave hull based on \code{\link[concaveman]{concaveman}}.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
-#' @return The projected crown area (numeric value) as the area of the
-#'   alpha-convex hull computed from the crown points of a tree point cloud.
+#' @return The projected crown area (numeric value) as the area of the concave
+#'   hull computed from the crown points of a tree point cloud.
 #'
 #' @export
 #'
 #' @examples
-#' PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
-#' pc <- read_tree_pc(PC_path,0.1)
-#' pca <- projected_crown_area_pc(pc,1,FALSE)
-projected_crown_area_pc <- function(pc, alpha, plot=FALSE){
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
+#' pca <- projected_crown_area_pc(pc)
+#' pca <- projected_crown_area_pc(pc,0.3,FALSE)
+#' pca <- projected_crown_area_pc(pc,1,TRUE)
+#' }
+projected_crown_area_pc <- function(pc, concavity=2, plot=FALSE){
   crown_pc <- classify_crown_pc(pc,1.5,4,FALSE)
-  crown_pc <- round(crown_pc,digits = 2)
-  crown_xy <- data.matrix(unique(crown_pc[1:2]))
-  ahull.obj <- alphahull::ahull(crown_xy, alpha = alpha)
+  points <- sf::st_as_sf(unique(crown_pc[1:2]), coords=c("X","Y"))
+  hull <- concaveman::concaveman(points, concavity)
+  pca <- sf::st_area(hull)
   if(plot){
-    graphics::par(pty="s")
-    plot(ahull.obj, col=c(1,2,3,4,5,6), wpoints=TRUE, xlab="X", ylab="Y")
+    plot(sf::st_geometry(hull), col = "lightgrey")
   }
-  pca <- alphahull::areaahull(ahull.obj, timeout = 5)
   return(pca)
 }
 
-#' Crown volume
+#' Crown volume point cloud
 #'
 #' Returns the crown volume measured from a tree point cloud.
 #'
@@ -462,9 +483,13 @@ projected_crown_area_pc <- function(pc, alpha, plot=FALSE){
 #' @export
 #'
 #' @examples
-#' PC_path <- "C:/Users/lmterryn/example_pointcloud2.txt"
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path,1)
-#' pca <- volume_crown_pc(pc,1,FALSE)
+#' vol_crown <- volume_crown_pc(pc)
+#' vol_crown <- volume_crown_pc(pc,0.3,FALSE)
+#' vol_crown <- volume_crown_pc(pc,1,TRUE)
+#' }
 volume_crown_pc <- function(pc, alpha=1, plot=FALSE){
   crown_pc <- classify_crown_pc(pc,1.5,4,FALSE)
   crown_xyz <- data.matrix(unique(crown_pc[1:3]))

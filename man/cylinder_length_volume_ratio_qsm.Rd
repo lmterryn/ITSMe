@@ -22,9 +22,11 @@ length and volume of the branch cylinders" (Akerblom et al., 2017 & Terryn et
 al., 2020).
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 len_vol_ratio <- cylinder_length_volume_ratio_qsm(qsm$treedata)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

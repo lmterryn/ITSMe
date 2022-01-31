@@ -4,7 +4,7 @@
 \alias{crown_diameterheight_ratio}
 \title{Crown diameter height ratio TreeQSM}
 \usage{
-crown_diameterheight_ratio(treedata, cylinder, crownset)
+crown_diameterheight_ratio(treedata, cylinder, pc = "NA")
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -13,8 +13,9 @@ crown_diameterheight_ratio(treedata, cylinder, crownset)
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
 
-\item{crownset}{An integer containing the indices of the cylinders belonging
-to the crownset which is returned by \code{\link{crownset}}.}
+\item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
+\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+cloud is available.}
 }
 \value{
 The ratio of the crown diameter and crown height.
@@ -27,13 +28,18 @@ TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020).
 The crown diameter is the maximum radii of the vertical bin radius estimates
 that are calculated with \code{\link{vertical_bin_radii}}. The crown height
 is the vertical distance between the highest and the lowest crown cylinder
-and is obtained from \code{\link{crown_height}} multiplied with the dbh.
+and is obtained from \code{\link{crown_height}} multiplied with the
+tree_height.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-crown <- crownset(qsm$cylinder)
 cdh_ratio <- crown_diameterheight_ratio(qsm$treedata,qsm$cylinder,crown)
+PC_path <- "path/to/point_cloud.txt"
+pc <- read_tree_pc(PC_path)
+cdh_ratio <- crown_diameterheight_ratio(qsm$treedata,qsm$cylinder,crown,pc)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

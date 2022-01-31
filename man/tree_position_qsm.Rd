@@ -18,7 +18,9 @@ Returns the position of a treeQSM based on the start position of the first
 cylinder that is higher than 1.3 m above ground.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 pos <- tree_position_qsm(qsm$cylinder)
+}
 }

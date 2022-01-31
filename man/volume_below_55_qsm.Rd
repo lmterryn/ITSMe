@@ -24,9 +24,11 @@ The volume below 55 is defined as "the relative branch volume below 55\% of
 tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 vol_55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

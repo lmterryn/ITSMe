@@ -4,14 +4,11 @@
 \alias{crown_evenness}
 \title{Crown evenness TreeQSM}
 \usage{
-crown_evenness(cylinder, crownset)
+crown_evenness(cylinder)
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
-
-\item{crownset}{An integer containing the indices of the cylinders belonging
-to the crownset which is returned by \code{\link{crownset}}.}
 }
 \value{
 The crown evenness.
@@ -22,13 +19,15 @@ Calculates the crown evenness from a TreeQSM.
 \details{
 The crown evenness is defined as "The crown cylinders divided into 8 angular
 bins. Ratio between the minimum heights of the highest and lowest bin."
-(Akerblom et al., 2017 & Terryn et al., 2020).
+(Akerblom et al., 2017 & Terryn et al., 2020). Crown cylinders are determined
+with \code{\link{crownset}}.
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-crown <- crownset(qsm$cylinder)
 ce <- crown_evenness(qsm$cylinder,crown)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.

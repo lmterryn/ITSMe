@@ -11,7 +11,7 @@ stem_branch_angle_qsm(branch)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The stem branch angle.
+The stem branch angle in degrees.
 }
 \description{
 Calculates the stem branch angle from a TreeQSM.
@@ -20,13 +20,13 @@ Calculates the stem branch angle from a TreeQSM.
 The stem branch angle is defined as "the median of the branching angles of
 the 1st order branches in degrees. 0 is upwards and 180 downwards (parallel
 with the trunk)" (Akerblom et al., 2017 & Terryn et al., 2020).
-
-The calculation of the stem branch angle is based on
 }
 \examples{
-QSM_path <- "C:/Users/lmterryn/example_qsm.mat"
+\dontrun{
+QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
 sba <- stem_branch_angle_qsm(qsm$branch)
+}
 }
 \references{
 Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
