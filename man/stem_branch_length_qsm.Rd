@@ -7,7 +7,7 @@
 stem_branch_length_qsm(
   branch,
   treedata,
-  normalisation = "no",
+  normalisation = "treeheight",
   pc = "NA",
   buttress = FALSE
 )

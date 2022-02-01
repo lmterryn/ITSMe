@@ -218,8 +218,8 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' pc <- read_tree_pc(PC_path)
 #' sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,"treeheight",pc)
 #' }
-stem_branch_radius_qsm <- function(cylinder, treedata, normalisation="no",
-                                   pc="NA") {
+stem_branch_radius_qsm <- function(cylinder, treedata,
+                                   normalisation="treeheight", pc="NA") {
   indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
                                   & cylinder$BranchOrder == 1)
   if(length(indices_stem_cylinders) > 0) {
@@ -303,7 +303,7 @@ stem_branch_radius_qsm <- function(cylinder, treedata, normalisation="no",
 #' pc <- read_tree_pc(PC_path)
 #' sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "dbh", pc, TRUE)
 #' }
-stem_branch_length_qsm <- function(branch, treedata, normalisation="no",
+stem_branch_length_qsm <- function(branch, treedata, normalisation="treeheight",
                                    pc="NA", buttress=FALSE) {
   indices_stem_branches <- which(branch$order == 1)
   if (length(indices_stem_branches) > 0) {
@@ -704,9 +704,9 @@ branch_angle_ratio_qsm <- function(branch){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' relvol_ratio <- relative_volume_ratio(qsm$cylinder, qsm$treedata)
+#' relvol_ratio <- relative_volume_ratio_qsm(qsm$cylinder, qsm$treedata)
 #' }
-relative_volume_ratio <- function(cylinder,treedata){
+relative_volume_ratio_qsm <- function(cylinder,treedata){
   tree_height <- treedata$TreeHeight[1]
   volume <- treedata$TotalVolume[1]
   number <- 10
@@ -763,9 +763,9 @@ relative_volume_ratio <- function(cylinder,treedata){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' crown <- crownset(qsm$cylinder)
+#' crown <- crownset_qsm(qsm$cylinder)
 #' }
-crownset <- function(cylinder){
+crownset_qsm <- function(cylinder){
   children <- c()
   for(i in 1:length(cylinder$parent)){
     c <- list(which(cylinder$parent == i))
@@ -813,7 +813,7 @@ crownset <- function(cylinder){
 #' The crown start height is defined as "The height of the first stem branch in
 #' the tree crown relative to the tree height" (Akerblom et al., 2017 & Terryn
 #' et al., 2020). The tree height is calculated with \code{\link{tree_height}}.
-#' Crown cylinders are determined with \code{\link{crownset}}.
+#' Crown cylinders are determined with \code{\link{crownset_qsm}}.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -840,13 +840,13 @@ crownset <- function(cylinder){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' csh <- crown_start_height(qsm$treedata,qsm$cylinder)
+#' csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' csh <- crown_start_height(qsm$treedata,qsm$cylinder,pc)
+#' csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder,pc)
 #' }
-crown_start_height <- function(treedata,cylinder,pc="NA"){
-  crownset <- crownset(cylinder)
+crown_start_height_qsm <- function(treedata,cylinder,pc="NA"){
+  crownset <- crownset_qsm(cylinder)
   tree_height <- tree_height(treedata,pc)
   crownset_parent0 <- crownset[cylinder$BranchOrder
                                [cylinder$parent[crownset]]==0]
@@ -867,7 +867,7 @@ crown_start_height <- function(treedata,cylinder,pc="NA"){
 #' the lowest crown cylinder relative to the tree height" (Akerblom et al., 2017
 #' & Terryn et al., 2020). The tree height is calculated with
 #' \code{\link{tree_height}}. Crown cylinders are determined with
-#' \code{\link{crownset}}.
+#' \code{\link{crownset_qsm}}.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -894,13 +894,13 @@ crown_start_height <- function(treedata,cylinder,pc="NA"){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' ch <- crown_height(qsm$treedata,qsm$cylinder)
+#' ch <- crown_height_qsm(qsm$treedata,qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' ch <- crown_height(qsm$treedata,qsm$cylinder,pc)
+#' ch <- crown_height_qsm(qsm$treedata,qsm$cylinder,pc)
 #' }
-crown_height <- function(treedata,cylinder,pc="NA"){
-  crownset <- crownset(cylinder)
+crown_height_qsm <- function(treedata,cylinder,pc="NA"){
+  crownset <- crownset_qsm(cylinder)
   tree_height <- tree_height(treedata,pc)
   if(length(crownset)>0){
     minz_crown <- min(cylinder$start[crownset,3])
@@ -921,7 +921,7 @@ crown_height <- function(treedata,cylinder,pc="NA"){
 #' The crown evenness is defined as "The crown cylinders divided into 8 angular
 #' bins. Ratio between the minimum heights of the highest and lowest bin."
 #' (Akerblom et al., 2017 & Terryn et al., 2020). Crown cylinders are determined
-#' with \code{\link{crownset}}.
+#' with \code{\link{crownset_qsm}}.
 #'
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -943,30 +943,35 @@ crown_height <- function(treedata,cylinder,pc="NA"){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' ce <- crown_evenness(qsm$cylinder,crown)
+#' ce <- crown_evenness_qsm(qsm$cylinder,crown)
 #' }
-crown_evenness <- function(cylinder){
-  crownset <- crownset(cylinder)
+crown_evenness_qsm <- function(cylinder){
+  crownset <- crownset_qsm(cylinder)
   if(length(crownset)>0){
-    bins <- c(0*2*pi/8-pi,1*2*pi/8-pi,2*2*pi/8-pi,3*2*pi/8-pi,4*2*pi/8-pi,5*2*pi/8-pi,
-              6*2*pi/8-pi,7*2*pi/8-pi,2*pi/1-pi)
+    bins <- c(0*2*pi/8-pi,1*2*pi/8-pi,2*2*pi/8-pi,3*2*pi/8-pi,4*2*pi/8-pi,
+              5*2*pi/8-pi,6*2*pi/8-pi,7*2*pi/8-pi,2*pi/1-pi)
     crownset_bo1 <- crownset[cylinder$BranchOrder[crownset]==1]
-    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[cylinder$parent[crownset_bo1]]==0]
+    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[cylinder$parent[
+      crownset_bo1]]==0]
     center_z <- min(cylinder$start[crownset_bo1_po0,3])
     center <- crownset_bo1_po0[cylinder$start[crownset_bo1_po0,3] == center_z]
     center_x <- cylinder$start[center,1]
     center_y <- cylinder$start[center,2]
-    R <- sqrt(((cylinder$start[crownset,1]-center_x)^2+(cylinder$start[crownset,2]-center_y)^2))
-    theta <- atan2((cylinder$start[crownset,2]-center_y),(cylinder$start[crownset,1]-center_x))
+    R <- sqrt(((cylinder$start[crownset,1]-center_x)^2+
+                 (cylinder$start[crownset,2]-center_y)^2))
+    theta <- atan2((cylinder$start[crownset,2]-center_y),
+                   (cylinder$start[crownset,1]-center_x))
     minimums <- c()
     for (i in 2:length(bins)){
       indices_bin <- (theta < bins[i] & theta >= bins[(i-1)])
       if(sum(indices_bin)>0){
-        minimums <- append(minimums,min(cylinder$start[crownset[indices_bin],3]))
+        minimums <- append(minimums,
+                           min(cylinder$start[crownset[indices_bin],3]))
       }
     }
     if(length(minimums)==length(bins)){
-      ce <- (min(minimums)-min(cylinder$start[,3]))/(max(minimums)-min(cylinder$start[,3]))
+      ce <- (min(minimums)-min(cylinder$start[,3]))/
+        (max(minimums)-min(cylinder$start[,3]))
     } else {
       ce <- 0
     }
@@ -1009,9 +1014,9 @@ crown_evenness <- function(cylinder){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' radii <- vertical_bin_radii(qsm$treedata,qsm$cylinder)
+#' radii <- vertical_bin_radii_qsm(qsm$treedata,qsm$cylinder)
 #' }
-vertical_bin_radii <- function(treedata,cylinder){
+vertical_bin_radii_qsm <- function(treedata,cylinder){
   dbh <- dbh_qsm(treedata)
   sx <- cylinder$start[,1]
   sy <- cylinder$start[,2]
@@ -1141,10 +1146,10 @@ vertical_bin_radii <- function(treedata,cylinder){
 #' TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020).
 #'
 #' The crown diameter is the maximum radii of the vertical bin radius estimates
-#' that are calculated with \code{\link{vertical_bin_radii}}. The crown height
-#' is the vertical distance between the highest and the lowest crown cylinder
-#' and is obtained from \code{\link{crown_height}} multiplied with the
-#' tree_height.
+#' that are calculated with \code{\link{vertical_bin_radii_qsm}}. The crown
+#' height is the vertical distance between the highest and the lowest crown
+#' cylinder and is obtained from \code{\link{crown_height_qsm}} multiplied with
+#' the tree_height.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -1171,15 +1176,16 @@ vertical_bin_radii <- function(treedata,cylinder){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' cdh_ratio <- crown_diameterheight_ratio(qsm$treedata,qsm$cylinder,crown)
+#' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' cdh_ratio <- crown_diameterheight_ratio(qsm$treedata,qsm$cylinder,crown,pc)
+#' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown,
+#'              pc)
 #' }
-crown_diameterheight_ratio <- function(treedata,cylinder,pc="NA"){
-  radii <- vertical_bin_radii(treedata,cylinder)
+crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc="NA"){
+  radii <- vertical_bin_radii_qsm(treedata,cylinder)
   diameter <- max(radii)*2
-  ch  <- crown_height(treedata,cylinder)
+  ch  <- crown_height_qsm(treedata,cylinder)
   tree_height <- tree_height(treedata,pc)
   height <- ch*tree_height
   return(diameter/height)
@@ -1193,7 +1199,8 @@ crown_diameterheight_ratio <- function(treedata,cylinder,pc="NA"){
 #' This ratio is defined as "Ratio between the DBH and the minimum of the
 #' vertical bin radius estimates" (Akerblom et al., 2017 & Terryn et al., 2020).
 #' The vertical bin radius estimates are calculated with
-#' \code{\link{vertical_bin_radii}}. DBH is calculated with \code{\link{dbh}}.
+#' \code{\link{vertical_bin_radii_qsm}}. DBH is calculated with
+#' \code{\link{dbh}}.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -1222,17 +1229,16 @@ crown_diameterheight_ratio <- function(treedata,cylinder,pc="NA"){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder)
+#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder,pc)
-#' dbh_rad_ratio <- dbh_minradius_ratio(qsm$treedata,qsm$cylinder,pc,TRUE)
+#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc)
+#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc,TRUE)
 #' }
-dbh_minradius_ratio <- function(treedata,cylinder,pc="NA",buttress=FALSE){
-  radii <- vertical_bin_radii(treedata,cylinder)
+dbh_minradius_ratio_qsm <- function(treedata,cylinder,pc="NA",buttress=FALSE){
+  radii <- vertical_bin_radii_qsm(treedata,cylinder)
   diameter <- min(radii)*2
   dbh <- dbh(treedata,pc,buttress)
   return(dbh/diameter)
 }
-
 

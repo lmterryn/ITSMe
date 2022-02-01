@@ -4,7 +4,12 @@
 \alias{stem_branch_radius_qsm}
 \title{Stem branch radius TreeQSM}
 \usage{
-stem_branch_radius_qsm(cylinder, treedata, normalisation = "no", pc = "NA")
+stem_branch_radius_qsm(
+  cylinder,
+  treedata,
+  normalisation = "treeheight",
+  pc = "NA"
+)
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
