@@ -33,6 +33,9 @@
 #'   example the n-th QSM that is made for tree 000). When multiple QSMs are
 #'   present for one tree the mean of the values of the different QSMs is taken
 #'   for that tree as a final value for a certain feature.
+#' @param version A character indicating the version of TreeQSM that was used to
+#'   produce the qsms. Default version is 2.4.0. Other possible versions are
+#'   2.2.0.
 #' @param PCs_path A charachter with the path to the folder that contains the
 #'   tree point clouds. Default is "NA" when the point clouds are not available.
 #'   The point clouds are used to determine the DBH, tree height, projected
@@ -60,11 +63,11 @@
 #' QSMs_path <- "path/to/folder/QSMs/"
 #' PCs_path <- "path/to/folder/PCs/"
 #' summary <- summary_Terryn_2020(QSMs_path)
-#' summary <- summary_Terryn_2020(QSMs_path,PCs_path,buttress=TRUE,
-#'            extension=".txt")
+#' summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
+#'                                buttress=TRUE,extension=".txt")
 #' }
-summary_Terryn_2020 <- function(QSMs_path,PCs_path="NA",buttress=FALSE,
-                                extension=".txt"){
+summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
+                                buttress=FALSE,extension=".txt"){
   filenames <- list.files(QSMs_path, pattern="*.mat", full.names=FALSE)
   unique_tree_ids <- c()
   tree_ids <- c()
@@ -112,9 +115,9 @@ summary_Terryn_2020 <- function(QSMs_path,PCs_path="NA",buttress=FALSE,
     trees <- df
     for (j in 1:length(qsms)){
       print(paste("processing ", unique_tree_ids[i], as.character(j)))
-      qsm <- read_tree_qsm(paste(QSMs_path,qsms[j],sep = ""))
-      h <- tree_height(qsm,pc)
-      dbh <- dbh(qsm,pc,buttress)
+      qsm <- read_tree_qsm(paste(QSMs_path,qsms[j],sep = ""),version)
+      h <- tree_height(qsm$treedata,pc)
+      dbh <- dbh(qsm$treedata,pc,buttress)
       sba <- stem_branch_angle_qsm(qsm$branch)
       sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
       sbr <- stem_branch_radius_qsm(qsm$cylinder,qsm$treedata,"treeheight",pc)

@@ -6,6 +6,7 @@
 \usage{
 summary_Terryn_2020(
   QSMs_path,
+  version = "2.4.0",
   PCs_path = "NA",
   buttress = FALSE,
   extension = ".txt"
@@ -18,6 +19,10 @@ plotname, 000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for
 example the n-th QSM that is made for tree 000). When multiple QSMs are
 present for one tree the mean of the values of the different QSMs is taken
 for that tree as a final value for a certain feature.}
+
+\item{version}{A character indicating the version of TreeQSM that was used to
+produce the qsms. Default version is 2.4.0. Other possible versions are
+2.2.0.}
 
 \item{PCs_path}{A charachter with the path to the folder that contains the
 tree point clouds. Default is "NA" when the point clouds are not available.
@@ -71,8 +76,8 @@ area and crown volume are determined with \code{\link{tree_height}},
 QSMs_path <- "path/to/folder/QSMs/"
 PCs_path <- "path/to/folder/PCs/"
 summary <- summary_Terryn_2020(QSMs_path)
-summary <- summary_Terryn_2020(QSMs_path,PCs_path,buttress=TRUE,
-           extension=".txt")
+summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
+                               buttress=TRUE,extension=".txt")
 }
 }
 \references{
