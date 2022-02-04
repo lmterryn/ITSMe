@@ -1,10 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# <img src="man/figures/logo.png" align="left" height="100" />
+# <img src="man/figures/logo.png" align="center" height="200" />
 
 <!-- badges: start -->
 <!-- badges: end -->
+
+# Goal
 
 The goal of the ITSMe package is to provide easy to use functions to
 quickly obtain structural metrics from tree point clouds and their
