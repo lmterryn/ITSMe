@@ -556,7 +556,7 @@ volume_below_55_qsm <- function(cylinder, treedata){
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
-#' @return The cylinder length volume ratio.
+#' @return The cylinder length volume ratio in meters-2.
 #'
 #' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
 #'   (2017). Automatic tree species recognition with quantitative structure
