@@ -30,7 +30,7 @@ quantitative structure models (QSMs) obtained with TreeQSM
 
 ## Individual tree structural metrics
 
-structural metrics which can be calculated with the ITSMe package are
+Structural metrics which can be calculated with the ITSMe package are
 summarized in the tables below.
 
 ### Basic structural metrics
@@ -42,6 +42,11 @@ summarized in the tables below.
 | tree height (m)                      | tree_height_pc, tree height_qsm | point cloud, QSM |
 | projected crown area (m<sup>2</sup>) |     projected_crown_area_pc     |      point cloud |
 | crown volume (m<sup>3</sup>)         |         volume_crown_pc         |      point cloud |
+| tree volume (m<sup>3</sup>)          |         tree_volume_qsm         |              QSM |
+| trunk volume (m<sup>3</sup>)         |        trunk_volume_qsm         |              QSM |
+| total branch volume (m<sup>3</sup>)  |     total_branch_volume_qsm     |              QSM |
+| total branch length (m)              |     total_branch_length_qsm     |              QSM |
+| total cylinder length (m)            |      total_cyl_length_qsm       |              QSM |
 
 ### Structural metrics from Terryn et al. (2020)
 
@@ -81,3 +86,17 @@ rather than the dbh is used.
 | dbh minimum tree radius ratio                 |     dbh_minradius_ratio_qsm      | QSM (+point cloud) |
 
 ## Example
+
+Calculating the diameter above buttresses
+
+``` r
+library(ITSMe)
+#Specify path to the tree point cloud file
+PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
+#Read the point cloud file
+pc <- read_tree_pc(PC_path)
+#Use dab_pc function with default parameters and plot the fit
+dab <- dab_pc(pc,0.001,9,TRUE)
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />

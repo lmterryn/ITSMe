@@ -11,7 +11,7 @@ cylinder_length_volume_ratio_qsm(treedata)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The cylinder length volume ratio.
+The cylinder length volume ratio in meters-2.
 }
 \description{
 Calculates the cylinder length volume ratio from a TreeQSM.

@@ -1,8 +1,7 @@
 #' Summary features Terryn et al. (2020)
 #'
-#' Returns a summary data.frame containing the tree height, dbh and the metrics
-#' defined by Terryn et al. (2020). Also contains the projected crown area and
-#' crown volume (NaN when point clouds are not available).
+#' Returns a summary data.frame containing all the metrics defined by Terryn et
+#' al. (2020).
 #'
 #' Metrics Terryn et al. (2020): stem branch angle (sba,
 #' \code{\link{stem_branch_angle_qsm}}), stem branch cluster size (sbcs,
@@ -21,11 +20,9 @@
 #' \code{\link{crown_height_qsm}}), crown evenness (ce,
 #' \code{\link{crown_evenness_qsm}}), crown diameter height ratio (cdhr,
 #' \code{\link{crown_diameterheight_ratio_qsm}}), dbh minimum radius ratio (dmr,
-#' \code{\link{dbh_minradius_ratio_qsm}}). Tree height, DBH, crown projection
-#' area and crown volume are determined with \code{\link{tree_height}},
-#' \code{\link{dbh}}, \code{\link{projected_crown_area_pc}} and
-#' \code{\link{volume_crown_pc}}. All functions are run with default parameters
-#' (except for the parameters pc and buttress if point clouds are available.)
+#' \code{\link{dbh_minradius_ratio_qsm}}). All functions are run with default
+#' parameters (except for the parameters pc and buttress if point clouds are
+#' available.)
 #'
 #' @param QSMs_path A charachter with the path to the folder that contains the
 #'   treeQSMs. These files have to be of the format xxx_000_qsm.mat (xxx is the
@@ -78,11 +75,7 @@ summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
     }
     tree_ids <- append(tree_ids,id)
   }
-  df <- data.frame(height=double(),
-                   dbh=double(),
-                   pca=double(),
-                   cv=double(),
-                   sba=double(),
+  df <- data.frame(sba=double(),
                    sbcs=double(),
                    sbr=double(),
                    sbl=double(),
@@ -105,19 +98,13 @@ summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
     qsms <- filenames[tree_ids == unique_tree_ids[i]]
     if (PCs_path != "NA"){
       pc <- read_tree_pc(paste(PCs_path,unique_tree_ids[i],"_pc",extension,sep = ""))
-      pca <- projected_crown_area_pc(pc)
-      vol <- volume_crown_pc(pc)
     } else {
       pc <- "NA"
-      pca <- NaN
-      vol <- NaN
     }
     trees <- df
     for (j in 1:length(qsms)){
       print(paste("processing ", unique_tree_ids[i], as.character(j)))
       qsm <- read_tree_qsm(paste(QSMs_path,qsms[j],sep = ""),version)
-      h <- tree_height(qsm$treedata,pc)
-      dbh <- dbh(qsm$treedata,pc,buttress)
       sba <- stem_branch_angle_qsm(qsm$branch)
       sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
       sbr <- stem_branch_radius_qsm(qsm$cylinder,qsm$treedata,"treeheight",pc)
@@ -136,11 +123,7 @@ summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
       ce <- crown_evenness_qsm(qsm$cylinder)
       cdhr <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,pc)
       dmr <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc,buttress)
-      tree <- data.frame(height=h,
-                         dbh=dbh,
-                         pca=pca,
-                         cv=vol,
-                         sba=sba,
+      tree <- data.frame(sba=sba,
                          sbcs=sbcs,
                          sbr=sbr,
                          sbl=sbl,

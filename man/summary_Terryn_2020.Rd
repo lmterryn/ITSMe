@@ -43,9 +43,8 @@ relevant if the tree point clouds are available.}
 The summary of all metrics from Terryn et al. (2020) as a data.frame.
 }
 \description{
-Returns a summary data.frame containing the tree height, dbh and the metrics
-defined by Terryn et al. (2020). Also contains the projected crown area and
-crown volume (NaN when point clouds are not available).
+Returns a summary data.frame containing all the metrics defined by Terryn et
+al. (2020).
 }
 \details{
 Metrics Terryn et al. (2020): stem branch angle (sba,
@@ -65,11 +64,9 @@ Metrics Terryn et al. (2020): stem branch angle (sba,
 \code{\link{crown_height_qsm}}), crown evenness (ce,
 \code{\link{crown_evenness_qsm}}), crown diameter height ratio (cdhr,
 \code{\link{crown_diameterheight_ratio_qsm}}), dbh minimum radius ratio (dmr,
-\code{\link{dbh_minradius_ratio_qsm}}). Tree height, DBH, crown projection
-area and crown volume are determined with \code{\link{tree_height}},
-\code{\link{dbh}}, \code{\link{projected_crown_area_pc}} and
-\code{\link{volume_crown_pc}}. All functions are run with default parameters
-(except for the parameters pc and buttress if point clouds are available.)
+\code{\link{dbh_minradius_ratio_qsm}}). All functions are run with default
+parameters (except for the parameters pc and buttress if point clouds are
+available.)
 }
 \examples{
 \dontrun{
