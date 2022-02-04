@@ -1,16 +1,16 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# <img src="man/figures/logo.png" align="center" height="200" />
-
+<p align="center">
+<img src="man/figures/logo.png" height="200" >
+</p>
 <!-- badges: start -->
 <!-- badges: end -->
 
-# Goal
+## Goal
 
 The goal of the ITSMe package is to provide easy to use functions to
-quickly obtain structural metrics from tree point clouds and their
-respective TreeQSMs obtained with version 2.4.0 of TreeQSM
+quickly obtain structural metrics from individual tree point clouds and
+their respective TreeQSMs obtained with TreeQSM
 (<https://github.com/InverseTampere/TreeQSM>).
 
 ## Installation
