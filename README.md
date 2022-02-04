@@ -33,4 +33,10 @@ quantitative structure models (QSMs) obtained with TreeQSM
 The structural metrics which can be calculated with this package are
 summarized in the tables below:
 
+| structural metric         |      function name      |
+|---------------------------|:-----------------------:|
+| diameter at breast height |         dbh_pc          |
+| tree height               |     tree_height_pc      |
+| projected crown area      | projected_crown_area_pc |
+
 ## Example
