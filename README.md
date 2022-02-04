@@ -33,12 +33,12 @@ quantitative structure models (QSMs) obtained with TreeQSM
 The structural metrics which can be calculated with the ITSMe package
 are summarized in the tables below:
 
-structural metric \| function name \| input \|  
-——————————\|:————————–:——-\|——————–\|  
-diameter at breast height \| dbh_pc, dbh_qsm \| point cloud, QSM \|  
-diameter above buttresses \| dab_pc \| point cloud \|  
-tree height \| tree_height_pc, tree height_qsm \| point cloud, QSM \|  
-projected crown area \| projected_crown_area_pc \| point cloud \|  
-crown volume (m<sup>3</sup>) \| volume_crown_pc \| point cloud \|
+| structural metric            |          function name          |            input |
+|------------------------------|:-------------------------------:|-----------------:|
+| diameter at breast height    |         dbh_pc, dbh_qsm         | point cloud, QSM |
+| diameter above buttresses    |             dab_pc              |      point cloud |
+| tree height                  | tree_height_pc, tree height_qsm | point cloud, QSM |
+| projected crown area         |     projected_crown_area_pc     |      point cloud |
+| crown volume (m<sup>3</sup>) |         volume_crown_pc         |      point cloud |
 
 ## Example
