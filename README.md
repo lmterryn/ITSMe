@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ITSMe <img src="man/figures/logo.png" align="right" height="47" />
+# <img src="man/figures/logo.png" align="left" height="100" />
 
 <!-- badges: start -->
 <!-- badges: end -->
