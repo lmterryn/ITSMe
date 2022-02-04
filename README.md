@@ -6,14 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-``` r
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
+# ITSMe <img src="man/figures/logo.png" align="right" height="47" />
 
 The goal of the ITSMe package is to provide easy to use functions to
 quickly obtain structural metrics from tree point clouds and their
