@@ -85,9 +85,9 @@ rather than the dbh is used.
 | crown diameter crown height ratio             |  crown_diameterheight_ratio_qsm  | QSM (+point cloud) |
 | dbh minimum tree radius ratio                 |     dbh_minradius_ratio_qsm      | QSM (+point cloud) |
 
-## Example
+## Examples
 
-Calculating the diameter above buttresses
+Calculating the diameter above buttresses of a tree:
 
 ``` r
 library(ITSMe)
@@ -100,3 +100,49 @@ dab <- dab_pc(pc,0.001,9,TRUE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+Calculating the stem branch distance of a TreeQSM:
+
+``` r
+library(ITSMe)
+#Specify path to the TreeQSM file
+QSM_path <- system.file("extdata", "example_qsm_1_1.mat", package = "ITSMe")
+#Read the TreeQSM file
+qsm <- read_tree_qsm(QSM_path)
+#Use stem_branch_distance_qsm function
+sbd <- stem_branch_distance_qsm(qsm$cylinder,qsm$treedata,
+                                normalisation="dbh")
+#Using the point cloud information for more accurate dbh normalisation
+PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
+pc <- read_tree_pc(PC_path)
+sbd <- stem_branch_distance_qsm(qsm$cylinder,qsm$treedata,
+                                normalisation="dbh",pc = pc,buttress = TRUE)
+```
+
+Calculating a summary data.frame with the basic structural metrics (tree
+position, dbh, dab, tree height, projected crown area, crown volume)
+that can be obtained from individual tree point clouds for all point
+clouds in a specific folder:
+
+``` r
+library(ITSMe)
+#Specify the path to the folder containing multiple tree point cloud files
+PCs_path <- "path/to/point/cloud/folder/"
+#Run summary function 
+basic_summary <- summary_basic_pointcloud_metrics(PCs_path, extension = ".txt")
+```
+
+Calculating a summary data.frame with the structural metrics defined by
+Terryn et al. (2020) for all TreeQSMs in a specific folder:
+
+``` r
+library(ITSMe)
+#Specify the path to the folder containing the respective tree point cloud files
+QSMs_path <- "path/to/QSM/folder/"
+#If you cant DBH/DAB and height to be calculated based on tree point clouds:
+#Specify the path to the folder containing the respective tree point cloud files
+PCs_path <- "path/to/point/cloud/folder/"
+#Run summary function 
+Terryn_summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
+                                      buttress=true,extension=".txt")
+```

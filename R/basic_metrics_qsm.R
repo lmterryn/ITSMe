@@ -1,12 +1,12 @@
 #' TreeQSM position
 #'
-#' Returns the position of a treeQSM based on the start position of the first
-#' cylinder that is higher than 1.3 m above ground.
+#' Returns the (X,Y)-position of a treeQSM based on the start position of the
+#' first cylinder that is higher than 1.3 m above ground.
 #'
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
-#' @return The XY coordinates (location) of the tree stem.
+#' @return Numeric with the XY coordinates (location) of the tree stem.
 #' @export
 #'
 #' @examples

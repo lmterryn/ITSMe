@@ -11,11 +11,11 @@ tree_position_qsm(cylinder)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The XY coordinates (location) of the tree stem.
+Numeric with the XY coordinates (location) of the tree stem.
 }
 \description{
-Returns the position of a treeQSM based on the start position of the first
-cylinder that is higher than 1.3 m above ground.
+Returns the (X,Y)-position of a treeQSM based on the start position of the
+first cylinder that is higher than 1.3 m above ground.
 }
 \examples{
 \dontrun{

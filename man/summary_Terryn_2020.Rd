@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_metrics.R
 \name{summary_Terryn_2020}
 \alias{summary_Terryn_2020}
-\title{Summary features Terryn et al. (2020)}
+\title{Summary structural metrics Terryn et al. (2020)}
 \usage{
 summary_Terryn_2020(
   QSMs_path,
@@ -13,7 +13,7 @@ summary_Terryn_2020(
 )
 }
 \arguments{
-\item{QSMs_path}{A charachter with the path to the folder that contains the
+\item{QSMs_path}{A character with the path to the folder that contains the
 treeQSMs. These files have to be of the format xxx_000_qsm.mat (xxx is the
 plotname, 000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for
 example the n-th QSM that is made for tree 000). When multiple QSMs are
@@ -24,7 +24,7 @@ for that tree as a final value for a certain feature.}
 produce the qsms. Default version is 2.4.0. Other possible versions are
 2.2.0.}
 
-\item{PCs_path}{A charachter with the path to the folder that contains the
+\item{PCs_path}{A character with the path to the folder that contains the
 tree point clouds. Default is "NA" when the point clouds are not available.
 The point clouds are used to determine the DBH, tree height, projected
 crown area and crown volume. The DBH and tree height obtained from the tree

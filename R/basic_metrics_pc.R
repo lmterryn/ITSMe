@@ -1,3 +1,29 @@
+#' Tree point cloud position
+#'
+#' Returns the (X,Y)-position of a tree point cloud based on the mean X and Y
+#' value of the points within a 6mm thick horizontal slice at breast height
+#' (from 1.27 m to 1.33 m above the lowest tree point).
+#'
+#' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
+#'   \code{\link{read_tree_pc}}.
+#'
+#' @return Numeric with the XY coordinates (location) of the tree stem.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
+#' pos <- tree_position_pc(pc)
+#' }
+tree_position_pc <- function(pc){
+  pc_bh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33),]
+  X_mean <- mean(pc_bh$X)
+  Y_mean <- mean(pc_bh$Y)
+  return(c(X_mean,Y_mean))
+}
+
 #' Tree height point cloud
 #'
 #' Returns the tree height measured from a tree point cloud.
