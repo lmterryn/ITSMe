@@ -87,7 +87,8 @@ rather than the dbh is used.
 
 ## Examples
 
-Calculating the diameter above buttresses of a tree:
+Calculating the diameter at breast height versus the diameter above
+buttresses of a tree:
 
 ``` r
 library(ITSMe)
@@ -95,12 +96,19 @@ library(ITSMe)
 PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
 #Read the point cloud file
 pc <- read_tree_pc(path = PC_path)
+#Use dbh_pc function with default parameters and plot the fit
+dbh <- dbh_pc(pc = pc,plot = TRUE)
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+``` r
 #Use dab_pc function with default parameters and plot the fit
 dab <- dab_pc(pc = pc,thresholdbuttress = 0.001,maxbuttressheight = 9,
               plot = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
 
 Calculating the stem branch distance of a TreeQSM:
 
