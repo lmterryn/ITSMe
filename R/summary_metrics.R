@@ -95,9 +95,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
 #' \code{\link{crown_height_qsm}}), crown evenness (ce,
 #' \code{\link{crown_evenness_qsm}}), crown diameter height ratio (cdhr,
 #' \code{\link{crown_diameterheight_ratio_qsm}}), dbh minimum radius ratio (dmr,
-#' \code{\link{dbh_minradius_ratio_qsm}}). All functions are run with default
-#' parameters (except for the parameters pc and buttress if point clouds are
-#' available.)
+#' \code{\link{dbh_minradius_ratio_qsm}}).
 #'
 #' @param QSMs_path A character with the path to the folder that contains the
 #'   treeQSMs. These files have to be of the format xxx_000_qsm.mat (xxx is the
@@ -120,6 +118,23 @@ summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 #'   relevant if the tree point clouds are available.
+#' @param sbr_normalisation Character (default="treeheight"). Normalisation
+#'   parameter of \code{\link{stem_branch_radius_qsm}}.
+#' @param sbl_normalisation Character (default="treeheight"). Normalisation
+#'   parameter of \code{\link{stem_branch_length_qsm}}.
+#' @param sbd_normalisation Character (default="no"). Normalisation
+#'   parameter of \code{\link{stem_branch_distance_qsm}}.
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses.
+#' @param maxbuttressheight Numeric value (default=9). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height.
+#' @param concavity Numeric value (default=2). Parameter of the
+#'   \code{\link{projected_crown_area_pc}} function used to calculate the
+#'   projected crown area.
+#' @param alpha Numeric value (default=1). Parameter of the
+#'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
 #'
 #' @return The summary of all metrics from Terryn et al. (2020) as a data.frame.
 #'
@@ -137,9 +152,20 @@ summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
 #' summary <- summary_Terryn_2020(QSMs_path)
 #' summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
 #'                                buttress=TRUE,extension=".txt")
+#' summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
+#'                                buttress=TRUE,extension=".txt",
+#'                                sbr_normalisation="dbh",
+#'                                sbl_normalisation="treeheight",
+#'                                sbd_normalisation="no",
+#'                                thresholdbuttress=0.001,
+#'                                maxbuttressheight=9,concavity=2,alpha=1)
 #' }
 summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
-                                buttress=FALSE,extension=".txt"){
+                                buttress=FALSE,extension=".txt",
+                                sbr_normalisation="treeheight",
+                                sbl_normalisation="treeheight",
+                                sbd_normalisation="no",thresholdbuttress=0.001,
+                                maxbuttressheight=9,concavity=2,alpha=1){
   filenames <- list.files(QSMs_path, pattern="*.mat", full.names=FALSE)
   unique_tree_ids <- c()
   tree_ids <- c()
@@ -183,10 +209,12 @@ summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
       qsm <- read_tree_qsm(paste(QSMs_path,qsms[j],sep = ""),version)
       sba <- stem_branch_angle_qsm(qsm$branch)
       sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
-      sbr <- stem_branch_radius_qsm(qsm$cylinder,qsm$treedata,"treeheight",pc)
-      sbl <- stem_branch_length_qsm(qsm$branch,qsm$treedata,"treeheight",pc)
-      sbd <- stem_branch_distance_qsm(qsm$cylinder,qsm$treedata,"no",pc,
-                                      buttress)
+      sbr <- stem_branch_radius_qsm(qsm$cylinder,qsm$treedata,sbr_normalisation,
+                                    pc)
+      sbl <- stem_branch_length_qsm(qsm$branch,qsm$treedata,sbl_normalisation,
+                                    pc,buttress)
+      sbd <- stem_branch_distance_qsm(qsm$cylinder,qsm$treedata,
+                                      sbd_normalisation,pc,buttress)
       dhr <- dbh_height_ratio_qsm(qsm$treedata,pc,buttress)
       dvr <- dbh_volume_ratio_qsm(qsm$treedata,pc,buttress)
       vb55 <- volume_below_55_qsm(qsm$cylinder,qsm$treedata)

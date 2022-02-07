@@ -9,7 +9,14 @@ summary_Terryn_2020(
   version = "2.4.0",
   PCs_path = "NA",
   buttress = FALSE,
-  extension = ".txt"
+  extension = ".txt",
+  sbr_normalisation = "treeheight",
+  sbl_normalisation = "treeheight",
+  sbd_normalisation = "no",
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 9,
+  concavity = 2,
+  alpha = 1
 )
 }
 \arguments{
@@ -38,6 +45,30 @@ buttresses. Only relevant if the tree point clouds are available.}
 \item{extension}{A character refering to the file extension of the point
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 relevant if the tree point clouds are available.}
+
+\item{sbr_normalisation}{Character (default="treeheight"). Normalisation
+parameter of \code{\link{stem_branch_radius_qsm}}.}
+
+\item{sbl_normalisation}{Character (default="treeheight"). Normalisation
+parameter of \code{\link{stem_branch_length_qsm}}.}
+
+\item{sbd_normalisation}{Character (default="no"). Normalisation
+parameter of \code{\link{stem_branch_distance_qsm}}.}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses.}
+
+\item{maxbuttressheight}{Numeric value (default=9). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height.}
+
+\item{concavity}{Numeric value (default=2). Parameter of the
+\code{\link{projected_crown_area_pc}} function used to calculate the
+projected crown area.}
+
+\item{alpha}{Numeric value (default=1). Parameter of the
+\code{\link{volume_crown_pc}} function used to calculate the crown volume.}
 }
 \value{
 The summary of all metrics from Terryn et al. (2020) as a data.frame.
@@ -64,9 +95,7 @@ Metrics Terryn et al. (2020): stem branch angle (sba,
 \code{\link{crown_height_qsm}}), crown evenness (ce,
 \code{\link{crown_evenness_qsm}}), crown diameter height ratio (cdhr,
 \code{\link{crown_diameterheight_ratio_qsm}}), dbh minimum radius ratio (dmr,
-\code{\link{dbh_minradius_ratio_qsm}}). All functions are run with default
-parameters (except for the parameters pc and buttress if point clouds are
-available.)
+\code{\link{dbh_minradius_ratio_qsm}}).
 }
 \examples{
 \dontrun{
@@ -75,6 +104,13 @@ PCs_path <- "path/to/folder/PCs/"
 summary <- summary_Terryn_2020(QSMs_path)
 summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
                                buttress=TRUE,extension=".txt")
+summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
+                               buttress=TRUE,extension=".txt",
+                               sbr_normalisation="dbh",
+                               sbl_normalisation="treeheight",
+                               sbd_normalisation="no",
+                               thresholdbuttress=0.001,
+                               maxbuttressheight=9,concavity=2,alpha=1)
 }
 }
 \references{

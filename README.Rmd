@@ -152,7 +152,7 @@ QSMs_path <- "path/to/QSM/folder/"
 #If you cant DBH/DAB and height to be calculated based on tree point clouds:
 #Specify the path to the folder containing the respective tree point cloud files
 PCs_path <- "path/to/point/cloud/folder/"
-#Run summary function 
+#Run summary function with default parameter settings
 Terryn_summary <- summary_Terryn_2020(QSMs_path = QSMs_path,version = "2.4.0",
                                       PCs_path = PCs_path,buttress = TRUE, 
                                       extension = ".txt")
