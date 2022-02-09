@@ -18,6 +18,7 @@ Imports:
     ggforce,
     ggplot2,
     graphics,
+    grDevices,
     gridExtra,
     lidR,
     nabor,
