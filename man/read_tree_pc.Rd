@@ -9,8 +9,9 @@ read_tree_pc(path, samplefactor = 1)
 \arguments{
 \item{path}{A character with the path to the tree point cloud file. File can
 be \emph{txt}, \emph{las} or \emph{ply} format. The 3D coordinates have to
-be in the first three columns and there can be no header (in case of a txt
-file).}
+be in the first three columns and field separator needs to be whitespace
+(that is one or more spaces, tabs, newlines or carriage returns) in case of
+a \emph{txt} file.}
 
 \item{samplefactor}{A numeric value ranging from 0 to 1 (default=1). This
 determines the amount of points that are sampled from the point cloud. 1 to
