@@ -447,6 +447,29 @@ classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
   return(crown_pc)
 }
 
+#' Normalize a tree point cloud
+#'
+#' Normalizes a tree point cloud by subtracting from each column its respective
+#' the min value (e.g. all X-values - min(all X-values)).
+#'
+#' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
+#'   \code{\link{read_tree_pc}}.
+#'
+#' @return Normalized point cloud as a data.frame with columns X,Y,Z.
+#'
+#' @examples
+#' \dontrun{
+#' PC_path <- "path/to/point_cloud.txt"
+#' pc <- read_tree_pc(PC_path)
+#' pc_norm <- normalize_pc(pc)
+#' }
+normalize_pc <- function(pc){
+  pc$X <- pc$X - min(pc$X)
+  pc$Y <- pc$Y - min(pc$Y)
+  pc$Z <- pc$Z - min(pc$Z)
+  return(pc)
+}
+
 #' Projected crown area point cloud
 #'
 #' Returns the projected crown area measured from a tree point cloud.
@@ -528,7 +551,8 @@ projected_crown_area_pc <- function(pc, concavity=2, thresholdbranch=1.5,
 volume_crown_pc <- function(pc, alpha=1, thresholdbranch=1.5,minheight=4,
                             plot=FALSE){
   crown_pc <- classify_crown_pc(pc,thresholdbranch,minheight,FALSE)
-  crown_xyz <- data.matrix(unique(crown_pc[1:3]))
+  crown_pc_norm <- normalize_pc(crown_pc)
+  crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)
   if(plot){
     graphics::par(pty="s")
