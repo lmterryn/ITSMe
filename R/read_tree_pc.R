@@ -31,10 +31,10 @@
 #' pc <- read_tree_pc(PC_path)
 #' pc <- read_tree_pc(PC_path,0.2)
 #' }
-read_tree_pc <- function(path, samplefactor=1) {
+read_tree_pc <- function(path, samplefactor=1,header=FALSE,sep="") {
   extension <- utils::tail(strsplit(path, split=".", fixed=T)[[1]],1)
   if(extension == "txt") {
-    txt <- utils::read.table(path, header = FALSE)
+    txt <- utils::read.table(path, header=header,sep=sep)
     txt <- txt[1:3]
     pc <- data.frame("X" = txt$V1, "Y" = txt$V2, "Z" = txt$V3)
   } else if(extension == "las") {
