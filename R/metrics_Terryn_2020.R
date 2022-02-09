@@ -989,14 +989,6 @@ crown_evenness_qsm <- function(cylinder){
       ce <- 0
     }
   }
-  for (i in 1:length(Indices_Bin)){
-    b <- cylinder$start[crownset[Indices_Bin[[i]]],]
-    if(!is.null(nrow(b)) & nrow(b)>0){
-      plot(b[,1],b[,2],col=colors()[i+10])
-    } else if (length(b)>1) {
-      plot(b[1],b[2],col=colors()[i+10])
-    }
-  }
   return(ce)
 }
 
