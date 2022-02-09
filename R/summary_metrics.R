@@ -107,7 +107,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
 #'   produce the qsms. Default version is 2.4.0. Other possible versions are
 #'   2.2.0.
 #' @param PCs_path A character with the path to the folder that contains the
-#'   tree point clouds. Default is "NA" when the point clouds are not available.
+#'   tree point clouds. Default is NA when the point clouds are not available.
 #'   The point clouds are used to determine the DBH, tree height, projected
 #'   crown area and crown volume. The DBH and tree height obtained from the tree
 #'   point clouds are then used for the normalisation of the other features. The
@@ -160,7 +160,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
 #'                                thresholdbuttress=0.001,
 #'                                maxbuttressheight=9,concavity=2,alpha=1)
 #' }
-summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
+summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path=NA,
                                 buttress=FALSE,extension=".txt",
                                 sbr_normalisation="treeheight",
                                 sbl_normalisation="treeheight",
@@ -197,11 +197,11 @@ summary_Terryn_2020 <- function(QSMs_path,version="2.4.0",PCs_path="NA",
   for (i in 1:length(unique_tree_ids)){
     print(paste("processing ", unique_tree_ids[i]))
     qsms <- filenames[tree_ids == unique_tree_ids[i]]
-    if (PCs_path != "NA"){
+    if (!is.na(PCs_path)){
       pc <- read_tree_pc(paste(PCs_path,unique_tree_ids[i],"_pc",extension,
                                sep = ""))
     } else {
-      pc <- "NA"
+      pc <- NA
     }
     trees <- df
     for (j in 1:length(qsms)){

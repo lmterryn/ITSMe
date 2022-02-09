@@ -11,8 +11,8 @@
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
-#'   cloud is available.
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
+#'   is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
 #'
@@ -28,8 +28,8 @@
 #' pc <- read_tree_pc(PC_path)
 #' DBH <- dbh(qsm,pc,TRUE)
 #' }
-dbh <- function(treedata,pc="NA",buttress=FALSE){
-  if(is.character(pc)){
+dbh <- function(treedata,pc=NA,buttress=FALSE){
+  if(!is.data.frame(pc)){
     return(dbh_qsm(treedata))
   } else {
     if(buttress){
@@ -52,8 +52,8 @@ dbh <- function(treedata,pc="NA",buttress=FALSE){
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. If the point cloud is not available "NA" is
-#'   used as input (default="NA").
+#'   \code{\link{read_tree_pc}}. If the point cloud is not available NA is used
+#'   as input (default=NA).
 #'
 #' @return The tree height in meters.
 #' @export
@@ -67,8 +67,8 @@ dbh <- function(treedata,pc="NA",buttress=FALSE){
 #' pc <- read_tree_pc(PC_path)
 #' h <- tree_height(qsm,pc)
 #' }
-tree_height <- function(treedata,pc="NA"){
-  if(is.character(pc)){
+tree_height <- function(treedata,pc=NA){
+  if(!is.data.frame(pc)){
     return(tree_height_qsm(treedata))
   } else {
     return(tree_height_pc(pc))
@@ -86,7 +86,8 @@ tree_height <- function(treedata,pc="NA"){
 #' @param branch Branch field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
-#' @return The stem branch angle in degrees.
+#' @return The stem branch angle in degrees. NaN when there are no stem
+#'   branches.
 #'
 #' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
 #'   (2017). Automatic tree species recognition with quantitative structure
@@ -107,8 +108,13 @@ tree_height <- function(treedata,pc="NA"){
 #' }
 stem_branch_angle_qsm <- function(branch) {
   indices_stem_branches <- which(branch$order == 1)
-  angle_stem_branches <- branch$angle[indices_stem_branches]
-  return(stats::median(angle_stem_branches))
+  if (length(indices_stem_branches) > 0){
+    angle_stem_branches <- branch$angle[indices_stem_branches]
+    sba <- stats::median(angle_stem_branches)
+  } else {
+    sba <- NaN
+  }
+  return(sba)
 }
 
 #' Stem branch cluster size TreeQSM
@@ -123,7 +129,7 @@ stem_branch_angle_qsm <- function(branch) {
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
-#' @return The stem branch cluster size.
+#' @return The stem branch cluster size. NaN when there are no stem branches.
 #'
 #' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
 #'   (2017). Automatic tree species recognition with quantitative structure
@@ -145,29 +151,34 @@ stem_branch_angle_qsm <- function(branch) {
 stem_branch_cluster_size_qsm <- function(cylinder) {
   indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
                                   & cylinder$BranchOrder == 1)
-  cylinder_heights <- cylinder$start[indices_stem_cylinders,3]
-  cylinder_heights <- cylinder_heights[order(cylinder_heights)]
-  start_heights <- cylinder_heights - 0.2
-  end_heights <- cylinder_heights + 0.2
-  label <- integer(length(cylinder_heights))
-  cluster <- c()
-  for(i in 1:length(cylinder_heights)) {
-    indices_in_interval <- which(cylinder_heights > start_heights[i]
-                                 & cylinder_heights < end_heights[i])
-    number_clusters <- 0
-    for(j in 1:length(indices_in_interval)) {
-      if (label[indices_in_interval[j]] == 1) {
-        #do nothing
-      } else if(label[indices_in_interval[j]] == 0) {
-        label[indices_in_interval[j]] <- 1
-        number_clusters <- number_clusters + 1
+  if (length(indices_stem_cylinders) > 0){
+    cylinder_heights <- cylinder$start[indices_stem_cylinders,3]
+    cylinder_heights <- cylinder_heights[order(cylinder_heights)]
+    start_heights <- cylinder_heights - 0.2
+    end_heights <- cylinder_heights + 0.2
+    label <- integer(length(cylinder_heights))
+    cluster <- c()
+    for(i in 1:length(cylinder_heights)) {
+      indices_in_interval <- which(cylinder_heights > start_heights[i]
+                                   & cylinder_heights < end_heights[i])
+      number_clusters <- 0
+      for(j in 1:length(indices_in_interval)) {
+        if (label[indices_in_interval[j]] == 1) {
+          #do nothing
+        } else if(label[indices_in_interval[j]] == 0) {
+          label[indices_in_interval[j]] <- 1
+          number_clusters <- number_clusters + 1
+        }
+      }
+      if(length(indices_in_interval) > 0 & number_clusters>0){
+        cluster <- append(cluster,number_clusters)
       }
     }
-    if(length(indices_in_interval) > 0 & number_clusters>0){
-      cluster <- append(cluster,number_clusters)
-    }
+    sbcs <- mean(cluster)
+  } else {
+    sbcs <- NaN
   }
-  return(mean(cluster))
+  return(sbcs)
 }
 
 #' Stem branch radius TreeQSM
@@ -191,11 +202,11 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #'   different than "treeheight" or "parentcylinder" is given, no normalisation
 #'   is done. Default is no normalisation.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
-#'   cloud is available. Only relevant if normalisation equals "treeheight".
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
+#'   is available. Only relevant if normalisation equals "treeheight".
 #'
 #' @return The stem branch radius. Unitless with normalisation, in meters
-#'   without normalisation.
+#'   without normalisation.  NaN when there are no stem branches.
 #'
 #' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
 #'   (2017). Automatic tree species recognition with quantitative structure
@@ -219,7 +230,7 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,"treeheight",pc)
 #' }
 stem_branch_radius_qsm <- function(cylinder, treedata,
-                                   normalisation="treeheight", pc="NA") {
+                                   normalisation="treeheight", pc=NA) {
   indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
                                   & cylinder$BranchOrder == 1)
   if(length(indices_stem_cylinders) > 0) {
@@ -272,7 +283,7 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #'   "treeheight" is given, no normalisation is done. Default is no
 #'   normalisation.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available. Only relevant if normalisation equals "dbh" or
 #'   "treeheight".
 #' @param buttress Logical (default=FALSE), indicates if the trees have
@@ -280,7 +291,7 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #'   "dbh".
 #'
 #' @return The stem branch length. Unitless with normalisation, in meters
-#'   without normalisation.
+#'   without normalisation. NaN when there are no stem branches.
 #'
 #' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
 #'   (2017). Automatic tree species recognition with quantitative structure
@@ -304,7 +315,7 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #' sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "dbh", pc, TRUE)
 #' }
 stem_branch_length_qsm <- function(branch, treedata, normalisation="treeheight",
-                                   pc="NA", buttress=FALSE) {
+                                   pc=NA, buttress=FALSE) {
   indices_stem_branches <- which(branch$order == 1)
   if (length(indices_stem_branches) > 0) {
     branch_lengths=branch$length[indices_stem_branches]
@@ -342,14 +353,14 @@ stem_branch_length_qsm <- function(branch, treedata, normalisation="treeheight",
 #' @param normalisation Can either be "dbh" or nothing. In case of "dbh" the
 #'   average distance is divided by the DBH (Akerblom et al., 2017).
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available. Only relevant if normalisation equals "dbh".
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available and normalisation equals
 #'   "dbh".
 #'
 #' @return The stem branch distance. Unitless with normalisation, in meters
-#'   without normalisation.
+#'   without normalisation. NaN when there are no stem branches.
 #'
 #' @references Akerblom, M., Raumonen, P., Makipaa, R., & Kaasalainen, M.
 #'   (2017). Automatic tree species recognition with quantitative structure
@@ -373,7 +384,7 @@ stem_branch_length_qsm <- function(branch, treedata, normalisation="treeheight",
 #' sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh", pc, TRUE)
 #' }
 stem_branch_distance_qsm <- function(cylinder, treedata, normalisation="no",
-                                     pc="NA", buttress=FALSE) {
+                                     pc=NA, buttress=FALSE) {
   indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
                                   & cylinder$BranchOrder == 1)
   cylinder_heights <- cylinder$start[indices_stem_cylinders,3]
@@ -422,7 +433,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation="no",
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
@@ -450,7 +461,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation="no",
 #' ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc)
 #' ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc, TRUE)
 #' }
-dbh_height_ratio_qsm <- function(treedata,pc="NA",buttress=FALSE){
+dbh_height_ratio_qsm <- function(treedata,pc=NA,buttress=FALSE){
   dbh <- dbh(treedata,pc,buttress)
   tree_height <- tree_height(treedata,pc)
   return(dbh/tree_height)
@@ -466,7 +477,7 @@ dbh_height_ratio_qsm <- function(treedata,pc="NA",buttress=FALSE){
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
@@ -494,7 +505,7 @@ dbh_height_ratio_qsm <- function(treedata,pc="NA",buttress=FALSE){
 #' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc)
 #' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc,TRUE)
 #' }
-dbh_volume_ratio_qsm <- function(treedata,pc="NA",buttress=FALSE){
+dbh_volume_ratio_qsm <- function(treedata,pc=NA,buttress=FALSE){
   dbh <- dbh(treedata,pc,buttress)
   volume <- tree_volume_qsm(treedata)
   return(dbh/volume)
@@ -820,7 +831,7 @@ crownset_qsm <- function(cylinder){
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #'
 #' @return The crown start height.
@@ -845,7 +856,7 @@ crownset_qsm <- function(cylinder){
 #' pc <- read_tree_pc(PC_path)
 #' csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder,pc)
 #' }
-crown_start_height_qsm <- function(treedata,cylinder,pc="NA"){
+crown_start_height_qsm <- function(treedata,cylinder,pc=NA){
   crownset <- crownset_qsm(cylinder)
   tree_height <- tree_height(treedata,pc)
   crownset_parent0 <- crownset[cylinder$BranchOrder
@@ -874,7 +885,7 @@ crown_start_height_qsm <- function(treedata,cylinder,pc="NA"){
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #'
 #' @return The crown height.
@@ -899,7 +910,7 @@ crown_start_height_qsm <- function(treedata,cylinder,pc="NA"){
 #' pc <- read_tree_pc(PC_path)
 #' ch <- crown_height_qsm(qsm$treedata,qsm$cylinder,pc)
 #' }
-crown_height_qsm <- function(treedata,cylinder,pc="NA"){
+crown_height_qsm <- function(treedata,cylinder,pc=NA){
   crownset <- crownset_qsm(cylinder)
   tree_height <- tree_height(treedata,pc)
   if(length(crownset)>0){
@@ -962,8 +973,10 @@ crown_evenness_qsm <- function(cylinder){
     theta <- atan2((cylinder$start[crownset,2]-center_y),
                    (cylinder$start[crownset,1]-center_x))
     minimums <- c()
+    Indices_Bin <- c()
     for (i in 2:length(bins)){
       indices_bin <- (theta < bins[i] & theta >= bins[(i-1)])
+      Indices_Bin <- append(Indices_Bin,list(indices_bin))
       if(sum(indices_bin)>0){
         minimums <- append(minimums,
                            min(cylinder$start[crownset[indices_bin],3]))
@@ -974,6 +987,14 @@ crown_evenness_qsm <- function(cylinder){
         (max(minimums)-min(cylinder$start[,3]))
     } else {
       ce <- 0
+    }
+  }
+  for (i in 1:length(Indices_Bin)){
+    b <- cylinder$start[crownset[Indices_Bin[[i]]],]
+    if(!is.null(nrow(b)) & nrow(b)>0){
+      plot(b[,1],b[,2],col=colors()[i+10])
+    } else if (length(b)>1) {
+      plot(b[1],b[2],col=colors()[i+10])
     }
   }
   return(ce)
@@ -1156,7 +1177,7 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #'
 #' @return The ratio of the crown diameter and crown height.
@@ -1182,7 +1203,7 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
 #' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown,
 #'              pc)
 #' }
-crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc="NA"){
+crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc=NA){
   radii <- vertical_bin_radii_qsm(treedata,cylinder)
   diameter <- max(radii)*2
   ch  <- crown_height_qsm(treedata,cylinder)
@@ -1207,7 +1228,7 @@ crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc="NA"){
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
@@ -1235,7 +1256,7 @@ crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc="NA"){
 #' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc)
 #' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc,TRUE)
 #' }
-dbh_minradius_ratio_qsm <- function(treedata,cylinder,pc="NA",buttress=FALSE){
+dbh_minradius_ratio_qsm <- function(treedata,cylinder,pc=NA,buttress=FALSE){
   radii <- vertical_bin_radii_qsm(treedata,cylinder)
   diameter <- min(radii)*2
   dbh <- dbh(treedata,pc,buttress)
