@@ -4,7 +4,7 @@
 #' point cloud as a data.frame with 3 columns (X,Y,Z).
 #'
 #' Reading the txt, las and ply files is based on
-#' \code{\link[utils]{read.table}}, \code{\link[lidR]{readTLSLAS}} and
+#' \code{\link[data.table]{fread}}, \code{\link[lidR]{readTLSLAS}} and
 #' \code{\link[Rvcg]{vcgPlyRead}} respectively. Sampling is based on
 #' \code{\link[base]{sample}} and is mainly a useful tool to reduce the amount
 #' of points for quicker plotting.
@@ -35,14 +35,9 @@
 read_tree_pc <- function(path, samplefactor=1) {
   extension <- utils::tail(strsplit(path, split=".", fixed=T)[[1]],1)
   if(extension == "txt") {
-    first_line <- utils::read.table(path, nrows=1)
-    if(is.character(first_line[[1]])){
-      txt <- utils::read.table(path, skip=1)
-    } else {
-      txt <- utils::read.table(path)
-    }
-    txt <- txt[1:3]
-    pc <- data.frame("X" = txt$V1, "Y" = txt$V2, "Z" = txt$V3)
+    txt <- data.table::fread(path)
+    pc <- data.frame(txt[,1:3])
+    colnames(pc) <- c("X","Y","Z")
   } else if(extension == "las") {
     las <- lidR::readTLSLAS(path)
     pc <- data.frame("X" = las$X, "Y" = las$Y, "Z" = las$Z)

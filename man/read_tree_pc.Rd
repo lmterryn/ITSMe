@@ -28,7 +28,7 @@ point cloud as a data.frame with 3 columns (X,Y,Z).
 }
 \details{
 Reading the txt, las and ply files is based on
-\code{\link[utils]{read.table}}, \code{\link[lidR]{readTLSLAS}} and
+\code{\link[data.table]{fread}}, \code{\link[lidR]{readTLSLAS}} and
 \code{\link[Rvcg]{vcgPlyRead}} respectively. Sampling is based on
 \code{\link[base]{sample}} and is mainly a useful tool to reduce the amount
 of points for quicker plotting.

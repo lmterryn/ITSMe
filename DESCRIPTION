@@ -15,6 +15,7 @@ RoxygenNote: 7.1.2
 Imports: 
     alphashape3d,
     concaveman,
+    data.table,
     ggforce,
     ggplot2,
     graphics,
