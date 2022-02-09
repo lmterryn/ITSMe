@@ -8,7 +8,7 @@ stem_branch_length_qsm(
   branch,
   treedata,
   normalisation = "treeheight",
-  pc = "NA",
+  pc = NA,
   buttress = FALSE
 )
 }
@@ -27,7 +27,7 @@ tree height (Terryn et al., 2020). When something different than "dbh" or
 normalisation.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 cloud is available. Only relevant if normalisation equals "dbh" or
 "treeheight".}
 
@@ -37,7 +37,7 @@ buttresses. Only relevant if pc is available and normalisation equals
 }
 \value{
 The stem branch length. Unitless with normalisation, in meters
-without normalisation.
+without normalisation. NaN when there are no stem branches.
 }
 \description{
 Calculates the stem branch length from a TreeQSM.

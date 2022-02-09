@@ -4,14 +4,14 @@
 \alias{dbh_volume_ratio_qsm}
 \title{DBH-tree volume ratio TreeQSM}
 \usage{
-dbh_volume_ratio_qsm(treedata, pc = "NA", buttress = FALSE)
+dbh_volume_ratio_qsm(treedata, pc = NA, buttress = FALSE)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 cloud is available.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have

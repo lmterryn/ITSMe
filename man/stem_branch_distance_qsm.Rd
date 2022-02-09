@@ -8,7 +8,7 @@ stem_branch_distance_qsm(
   cylinder,
   treedata,
   normalisation = "no",
-  pc = "NA",
+  pc = NA,
   buttress = FALSE
 )
 }
@@ -23,7 +23,7 @@ stem_branch_distance_qsm(
 average distance is divided by the DBH (Akerblom et al., 2017).}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 cloud is available. Only relevant if normalisation equals "dbh".}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
@@ -32,7 +32,7 @@ buttresses. Only relevant if pc is available and normalisation equals
 }
 \value{
 The stem branch distance. Unitless with normalisation, in meters
-without normalisation.
+without normalisation. NaN when there are no stem branches.
 }
 \description{
 Calculates the stem branch distance from a TreeQSM.

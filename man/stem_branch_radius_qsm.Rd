@@ -8,7 +8,7 @@ stem_branch_radius_qsm(
   cylinder,
   treedata,
   normalisation = "treeheight",
-  pc = "NA"
+  pc = NA
 )
 }
 \arguments{
@@ -27,12 +27,12 @@ different than "treeheight" or "parentcylinder" is given, no normalisation
 is done. Default is no normalisation.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
-cloud is available. Only relevant if normalisation equals "treeheight".}
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
+is available. Only relevant if normalisation equals "treeheight".}
 }
 \value{
 The stem branch radius. Unitless with normalisation, in meters
-without normalisation.
+without normalisation.  NaN when there are no stem branches.
 }
 \description{
 Calculates the stem branch radius from a TreeQSM.

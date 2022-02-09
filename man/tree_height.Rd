@@ -4,15 +4,15 @@
 \alias{tree_height}
 \title{Tree height}
 \usage{
-tree_height(treedata, pc = "NA")
+tree_height(treedata, pc = NA)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. If the point cloud is not available "NA" is
-used as input (default="NA").}
+\code{\link{read_tree_pc}}. If the point cloud is not available NA is used
+as input (default=NA).}
 }
 \value{
 The tree height in meters.

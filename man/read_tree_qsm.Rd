@@ -29,7 +29,7 @@ optionally saves the TreeQSM components into the global environment.
 \details{
 Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
 TreeQSM versions older than 2.4.0 are converted to the 2.4.0 structure, where
-the value of attributes not found in the older version is set "NA".
+the value of attributes not found in the older version is set NA.
 }
 \examples{
 \dontrun{

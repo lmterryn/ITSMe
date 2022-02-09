@@ -4,7 +4,7 @@
 \alias{crown_height_qsm}
 \title{Crown height TreeQSM}
 \usage{
-crown_height_qsm(treedata, cylinder, pc = "NA")
+crown_height_qsm(treedata, cylinder, pc = NA)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -14,7 +14,7 @@ crown_height_qsm(treedata, cylinder, pc = "NA")
 \code{\link{read_tree_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 cloud is available.}
 }
 \value{

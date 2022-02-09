@@ -460,6 +460,10 @@ classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
 #'   \code{\link{read_tree_pc}}.
 #' @param concavity Numeric value (default=2) concavity for the computation of a
 #'   concave hull based on \code{\link[concaveman]{concaveman}}.
+#' @param thresholdbranch Numeric value (default=1.5) from
+#'   \code{\link{classify_crown_pc}}.
+#' @param minheight Numeric value (default=4) from
+#'   \code{\link{classify_crown_pc}}.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -473,11 +477,12 @@ classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
 #' pca <- projected_crown_area_pc(pc)
-#' pca <- projected_crown_area_pc(pc,0.3,FALSE)
-#' pca <- projected_crown_area_pc(pc,1,TRUE)
+#' pca <- projected_crown_area_pc(pc,0.3)
+#' pca <- projected_crown_area_pc(pc,1,1.5,4,TRUE)
 #' }
-projected_crown_area_pc <- function(pc, concavity=2, plot=FALSE){
-  crown_pc <- classify_crown_pc(pc,1.5,4,FALSE)
+projected_crown_area_pc <- function(pc, concavity=2, thresholdbranch=1.5,
+                                    minheight=4, plot=FALSE){
+  crown_pc <- classify_crown_pc(pc,thresholdbranch,minheight,FALSE)
   points <- sf::st_as_sf(unique(crown_pc[1:2]), coords=c("X","Y"))
   hull <- concaveman::concaveman(points, concavity)
   pca <- sf::st_area(hull)
@@ -501,6 +506,10 @@ projected_crown_area_pc <- function(pc, concavity=2, plot=FALSE){
 #' @param alpha Numeric value (default=1) alpha for the computation of the 3D
 #'   alpha-shape of the tree crown based on
 #'   \code{\link[alphashape3d]{ashape3d}}.
+#' @param thresholdbranch Numeric value (default=1.5) from
+#'   \code{\link{classify_crown_pc}}.
+#' @param minheight Numeric value (default=4) from
+#'   \code{\link{classify_crown_pc}}.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -516,8 +525,9 @@ projected_crown_area_pc <- function(pc, concavity=2, plot=FALSE){
 #' vol_crown <- volume_crown_pc(pc,0.3,FALSE)
 #' vol_crown <- volume_crown_pc(pc,1,TRUE)
 #' }
-volume_crown_pc <- function(pc, alpha=1, plot=FALSE){
-  crown_pc <- classify_crown_pc(pc,1.5,4,FALSE)
+volume_crown_pc <- function(pc, alpha=1, thresholdbranch=1.5,minheight=4,
+                            plot=FALSE){
+  crown_pc <- classify_crown_pc(pc,thresholdbranch,minheight,FALSE)
   crown_xyz <- data.matrix(unique(crown_pc[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)
   if(plot){

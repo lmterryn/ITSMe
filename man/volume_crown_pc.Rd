@@ -4,7 +4,13 @@
 \alias{volume_crown_pc}
 \title{Crown volume point cloud}
 \usage{
-volume_crown_pc(pc, alpha = 1, plot = FALSE)
+volume_crown_pc(
+  pc,
+  alpha = 1,
+  thresholdbranch = 1.5,
+  minheight = 4,
+  plot = FALSE
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -13,6 +19,12 @@ volume_crown_pc(pc, alpha = 1, plot = FALSE)
 \item{alpha}{Numeric value (default=1) alpha for the computation of the 3D
 alpha-shape of the tree crown based on
 \code{\link[alphashape3d]{ashape3d}}.}
+
+\item{thresholdbranch}{Numeric value (default=1.5) from
+\code{\link{classify_crown_pc}}.}
+
+\item{minheight}{Numeric value (default=4) from
+\code{\link{classify_crown_pc}}.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}

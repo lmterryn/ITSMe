@@ -11,7 +11,7 @@ stem_branch_cluster_size_qsm(cylinder)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The stem branch cluster size.
+The stem branch cluster size. NaN when there are no stem branches.
 }
 \description{
 Calculates the stem branch cluster size from a TreeQSM.

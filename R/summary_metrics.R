@@ -22,6 +22,10 @@
 #' @param maxbuttressheight Numeric value (default=9). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height.
+#' @param thresholdbranch Numeric value (default=1.5) from
+#'   \code{\link{classify_crown_pc}}.
+#' @param minheight Numeric value (default=4) from
+#'   \code{\link{classify_crown_pc}}.
 #' @param concavity Numeric value (default=2). Parameter of the
 #'   \code{\link{projected_crown_area_pc}} function used to calculate the
 #'   projected crown area.
@@ -42,8 +46,9 @@
 #' }
 summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
                                              thresholdbuttress=0.001,
-                                             maxbuttressheight=9,concavity=2,
-                                             alpha=1){
+                                             maxbuttressheight=9,
+                                             thresholdbranch=1.5,minheight=4,
+                                             concavity=2,alpha=1){
   trees <- data.frame("tree_id"=character(),"X-position"=double(),
                       "Y-position"=double(),"tree_height"=double(),
                       "diameter_at_breast_height"=double(),
@@ -60,8 +65,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path,extension=".txt",
     h <- tree_height_pc(pc)
     dab <- dab_pc(pc,thresholdbuttress,maxbuttressheight)
     dbh <- dbh_pc(pc)
-    pca <- projected_crown_area_pc(pc,concavity)
-    cv <- volume_crown_pc(pc,alpha)
+    pca <- projected_crown_area_pc(pc,concavity,thresholdbranch,minheight)
+    cv <- volume_crown_pc(pc,alpha,thresholdbranch,minheight)
     tree <- data.frame("tree_id"=filenames[i],"X-position"=pos[1],
                        "Y-position"=pos[2],"tree_height"=h,
                        "diameter_at_breast_height"=dbh,

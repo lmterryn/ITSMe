@@ -4,7 +4,7 @@
 \alias{dbh_minradius_ratio_qsm}
 \title{DBH minimum tree radius ratio TreeQSM}
 \usage{
-dbh_minradius_ratio_qsm(treedata, cylinder, pc = "NA", buttress = FALSE)
+dbh_minradius_ratio_qsm(treedata, cylinder, pc = NA, buttress = FALSE)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -14,7 +14,7 @@ dbh_minradius_ratio_qsm(treedata, cylinder, pc = "NA", buttress = FALSE)
 \code{\link{read_tree_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is "NA" and indicates no tree point
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 cloud is available.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have

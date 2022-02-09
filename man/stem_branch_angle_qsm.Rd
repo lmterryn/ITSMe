@@ -11,7 +11,8 @@ stem_branch_angle_qsm(branch)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The stem branch angle in degrees.
+The stem branch angle in degrees. NaN when there are no stem
+branches.
 }
 \description{
 Calculates the stem branch angle from a TreeQSM.

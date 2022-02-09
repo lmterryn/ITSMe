@@ -9,6 +9,8 @@ summary_basic_pointcloud_metrics(
   extension = ".txt",
   thresholdbuttress = 0.001,
   maxbuttressheight = 9,
+  thresholdbranch = 1.5,
+  minheight = 4,
   concavity = 2,
   alpha = 1
 )
@@ -28,6 +30,12 @@ buttresses.}
 \item{maxbuttressheight}{Numeric value (default=9). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height.}
+
+\item{thresholdbranch}{Numeric value (default=1.5) from
+\code{\link{classify_crown_pc}}.}
+
+\item{minheight}{Numeric value (default=4) from
+\code{\link{classify_crown_pc}}.}
 
 \item{concavity}{Numeric value (default=2). Parameter of the
 \code{\link{projected_crown_area_pc}} function used to calculate the

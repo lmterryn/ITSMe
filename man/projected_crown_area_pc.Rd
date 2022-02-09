@@ -4,7 +4,13 @@
 \alias{projected_crown_area_pc}
 \title{Projected crown area point cloud}
 \usage{
-projected_crown_area_pc(pc, concavity = 2, plot = FALSE)
+projected_crown_area_pc(
+  pc,
+  concavity = 2,
+  thresholdbranch = 1.5,
+  minheight = 4,
+  plot = FALSE
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -12,6 +18,12 @@ projected_crown_area_pc(pc, concavity = 2, plot = FALSE)
 
 \item{concavity}{Numeric value (default=2) concavity for the computation of a
 concave hull based on \code{\link[concaveman]{concaveman}}.}
+
+\item{thresholdbranch}{Numeric value (default=1.5) from
+\code{\link{classify_crown_pc}}.}
+
+\item{minheight}{Numeric value (default=4) from
+\code{\link{classify_crown_pc}}.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
@@ -34,7 +46,7 @@ hull fitted to the crown points obtained with
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
 pca <- projected_crown_area_pc(pc)
-pca <- projected_crown_area_pc(pc,0.3,FALSE)
-pca <- projected_crown_area_pc(pc,1,TRUE)
+pca <- projected_crown_area_pc(pc,0.3)
+pca <- projected_crown_area_pc(pc,1,1.5,4,TRUE)
 }
 }
