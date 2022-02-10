@@ -11,7 +11,7 @@ branch_angle_ratio_qsm(branch)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The branch angle ratio
+The branch angle ratio. NaN when there are no branches.
 }
 \description{
 Calculates the branch angle ratio from a TreeQSM.
@@ -25,7 +25,8 @@ angles of the 1st order branches and 2nd order branches" (Terryn et al.,
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-ba_ratio <- branch_angle_ratio_qsm(qsm$branch)}
+ba_ratio <- branch_angle_ratio_qsm(qsm$branch)
+}
 }
 \references{
 Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,

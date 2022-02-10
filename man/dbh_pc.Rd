@@ -32,6 +32,6 @@ optimal fit.
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
 dbh <- dbh_pc(pc)
-dbh <- dbh_pc(pc,TRUE)
+dbh <- dbh_pc(pc, TRUE)
 }
 }

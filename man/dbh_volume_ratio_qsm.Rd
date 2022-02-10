@@ -34,8 +34,8 @@ qsm <- read_tree_qsm(QSM_path)
 ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc)
-ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc,TRUE)
+ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc)
+ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc, TRUE)
 }
 }
 \references{

@@ -17,11 +17,11 @@
 #' pc <- read_tree_pc(PC_path)
 #' pos <- tree_position_pc(pc)
 #' }
-tree_position_pc <- function(pc){
-  pc_bh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33),]
+tree_position_pc <- function(pc) {
+  pc_bh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33), ]
   X_mean <- mean(pc_bh$X)
   Y_mean <- mean(pc_bh$Y)
-  return(c(X_mean,Y_mean))
+  return(c(X_mean, Y_mean))
 }
 
 #' Tree height point cloud
@@ -44,8 +44,8 @@ tree_position_pc <- function(pc){
 #' pc <- read_tree_pc(PC_path)
 #' tree_height <- tree_height_pc(pc)
 #' }
-tree_height_pc <-function(pc) {
-  return(max(pc$Z)-min(pc$Z))
+tree_height_pc <- function(pc) {
+  return(max(pc$Z) - min(pc$Z))
 }
 
 #' Distance from the center
@@ -65,11 +65,11 @@ tree_height_pc <-function(pc) {
 #'
 #' @examples
 #' \dontrun{
-#' Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
+#' Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
 #' R <- mean(Ri)
 #' }
-calc_r <- function(x, y, xc, yc){
-  return(sqrt((x-xc)**2 + (y-yc)**2))
+calc_r <- function(x, y, xc, yc) {
+  return(sqrt((x - xc)**2 + (y - yc)**2))
 }
 
 #' Algebraic distance from the center
@@ -89,11 +89,11 @@ calc_r <- function(x, y, xc, yc){
 #'
 #' @examples
 #' \dontrun{
-#' center_estimate <- optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+#' center_estimate <- optim(par = c(x_m, y_m), fn = f, x = x_dbh, y = y_dbh)
 #' }
-f <- function(c, x, y){
+f <- function(c, x, y) {
   Ri <- calc_r(x, y, c[1], c[2])
-  return(sum((Ri-mean(Ri))**2))
+  return(sum((Ri - mean(Ri))**2))
 }
 
 #' Diameter at breast height point cloud
@@ -121,47 +121,55 @@ f <- function(c, x, y){
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
 #' dbh <- dbh_pc(pc)
-#' dbh <- dbh_pc(pc,TRUE)
+#' dbh <- dbh_pc(pc, TRUE)
 #' }
-dbh_pc <-function(pc,plot=FALSE) {
-  if(max(pc$Z)-min(pc$Z) > 1.3){
-    pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33),]
-    xy_dbh <- pc_dbh[,c("X","Y")]
+dbh_pc <- function(pc, plot = FALSE) {
+  if (max(pc$Z) - min(pc$Z) > 1.3) {
+    pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33), ]
+    xy_dbh <- pc_dbh[, c("X", "Y")]
     XY_dbh <- data.matrix(xy_dbh)
     k <- 2
-    knn1 <- nabor::knn(XY_dbh, XY_dbh, k=k, radius = 0)
-    knn_ind <- data.frame(knn=knn1[[1]][,2:k])
-    knn_dist <- data.frame(knn.dist=knn1[[2]][,2:k])
-    remove <- which(knn_dist[,k-1]>0.05)
-    if(length(remove)!=0){
-      xy_dbh <- xy_dbh[-remove,]
+    knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
+    knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
+    knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
+    remove <- which(knn_dist[, k - 1] > 0.05)
+    if (length(remove) != 0) {
+      xy_dbh <- xy_dbh[-remove, ]
     }
     x_dbh <- xy_dbh$X
     y_dbh <- xy_dbh$Y
-    x_m <- mean(x_dbh) #first estimate of the center
+    x_m <- mean(x_dbh) # first estimate of the center
     y_m <- mean(y_dbh)
-    center_estimate <- stats::optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+    center_estimate <- stats::optim(par = c(x_m, y_m), fn = f, x = x_dbh,
+                                    y = y_dbh)
     x_c <- center_estimate$par[1]
     y_c <- center_estimate$par[2]
-    Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
-    R <- mean(Ri) #radius (DBH/2)
-    residu <- sum((Ri - R)**2)/length(Ri) #average residual
-    if(plot){
+    Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
+    R <- mean(Ri) # radius (DBH/2)
+    residu <- sum((Ri - R)**2) / length(Ri) # average residual
+    if (plot) {
       X <- Y <- x0 <- y0 <- r <- NULL
       data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
       plotDBH <- ggplot2::ggplot() +
-        ggplot2::geom_point(data=xy_dbh, ggplot2::aes(X,Y), size=1) +
+        ggplot2::geom_point(data = xy_dbh, ggplot2::aes(X, Y), size = 1) +
         ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::geom_point(data=data_circle,
-                            ggplot2::aes(x0,y0, color="estimated center")) +
-        ggforce::geom_circle(data=data_circle,
-                             ggplot2::aes(x0 = x0, y0 = y0, r = r,
-                                          color="fitted circle"),
-                             inherit.aes = FALSE, show.legend = FALSE) +
-        ggplot2::ggtitle(paste("DBH = ",as.character(round(2*R,2)),"m",sep = ""))
+        ggplot2::geom_point(
+          data = data_circle,
+          ggplot2::aes(x0, y0, color = "estimated center")
+        ) +
+        ggforce::geom_circle(
+          data = data_circle,
+          ggplot2::aes(
+            x0 = x0, y0 = y0, r = r,
+            color = "fitted circle"
+          ),
+          inherit.aes = FALSE, show.legend = FALSE
+        ) +
+        ggplot2::ggtitle(paste("DBH = ", as.character(round(2 * R, 2)), "m",
+                               sep = ""))
       print(plotDBH)
     }
-    dbh <- 2*R
+    dbh <- 2 * R
   } else {
     dbh <- NaN
   }
@@ -214,10 +222,10 @@ dbh_pc <-function(pc,plot=FALSE) {
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
 #' dab <- dab_pc(pc)
-#' dab <- dab_pc(pc,0.001,9,TRUE)
+#' dab <- dab_pc(pc, 0.001, 9, TRUE)
 #' }
-dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
-                           plot=FALSE){
+dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
+                   plot = FALSE) {
   lh <- 1.27
   uh <- 1.33
   residu <- 1
@@ -228,52 +236,53 @@ dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
   DBH_HEIGHT <- c()
   R_slices <- c()
   loop <- 1
-  while(loop ==1){
-    while((residu > thresholdbuttress*R) & (uh < maxbuttressheight) | (R > 2) |
-          (r_diff > 2)){
-      if(max(pc$Z)-min(pc$Z) > (lh+uh)/2){
-        pc_dbh <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh),]
-        xy_dbh <- pc_dbh[,c("X","Y")]
+  while (loop == 1) {
+    while ((residu > thresholdbuttress * R) & (uh < maxbuttressheight) |
+           (R > 2) | (r_diff > 2)) {
+      if (max(pc$Z) - min(pc$Z) > (lh + uh) / 2) {
+        pc_dbh <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+        xy_dbh <- pc_dbh[, c("X", "Y")]
         XY_dbh <- data.matrix(xy_dbh)
         k <- 2
-        knn1 <- nabor::knn(XY_dbh, XY_dbh, k=k, radius = 0)
-        knn_ind <- data.frame(knn=knn1[[1]][,2:k])
-        knn_dist <- data.frame(knn.dist=knn1[[2]][,2:k])
-        remove <- which(knn_dist[,k-1]>0.05)
-        if(length(remove)!=0){
-          xy_dbh <- xy_dbh[-remove,]
+        knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
+        knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
+        knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
+        remove <- which(knn_dist[, k - 1] > 0.05)
+        if (length(remove) != 0) {
+          xy_dbh <- xy_dbh[-remove, ]
         }
         x_dbh <- xy_dbh$X
         y_dbh <- xy_dbh$Y
-        x_m <- mean(x_dbh) #first estimate of the center
+        x_m <- mean(x_dbh) # first estimate of the center
         y_m <- mean(y_dbh)
-        center_estimate <- stats::optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+        center_estimate <- stats::optim(par = c(x_m, y_m), fn = f, x = x_dbh,
+                                        y = y_dbh)
         x_c <- center_estimate$par[1]
         y_c <- center_estimate$par[2]
-        Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
-        R <- mean(Ri) #radius (DBH/2)
-        residu <- sum((Ri - R)**2)/length(Ri) #average residual between
-        if(lh ==1.27){
+        Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
+        R <- mean(Ri) # radius (DBH/2)
+        residu <- sum((Ri - R)**2) / length(Ri) # average residual between
+        if (lh == 1.27) {
           r_diff <- 1
         } else {
-          r_diff <- utils::tail(R_slices, n=1)/R
+          r_diff <- utils::tail(R_slices, n = 1) / R
         }
-        R_slices <- append(R_slices,R)
-        RES <- append(RES,residu)
-        THRESH <- append(THRESH,thresholdbuttress*R)
-        DBH_HEIGHT <- append(DBH_HEIGHT,(lh+uh)/2)
-        lh <- lh+0.06
-        uh <- uh+0.06
-      }else{
+        R_slices <- append(R_slices, R)
+        RES <- append(RES, residu)
+        THRESH <- append(THRESH, thresholdbuttress * R)
+        DBH_HEIGHT <- append(DBH_HEIGHT, (lh + uh) / 2)
+        lh <- lh + 0.06
+        uh <- uh + 0.06
+      } else {
         dbh <- NaN
       }
     }
-    if(uh < 9){
-      lh <- lh-0.06
-      uh <- uh-0.06
+    if (uh < 9) {
+      lh <- lh - 0.06
+      uh <- uh - 0.06
       loop <- 0
-    }else {
-      thresholdbuttress <- thresholdbuttress+0.0005
+    } else {
+      thresholdbuttress <- thresholdbuttress + 0.0005
       lh <- 1.27
       uh <- 1.33
       residu <- 1
@@ -288,19 +297,26 @@ dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
     X <- Y <- x0 <- y0 <- r <- NULL
     data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
     plotDAB <- ggplot2::ggplot() +
-      ggplot2::geom_point(data=xy_dbh, ggplot2::aes(X,Y), size=1) +
+      ggplot2::geom_point(data = xy_dbh, ggplot2::aes(X, Y), size = 1) +
       ggplot2::coord_fixed(ratio = 1) +
-      ggplot2::geom_point(data=data_circle,
-                          ggplot2::aes(x0,y0, color="estimated center")) +
-      ggforce::geom_circle(data=data_circle,
-                           ggplot2::aes(x0 = x0, y0 = y0, r = r,
-                                        color="fitted circle"),
-                           inherit.aes = FALSE, show.legend = FALSE) +
-      ggplot2::ggtitle(paste("DAB = ",as.character(round(2*R,2)),"m at H = ",
-                             as.character(round((lh+uh)/2,2)),"m",sep = ""))
+      ggplot2::geom_point(
+        data = data_circle,
+        ggplot2::aes(x0, y0, color = "estimated center")
+      ) +
+      ggforce::geom_circle(
+        data = data_circle,
+        ggplot2::aes(
+          x0 = x0, y0 = y0, r = r,
+          color = "fitted circle"
+        ),
+        inherit.aes = FALSE, show.legend = FALSE
+      ) +
+      ggplot2::ggtitle(paste("DAB = ", as.character(round(2 * R, 2)),
+                             "m at H = ", as.character(round((lh + uh) / 2, 2)),
+                             "m", sep = ""))
     print(plotDAB)
   }
-  dbh <- 2*R
+  dbh <- 2 * R
   return(dbh)
 }
 
@@ -333,115 +349,121 @@ dab_pc <- function(pc,thresholdbuttress=0.001,maxbuttressheight=9,
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
 #' crown_pc <- classify_crown_pc(pc)
-#' crown_pc <- classify_crown_pc(pc,1.5,4,TRUE)
+#' crown_pc <- classify_crown_pc(pc, 1.5, 4, TRUE)
 #' }
-classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
-                                      plot=FALSE){
+classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 4,
+                              plot = FALSE) {
   dab <- dab_pc(pc)
-  d <- thresholdbranch*dab+0.1
+  d <- thresholdbranch * dab + 0.1
   dh <- 0.25
-  lh <- minheight-dh #initiation first slice
-  uh <- minheight #initiation first slice
+  lh <- minheight - dh # initiation first slice
+  uh <- minheight # initiation first slice
   S_X <- S_Y <- 0
   while ((S_X < d) & (S_Y < d)) {
     lh <- lh + dh
     uh <- uh + dh
-    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh),]
-    if (nrow(pc_slice)==0) {
+    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+    if (nrow(pc_slice) == 0) {
       S_X <- S_Y <- 0
     } else {
-      xy_dbh <- pc_slice[,c("X","Y")]
+      xy_dbh <- pc_slice[, c("X", "Y")]
       XY_dbh <- data.matrix(xy_dbh)
       k <- 2
-      distance <- dab/10
-      knn1 <- nabor::knn(XY_dbh, XY_dbh, k=k, radius = 0)
-      knn_ind <- data.frame(knn=knn1[[1]][,2:k])
-      knn_dist <- data.frame(knn.dist=knn1[[2]][,2:k])
-      remove <- which(knn_dist[,k-1]>distance)
-      if(length(remove)!=0){
-        pc_slice <- pc_slice[-remove,]
+      distance <- dab / 10
+      knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
+      knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
+      knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
+      remove <- which(knn_dist[, k - 1] > distance)
+      if (length(remove) != 0) {
+        pc_slice <- pc_slice[-remove, ]
       }
-      if (nrow(pc_slice)!=0){
-        S_X <- max(pc_slice$X)-min(pc_slice$X)
-        S_Y <- max(pc_slice$Y)-min(pc_slice$Y)
+      if (nrow(pc_slice) != 0) {
+        S_X <- max(pc_slice$X) - min(pc_slice$X)
+        S_Y <- max(pc_slice$Y) - min(pc_slice$Y)
       } else {
         S_X <- S_Y <- 0
       }
     }
   }
-  lh <- lh-dh
-  uh <- uh-dh
-  pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh),]
+  lh <- lh - dh
+  uh <- uh - dh
+  pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
   k1 <- stats::kmeans(pc_slice, centers = 1, nstart = 10)
   pc_slice$C <- k1$cluster
   center_trunk <- k1$centers
-  trunk_pc <- pc[pc$Z < min(pc$Z)+uh,]
-  crown_pc <- pc[FALSE,]
-  d <- thresholdbranch*dab
+  trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
+  crown_pc <- pc[FALSE, ]
+  d <- thresholdbranch * dab
   S_X <- S_Y <- n <- stop <- 0
-  while((S_X < d) & (S_Y < d) & (stop==0)){
-    if (n>0){
-      crown_pc <- rbind(crown_pc, pc_slice[pc_slice$C %in% crown,
-                                           c("X","Y","Z")])
+  while ((S_X < d) & (S_Y < d) & (stop == 0)) {
+    if (n > 0) {
+      crown_pc <- rbind(crown_pc, pc_slice[
+        pc_slice$C %in% crown,
+        c("X", "Y", "Z")
+      ])
       trunk_pc <- rbind(trunk_pc, trunk_slice)
     }
     n <- n + 1
-    lh <- lh+dh
-    uh <- uh+dh
-    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh),]
+    lh <- lh + dh
+    uh <- uh + dh
+    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
     k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25)
     pc_slice$C <- k10$cluster
     distance_to_centers <- c()
-    centers <- c(1,2,3,4,5,6,7,8,9,10)
-    for (i in 1:10){
-      distance_to_centers <- append(distance_to_centers,
-                                    ((k10$centers[i,"X"]-k1$centers[1,"X"])^2+
-                                       (k10$centers[i,"Y"]-k1$centers[1,"Y"])^2+
-                                       (k10$centers[i,"Z"]-
-                                          k1$centers[1,"Z"])^2)^(1/2))
+    centers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    for (i in 1:10) {
+      distance_to_centers <- append(
+        distance_to_centers,
+        ((k10$centers[i, "X"] - k1$centers[1, "X"])^2 +
+          (k10$centers[i, "Y"] - k1$centers[1, "Y"])^2 +
+          (k10$centers[i, "Z"] -
+            k1$centers[1, "Z"])^2)^(1 / 2)
+      )
     }
-    crown <- centers[distance_to_centers>d]
-    trunk_slice <- pc_slice[!(pc_slice$C %in% crown),c("X","Y","Z")]
-    if(nrow(trunk_slice)==0){
+    crown <- centers[distance_to_centers > d]
+    trunk_slice <- pc_slice[!(pc_slice$C %in% crown), c("X", "Y", "Z")]
+    if (nrow(trunk_slice) == 0) {
       stop <- 1
       S_X <- S_Y <- 0
-    }else{
+    } else {
       k1 <- stats::kmeans(trunk_slice, centers = 1, nstart = 25)
       center_trunk <- k1$centers
-      S_X <- max(trunk_slice$X)-min(trunk_slice$X)
-      S_Y <- max(trunk_slice$Y)-min(trunk_slice$Y)
+      S_X <- max(trunk_slice$X) - min(trunk_slice$X)
+      S_Y <- max(trunk_slice$Y) - min(trunk_slice$Y)
     }
   }
-  crown_pc <- rbind(crown_pc,pc[pc$Z > min(pc$Z)+lh,])
-  if (plot){
+  crown_pc <- rbind(crown_pc, pc[pc$Z > min(pc$Z) + lh, ])
+  if (plot) {
     downsample <- 0.1
     crown <- crown_pc[sample(nrow(crown_pc),
-                             size = floor(nrow(crown_pc)*downsample),
-                             replace = FALSE, prob = NULL), ]
+      size = floor(nrow(crown_pc) * downsample),
+      replace = FALSE, prob = NULL
+    ), ]
     crown$class <- "crown"
     X <- Y <- Z <- NULL
-    if (nrow(trunk_pc)==0){
+    if (nrow(trunk_pc) == 0) {
       tree <- crown
-      plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X,Z)) +
-        ggplot2::geom_point(size=1,ggplot2::aes(col=class)) +
+      plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
+        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
         ggplot2::coord_fixed(ratio = 1)
-      plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y,Z)) +
-        ggplot2::geom_point(size=1,ggplot2::aes(col=class)) +
+      plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
+        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
         ggplot2::coord_fixed(ratio = 1)
-      gridExtra::grid.arrange(plotXZ, plotYZ, ncol=2)
+      gridExtra::grid.arrange(plotXZ, plotYZ, ncol = 2)
     } else {
       trunk <- trunk_pc[sample(nrow(trunk_pc),
-                               size = floor(nrow(trunk_pc)*downsample),
-                               replace = FALSE, prob = NULL), ]
+        size = floor(nrow(trunk_pc) * downsample),
+        replace = FALSE, prob = NULL
+      ), ]
       trunk$class <- "trunk"
-      tree <- rbind(crown,trunk)
-      plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X,Z)) +
-        ggplot2::geom_point(size=1,ggplot2::aes(col=class)) +
+      tree <- rbind(crown, trunk)
+      plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
+        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
         ggplot2::coord_fixed(ratio = 1)
-      plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y,Z)) +
-        ggplot2::geom_point(size=1,ggplot2::aes(col=class)) +
+      plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
+        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
         ggplot2::coord_fixed(ratio = 1)
-      gridExtra::grid.arrange(plotXZ, plotYZ, ncol=2)
+      gridExtra::grid.arrange(plotXZ, plotYZ, ncol = 2)
     }
   }
   return(crown_pc)
@@ -463,7 +485,7 @@ classify_crown_pc <- function(pc,thresholdbranch=1.5,minheight=4,
 #' pc <- read_tree_pc(PC_path)
 #' pc_norm <- normalize_pc(pc)
 #' }
-normalize_pc <- function(pc){
+normalize_pc <- function(pc) {
   pc$X <- pc$X - min(pc$X)
   pc$Y <- pc$Y - min(pc$Y)
   pc$Z <- pc$Z - min(pc$Z)
@@ -500,16 +522,16 @@ normalize_pc <- function(pc){
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
 #' pca <- projected_crown_area_pc(pc)
-#' pca <- projected_crown_area_pc(pc,0.3)
-#' pca <- projected_crown_area_pc(pc,1,1.5,4,TRUE)
+#' pca <- projected_crown_area_pc(pc, 0.3)
+#' pca <- projected_crown_area_pc(pc, 1, 1.5, 4, TRUE)
 #' }
-projected_crown_area_pc <- function(pc, concavity=2, thresholdbranch=1.5,
-                                    minheight=4, plot=FALSE){
-  crown_pc <- classify_crown_pc(pc,thresholdbranch,minheight,FALSE)
-  points <- sf::st_as_sf(unique(crown_pc[1:2]), coords=c("X","Y"))
+projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
+                                    minheight = 4, plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, FALSE)
+  points <- sf::st_as_sf(unique(crown_pc[1:2]), coords = c("X", "Y"))
   hull <- concaveman::concaveman(points, concavity)
   pca <- sf::st_area(hull)
-  if(plot){
+  if (plot) {
     plot(sf::st_geometry(hull), col = "lightgrey")
   }
   return(pca)
@@ -543,23 +565,21 @@ projected_crown_area_pc <- function(pc, concavity=2, thresholdbranch=1.5,
 #' @examples
 #' \dontrun{
 #' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path,1)
+#' pc <- read_tree_pc(PC_path, 1)
 #' vol_crown <- volume_crown_pc(pc)
-#' vol_crown <- volume_crown_pc(pc,0.3,FALSE)
-#' vol_crown <- volume_crown_pc(pc,1,TRUE)
+#' vol_crown <- volume_crown_pc(pc, 0.3, FALSE)
+#' vol_crown <- volume_crown_pc(pc, 1, TRUE)
 #' }
-volume_crown_pc <- function(pc, alpha=1, thresholdbranch=1.5,minheight=4,
-                            plot=FALSE){
-  crown_pc <- classify_crown_pc(pc,thresholdbranch,minheight,FALSE)
+volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 4,
+                            plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, FALSE)
   crown_pc_norm <- normalize_pc(crown_pc)
   crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)
-  if(plot){
-    graphics::par(pty="s")
+  if (plot) {
+    graphics::par(pty = "s")
     plot(ashape3d.obj)
   }
   vol_crown <- alphashape3d::volume_ashape3d(ashape3d.obj)
   return(vol_crown)
 }
-
-

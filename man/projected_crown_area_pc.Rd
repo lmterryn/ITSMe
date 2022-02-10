@@ -46,7 +46,7 @@ hull fitted to the crown points obtained with
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
 pca <- projected_crown_area_pc(pc)
-pca <- projected_crown_area_pc(pc,0.3)
-pca <- projected_crown_area_pc(pc,1,1.5,4,TRUE)
+pca <- projected_crown_area_pc(pc, 0.3)
+pca <- projected_crown_area_pc(pc, 1, 1.5, 4, TRUE)
 }
 }

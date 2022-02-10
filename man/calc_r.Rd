@@ -28,7 +28,7 @@ Support function used to determine the DBH from a tree point cloud with
 }
 \examples{
 \dontrun{
-Ri <- calc_r(x_dbh,y_dbh,x_c,y_c)
+Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
 R <- mean(Ri)
 }
 }

@@ -38,11 +38,10 @@ The vertical bin radius estimates are calculated with
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder)
+dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc)
-dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc,TRUE)
+dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
 }
 }
 \references{

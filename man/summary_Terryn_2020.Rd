@@ -102,15 +102,19 @@ Metrics Terryn et al. (2020): stem branch angle (sba,
 QSMs_path <- "path/to/folder/QSMs/"
 PCs_path <- "path/to/folder/PCs/"
 summary <- summary_Terryn_2020(QSMs_path)
-summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
-                               buttress=TRUE,extension=".txt")
-summary <- summary_Terryn_2020(QSMs_path,version="2.4.0",PCs_path,
-                               buttress=TRUE,extension=".txt",
-                               sbr_normalisation="dbh",
-                               sbl_normalisation="treeheight",
-                               sbd_normalisation="no",
-                               thresholdbuttress=0.001,
-                               maxbuttressheight=9,concavity=2,alpha=1)
+summary <- summary_Terryn_2020(QSMs_path,
+  version = "2.4.0", PCs_path,
+  buttress = TRUE, extension = ".txt"
+)
+summary <- summary_Terryn_2020(QSMs_path,
+  version = "2.4.0", PCs_path,
+  buttress = TRUE, extension = ".txt",
+  sbr_normalisation = "dbh",
+  sbl_normalisation = "treeheight",
+  sbd_normalisation = "no",
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 9, concavity = 2, alpha = 1
+)
 }
 }
 \references{

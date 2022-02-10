@@ -38,6 +38,6 @@ when the first branch is reached with increasing height.
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
 crown_pc <- classify_crown_pc(pc)
-crown_pc <- classify_crown_pc(pc,1.5,4,TRUE)
+crown_pc <- classify_crown_pc(pc, 1.5, 4, TRUE)
 }
 }

@@ -34,10 +34,10 @@ the lowest crown cylinder relative to the tree height" (Akerblom et al., 2017
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-ch <- crown_height_qsm(qsm$treedata,qsm$cylinder)
+ch <- crown_height_qsm(qsm$treedata, qsm$cylinder)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-ch <- crown_height_qsm(qsm$treedata,qsm$cylinder,pc)
+ch <- crown_height_qsm(qsm$treedata, qsm$cylinder, pc)
 }
 }
 \references{

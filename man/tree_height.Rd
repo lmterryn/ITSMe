@@ -33,6 +33,6 @@ qsm <- read_tree_qsm(QSM_path)
 h <- tree_height(qsm)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-h <- tree_height(qsm,pc)
+h <- tree_height(qsm, pc)
 }
 }

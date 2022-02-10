@@ -45,9 +45,9 @@ alpha-shape fitted to the crown points obtained with
 \examples{
 \dontrun{
 PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path,1)
+pc <- read_tree_pc(PC_path, 1)
 vol_crown <- volume_crown_pc(pc)
-vol_crown <- volume_crown_pc(pc,0.3,FALSE)
-vol_crown <- volume_crown_pc(pc,1,TRUE)
+vol_crown <- volume_crown_pc(pc, 0.3, FALSE)
+vol_crown <- volume_crown_pc(pc, 1, TRUE)
 }
 }

@@ -37,6 +37,6 @@ qsm <- read_tree_qsm(QSM_path)
 DBH <- dbh(qsm)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-DBH <- dbh(qsm,pc,TRUE)
+DBH <- dbh(qsm, pc, TRUE)
 }
 }

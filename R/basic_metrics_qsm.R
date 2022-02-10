@@ -17,13 +17,12 @@
 #' }
 tree_position_qsm <- function(cylinder) {
   j <- 0
-  while (sum(cylinder$length[1:(j+1)]) < 1.3)
-  {
-    j <- j+1
+  while (sum(cylinder$length[1:(j + 1)]) < 1.3) {
+    j <- j + 1
   }
-  x_location <- cylinder$start[j+1,1]
-  y_location <- cylinder$start[j+1,2]
-  return(c(x_location,y_location))
+  x_location <- cylinder$start[j + 1, 1]
+  y_location <- cylinder$start[j + 1, 2]
+  return(c(x_location, y_location))
 }
 
 #' Total cylinder length TreeQSM
@@ -69,7 +68,7 @@ total_cyl_length_qsm <- function(treedata) {
 #' tot_vol <- tree_volume_qsm(qsm$treedata)
 #' }
 tree_volume_qsm <- function(treedata) {
-  if (length(treedata) > 83){
+  if (length(treedata) > 83) {
     volume <- treedata$MixTotalVolume[1]
   } else {
     volume <- treedata$TotalVolume[1]
@@ -97,7 +96,7 @@ tree_volume_qsm <- function(treedata) {
 #' trunkvol <- trunk_volume_qsm(qsm$treedata)
 #' }
 trunk_volume_qsm <- function(treedata) {
-  if (length(treedata) > 83){
+  if (length(treedata) > 83) {
     volume <- treedata$MixTrunkVolume[1]
   } else {
     volume <- treedata$TrunkVolume[1]
@@ -122,7 +121,7 @@ trunk_volume_qsm <- function(treedata) {
 #' qsm <- read_tree_qsm(QSM_path)
 #' branchvol <- total_branch_volume_qsm(qsm$treedata)
 #' }
-total_branch_volume_qsm  <- function(treedata) {
+total_branch_volume_qsm <- function(treedata) {
   return(treedata$BranchVolume[1])
 }
 
@@ -143,7 +142,7 @@ total_branch_volume_qsm  <- function(treedata) {
 #' qsm <- read_tree_qsm(QSM_path)
 #' branchlen <- total_branch_length_qsm(qsm$treedata)
 #' }
-total_branch_length_qsm  <- function(treedata) {
+total_branch_length_qsm <- function(treedata) {
   return(treedata$BranchLength[1])
 }
 
@@ -190,7 +189,7 @@ tree_height_qsm <- function(treedata) {
 #' dbh <- dbh_qsm(qsm$treedata)
 #' }
 dbh_qsm <- function(treedata) {
-  if (length(treedata) > 83){
+  if (length(treedata) > 83) {
     dbh <- treedata$DBHtri[1]
   } else {
     dbh <- treedata$DBHqsm[1]

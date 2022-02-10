@@ -35,7 +35,7 @@ the value of attributes not found in the older version is set NA.
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-qsm <- read_tree_qsm(QSM_path,version="2.0")
-qsm <- read_tree_qsm(QSM_path,version="2.4.0",global=TRUE)
+qsm <- read_tree_qsm(QSM_path, version = "2.0")
+qsm <- read_tree_qsm(QSM_path, version = "2.4.0", global = TRUE)
 }
 }

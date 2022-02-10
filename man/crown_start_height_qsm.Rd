@@ -33,10 +33,10 @@ Crown cylinders are determined with \code{\link{crownset_qsm}}.
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder)
+csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder,pc)
+csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder, pc)
 }
 }
 \references{

@@ -55,6 +55,6 @@ iterative process is restarted with a "thresholdbuttress" increased with
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
 dab <- dab_pc(pc)
-dab <- dab_pc(pc,0.001,9,TRUE)
+dab <- dab_pc(pc, 0.001, 9, TRUE)
 }
 }

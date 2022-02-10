@@ -66,6 +66,6 @@ respectively.
 \dontrun{
 PCs_path <- "path/to/folder/PCs/"
 summary <- summary_basic_pointcloud_metrics(PCs_path)
-summary <- summary_basic_pointcloud_metrics(PCs_path,extension=".ply")
+summary <- summary_basic_pointcloud_metrics(PCs_path, extension = ".ply")
 }
 }

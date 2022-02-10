@@ -51,7 +51,7 @@ sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "parentcyl")
 sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,"treeheight",pc)
+sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight", pc)
 }
 }
 \references{

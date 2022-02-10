@@ -26,13 +26,13 @@
 #' DBH <- dbh(qsm)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' DBH <- dbh(qsm,pc,TRUE)
+#' DBH <- dbh(qsm, pc, TRUE)
 #' }
-dbh <- function(treedata,pc=NA,buttress=FALSE){
-  if(!is.data.frame(pc)){
+dbh <- function(treedata, pc = NA, buttress = FALSE) {
+  if (!is.data.frame(pc)) {
     return(dbh_qsm(treedata))
   } else {
-    if(buttress){
+    if (buttress) {
       return(dab_pc(pc))
     } else {
       return(dbh_pc(pc))
@@ -65,10 +65,10 @@ dbh <- function(treedata,pc=NA,buttress=FALSE){
 #' h <- tree_height(qsm)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' h <- tree_height(qsm,pc)
+#' h <- tree_height(qsm, pc)
 #' }
-tree_height <- function(treedata,pc=NA){
-  if(!is.data.frame(pc)){
+tree_height <- function(treedata, pc = NA) {
+  if (!is.data.frame(pc)) {
     return(tree_height_qsm(treedata))
   } else {
     return(tree_height_pc(pc))
@@ -107,9 +107,9 @@ tree_height <- function(treedata,pc=NA){
 #' sba <- stem_branch_angle_qsm(qsm$branch)
 #' }
 stem_branch_angle_qsm <- function(branch) {
-  indices_stem_branches <- which(branch$order == 1)
-  if (length(indices_stem_branches) > 0){
-    angle_stem_branches <- branch$angle[indices_stem_branches]
+  ind_stem_branches <- which(branch$order == 1)
+  if (length(ind_stem_branches) > 0) {
+    angle_stem_branches <- branch$angle[ind_stem_branches]
     sba <- stats::median(angle_stem_branches)
   } else {
     sba <- NaN
@@ -149,29 +149,29 @@ stem_branch_angle_qsm <- function(branch) {
 #' sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
 #' }
 stem_branch_cluster_size_qsm <- function(cylinder) {
-  indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
-                                  & cylinder$BranchOrder == 1)
-  if (length(indices_stem_cylinders) > 0){
-    cylinder_heights <- cylinder$start[indices_stem_cylinders,3]
-    cylinder_heights <- cylinder_heights[order(cylinder_heights)]
-    start_heights <- cylinder_heights - 0.2
-    end_heights <- cylinder_heights + 0.2
-    label <- integer(length(cylinder_heights))
+  ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
+                                cylinder$BranchOrder == 1)
+  if (length(ind_stem_cyl) > 0) {
+    cyl_heights <- cylinder$start[ind_stem_cyl, 3]
+    cyl_heights <- cyl_heights[order(cyl_heights)]
+    start_heights <- cyl_heights - 0.2
+    end_heights <- cyl_heights + 0.2
+    label <- integer(length(cyl_heights))
     cluster <- c()
-    for(i in 1:length(cylinder_heights)) {
-      indices_in_interval <- which(cylinder_heights > start_heights[i]
-                                   & cylinder_heights < end_heights[i])
-      number_clusters <- 0
-      for(j in 1:length(indices_in_interval)) {
-        if (label[indices_in_interval[j]] == 1) {
-          #do nothing
-        } else if(label[indices_in_interval[j]] == 0) {
-          label[indices_in_interval[j]] <- 1
-          number_clusters <- number_clusters + 1
+    for (i in 1:length(cyl_heights)) {
+      ind_in_interval <- which(cyl_heights > start_heights[i] &
+                                 cyl_heights < end_heights[i])
+      num_clusters <- 0
+      for (j in 1:length(ind_in_interval)) {
+        if (label[ind_in_interval[j]] == 1) {
+          # do nothing
+        } else if (label[ind_in_interval[j]] == 0) {
+          label[ind_in_interval[j]] <- 1
+          num_clusters <- num_clusters + 1
         }
       }
-      if(length(indices_in_interval) > 0 & number_clusters>0){
-        cluster <- append(cluster,number_clusters)
+      if (length(ind_in_interval) > 0 & num_clusters > 0) {
+        cluster <- append(cluster, num_clusters)
       }
     }
     sbcs <- mean(cluster)
@@ -227,35 +227,33 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,"treeheight",pc)
+#' sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight", pc)
 #' }
 stem_branch_radius_qsm <- function(cylinder, treedata,
-                                   normalisation="treeheight", pc=NA) {
-  indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
-                                  & cylinder$BranchOrder == 1)
-  if(length(indices_stem_cylinders) > 0) {
-    branch_radius <- cylinder$radius[indices_stem_cylinders]
-    branch_indices_sorted <- indices_stem_cylinders[order(branch_radius,
-                                                          decreasing = TRUE)]
-    branch_radius_sorted <- branch_radius[order(branch_radius,
-                                                decreasing = TRUE)]
-    if(length(branch_indices_sorted) < 10){
-      indices_biggest_ten <- branch_indices_sorted
-      radius_biggest_ten <- branch_radius_sorted
+                                   normalisation = "treeheight", pc = NA) {
+  ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
+                          cylinder$BranchOrder == 1)
+  if (length(ind_stem_cyl) > 0) {
+    branch_rad <- cylinder$radius[ind_stem_cyl]
+    branch_ind_sorted <- ind_stem_cyl[order(branch_rad,decreasing = TRUE)]
+    branch_rad_sorted <- branch_rad[order(branch_rad,decreasing = TRUE)]
+    if (length(branch_ind_sorted) < 10) {
+      ind_b10 <- branch_ind_sorted
+      rad_b10 <- branch_rad_sorted
     } else {
-      indices_biggest_ten <- branch_indices_sorted[1:10]
-      radius_biggest_ten <- branch_radius_sorted[1:10]
+      ind_b10 <- branch_ind_sorted[1:10]
+      rad_b10 <- branch_rad_sorted[1:10]
     }
-    indices_parents_bt <- cylinder$parent[indices_biggest_ten]
-    radius_parents_bt <- cylinder$radius[indices_parents_bt]
-    if(normalisation == "treeheight") {
-      tree_height <- tree_height(treedata,pc)
-      sbr <- mean(radius_biggest_ten)/tree_height
+    ind_parents_b10 <- cylinder$parent[ind_b10]
+    rad_parents_b10 <- cylinder$radius[ind_parents_b10]
+    if (normalisation == "treeheight") {
+      tree_height <- tree_height(treedata, pc)
+      sbr <- mean(rad_b10) / tree_height
     } else if (normalisation == "parentcylinder") {
-      sbr <- mean(radius_biggest_ten/radius_parents_bt)
+      sbr <- mean(rad_b10 / rad_parents_b10)
     } else {
       print("No normalisation")
-      sbr <- mean(radius_biggest_ten)
+      sbr <- mean(rad_b10)
     }
   } else {
     sbr <- NaN
@@ -314,20 +312,21 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #' pc <- read_tree_pc(PC_path)
 #' sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, "dbh", pc, TRUE)
 #' }
-stem_branch_length_qsm <- function(branch, treedata, normalisation="treeheight",
-                                   pc=NA, buttress=FALSE) {
-  indices_stem_branches <- which(branch$order == 1)
-  if (length(indices_stem_branches) > 0) {
-    branch_lengths=branch$length[indices_stem_branches]
+stem_branch_length_qsm <- function(branch, treedata,
+                                   normalisation = "treeheight", pc = NA,
+                                   buttress = FALSE) {
+  ind_stem_branches <- which(branch$order == 1)
+  if (length(ind_stem_branches) > 0) {
+    branch_len <- branch$length[ind_stem_branches]
     if (normalisation == "dbh") {
-      dbh <- dbh(treedata,pc,buttress)
-      sbl <- mean(branch_lengths)/dbh
+      dbh <- dbh(treedata, pc, buttress)
+      sbl <- mean(branch_len) / dbh
     } else if (normalisation == "treeheight") {
-      tree_height <- tree_height(treedata,pc)
-      sbl <- mean(branch_lengths)/tree_height
+      tree_height <- tree_height(treedata, pc)
+      sbl <- mean(branch_len) / tree_height
     } else {
       print("No normalisation")
-      sbl <- mean(branch_lengths)
+      sbl <- mean(branch_len)
     }
   } else {
     sbl <- NaN
@@ -383,38 +382,37 @@ stem_branch_length_qsm <- function(branch, treedata, normalisation="treeheight",
 #' pc <- read_tree_pc(PC_path)
 #' sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh", pc, TRUE)
 #' }
-stem_branch_distance_qsm <- function(cylinder, treedata, normalisation="no",
-                                     pc=NA, buttress=FALSE) {
-  indices_stem_cylinders <- which(cylinder$PositionInBranch == 1
-                                  & cylinder$BranchOrder == 1)
-  cylinder_heights <- cylinder$start[indices_stem_cylinders,3]
-  cylinder_heights <- cylinder_heights[order(cylinder_heights)]
-  if(length(indices_stem_cylinders) > 0) {
-    upper_heights <- cylinder_heights[2:length(cylinder_heights)]
-    lower_heights <- cylinder_heights[1:length(cylinder_heights)-1]
-    height_difference <- upper_heights - lower_heights
-    start_heights <- cylinder_heights - 0.5
-    end_heights <- cylinder_heights + 0.5
+stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
+                                     pc = NA, buttress = FALSE) {
+  ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
+                          cylinder$BranchOrder == 1)
+  cyl_heights <- cylinder$start[ind_stem_cyl, 3]
+  cyl_heights <- cyl_heights[order(cyl_heights)]
+  if (length(ind_stem_cyl) > 0) {
+    up_heights <- cyl_heights[2:length(cyl_heights)]
+    lo_heights <- cyl_heights[1:length(cyl_heights) - 1]
+    height_dif <- up_heights - lo_heights
+    start_heights <- cyl_heights - 0.5
+    end_heights <- cyl_heights + 0.5
     average_distance <- c()
-    for(i in 1:length(cylinder_heights)){
-      indices_in_interval <- which(cylinder_heights > start_heights[i]
-                                   & cylinder_heights < end_heights[i])
-      if(length(indices_in_interval) == 1) {
-        average_distance <- append(average_distance,0.5)
+    for (i in 1:length(cyl_heights)) {
+      ind_in_interval <- which(cyl_heights > start_heights[i] &
+                                 cyl_heights < end_heights[i])
+      if (length(ind_in_interval) == 1) {
+        average_distance <- append(average_distance, 0.5)
       } else {
         distance <- c()
-        for(j in 1:length(indices_in_interval)-1) {
-          distance <- append(distance,
-                             height_difference[indices_in_interval[j]])
+        for (j in 1:length(ind_in_interval) - 1) {
+          distance <- append(distance, height_dif[ind_in_interval[j]])
         }
-        average_distance <- append(average_distance,mean(distance))
+        average_distance <- append(average_distance, mean(distance))
       }
     }
-    if(normalisation == "dbh") {
-      dbh <- dbh(treedata,pc,buttress)
-      sbd <- mean(average_distance)/dbh
+    if (normalisation == "dbh") {
+      dbh <- dbh(treedata, pc, buttress)
+      sbd <- mean(average_distance) / dbh
     } else {
-      #print("No normalisation")
+      # print("No normalisation")
       sbd <- mean(average_distance)
     }
   } else {
@@ -461,10 +459,10 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation="no",
 #' ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc)
 #' ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc, TRUE)
 #' }
-dbh_height_ratio_qsm <- function(treedata,pc=NA,buttress=FALSE){
-  dbh <- dbh(treedata,pc,buttress)
-  tree_height <- tree_height(treedata,pc)
-  return(dbh/tree_height)
+dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE) {
+  dbh <- dbh(treedata, pc, buttress)
+  tree_height <- tree_height(treedata, pc)
+  return(dbh / tree_height)
 }
 
 #' DBH-tree volume ratio TreeQSM
@@ -502,13 +500,13 @@ dbh_height_ratio_qsm <- function(treedata,pc=NA,buttress=FALSE){
 #' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc)
-#' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata,pc,TRUE)
+#' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc)
+#' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc, TRUE)
 #' }
-dbh_volume_ratio_qsm <- function(treedata,pc=NA,buttress=FALSE){
-  dbh <- dbh(treedata,pc,buttress)
+dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE) {
+  dbh <- dbh(treedata, pc, buttress)
   volume <- tree_volume_qsm(treedata)
-  return(dbh/volume)
+  return(dbh / volume)
 }
 
 #' Volume below 55 TreeQSM
@@ -542,17 +540,15 @@ dbh_volume_ratio_qsm <- function(treedata,pc=NA,buttress=FALSE){
 #' qsm <- read_tree_qsm(QSM_path)
 #' vol_55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
 #' }
-volume_below_55_qsm <- function(cylinder, treedata){
+volume_below_55_qsm <- function(cylinder, treedata) {
   tree_height <- tree_height_qsm(treedata)
   volume_branches <- total_branch_volume_qsm(treedata)
-  height_at_55 <- tree_height*0.55+min(cylinder$start[,3])
-  indices_branch_cylinders_under_55 <- which(cylinder$start[,3]
-                                             < height_at_55
-                                             & cylinder$BranchOrder != 0)
-  volumes_branch_cylinders_under_55 <- cylinder$length[
-    indices_branch_cylinders_under_55]*
-    pi%*%cylinder$radius[indices_branch_cylinders_under_55]**2
-  vb55 <- sum(volumes_branch_cylinders_under_55)/volume_branches
+  height_at_55 <- tree_height * 0.55 + min(cylinder$start[, 3])
+  ind_branch_cyl_u55 <- which(cylinder$start[, 3] < height_at_55 &
+                                               cylinder$BranchOrder != 0)
+  vol_branch_cyl_u55 <- cylinder$length[ind_branch_cyl_u55] * pi %*%
+    cylinder$radius[ind_branch_cyl_u55]**2
+  vb55 <- sum(vol_branch_cyl_u55) / volume_branches
   return(vb55)
 }
 
@@ -586,10 +582,10 @@ volume_below_55_qsm <- function(cylinder, treedata){
 #' qsm <- read_tree_qsm(QSM_path)
 #' len_vol_ratio <- cylinder_length_volume_ratio_qsm(qsm$treedata)
 #' }
-cylinder_length_volume_ratio_qsm <- function(treedata){
+cylinder_length_volume_ratio_qsm <- function(treedata) {
   total_branch_volume <- total_branch_volume_qsm(treedata)
   total_branch_length <- total_branch_length_qsm(treedata)
-  return(total_branch_length/total_branch_volume)
+  return(total_branch_length / total_branch_volume)
 }
 
 #' Shedding ratio TreeQSM
@@ -624,27 +620,25 @@ cylinder_length_volume_ratio_qsm <- function(treedata){
 #' qsm <- read_tree_qsm(QSM_path)
 #' shed_ratio <- shedding_ratio_qsm(qsm$branch, qsm$treedata)
 #' }
-shedding_ratio_qsm <- function(branch,treedata){
-  indices_stem_branches <- which(branch$order == 1)
+shedding_ratio_qsm <- function(branch, treedata) {
+  ind_stem_branches <- which(branch$order == 1)
   tree_height <- treedata$TreeHeight[1]
-  if(length(indices_stem_branches) > 0){
-    indices_stem_branches_under_third <- which(branch$height < tree_height/3
-                                               & branch$order == 1)
-    if (rapportools::is.empty(indices_stem_branches_under_third)){
+  if (length(ind_stem_branches) > 0) {
+    ind_stem_branches_u3rd <- which(branch$height < tree_height / 3 &
+                                    branch$order == 1)
+    if (rapportools::is.empty(ind_stem_branches_u3rd)) {
       sr <- 0
     } else {
-      number_stem_branches_under_third <- length(
-        indices_stem_branches_under_third)
-      number_without_children <- 0
-      for(i in 1:number_stem_branches_under_third){
-        number_children <- sum(branch$parent ==
-                                 indices_stem_branches_under_third[i])
-        if(number_children == 0){
-          number_without_children <- number_without_children + 1
+      num_stem_branches_u3 <- length(ind_stem_branches_u3rd)
+      num_without_children <- 0
+      for (i in 1:num_stem_branches_u3rd) {
+        num_children <- sum(branch$parent == ind_stem_branches_u3rd[i])
+        if (num_children == 0) {
+          num_without_children <- num_without_children + 1
         }
       }
-      if(number_without_children > 0){
-        sr <- number_without_children/number_stem_branches_under_third
+      if (num_without_children > 0) {
+        sr <- num_without_children / num_stem_branches_u3rd
       } else {
         sr <- 0
       }
@@ -666,7 +660,7 @@ shedding_ratio_qsm <- function(branch,treedata){
 #' @param branch Branch field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
-#' @return The branch angle ratio
+#' @return The branch angle ratio. NaN when there are no branches.
 #'
 #' @references Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,
 #'   Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using
@@ -679,14 +673,20 @@ shedding_ratio_qsm <- function(branch,treedata){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' ba_ratio <- branch_angle_ratio_qsm(qsm$branch)}
-branch_angle_ratio_qsm <- function(branch){
-  indices_first_order_branches <- which(branch$order == 1)
-  indices_second_order_branches <- which(branch$order == 2)
-  angle_first_order_branches <- branch$angle[indices_first_order_branches]
-  angle_second_order_branches <- branch$angle[indices_second_order_branches]
-  return(stats::median(angle_first_order_branches)/
-           stats::median(angle_second_order_branches))
+#' ba_ratio <- branch_angle_ratio_qsm(qsm$branch)
+#' }
+branch_angle_ratio_qsm <- function(branch) {
+  if (length(branch$order) > 1) {
+    ind_1st_order_branches <- which(branch$order == 1)
+    ind_2nd_order_branches <- which(branch$order == 2)
+    angle_1st_order_branches <- branch$angle[ind_1st_order_branches]
+    angle_2nd_order_branches <- branch$angle[ind_2nd_order_branches]
+    bar <- stats::median(angle_1st_order_branches) /
+      stats::median(angle_2nd_order_branches)
+  } else {
+    bar <- NaN
+  }
+  return(bar)
 }
 
 #' Relative volume ratio TreeQSM
@@ -717,30 +717,24 @@ branch_angle_ratio_qsm <- function(branch){
 #' qsm <- read_tree_qsm(QSM_path)
 #' relvol_ratio <- relative_volume_ratio_qsm(qsm$cylinder, qsm$treedata)
 #' }
-relative_volume_ratio_qsm <- function(cylinder,treedata){
+relative_volume_ratio_qsm <- function(cylinder, treedata) {
   tree_height <- treedata$TreeHeight[1]
-  volume <- treedata$TotalVolume[1]
   number <- 10
-  interval <- tree_height/number
-  cylinder_z_coordinates <- cylinder$start[,3]
-  minimum_z_coordinate <- min(cylinder_z_coordinates)
-  volume_distribution <- integer(1)
-  for(i in 0:number){
-    interval_start <- minimum_z_coordinate + i*interval
+  interval <- tree_height / number
+  cyl_z_coo <- cylinder$start[, 3]
+  min_z_coo <- min(cyl_z_coo)
+  vol_dist <- integer(1)
+  for (i in 0:number) {
+    interval_start <- min_z_coo + i * interval
     interval_end <- interval_start + interval
-    indices_cylinders_in_interval <- which(cylinder_z_coordinates >=
-                                             interval_start
-                                           & cylinder_z_coordinates <
-                                             interval_end)
-    volume_cylinders_in_interval <- sum(cylinder$length
-                                        [indices_cylinders_in_interval]*
-                                          pi%*%cylinder$radius
-                                        [indices_cylinders_in_interval]**2)
-    volume_distribution <- append(volume_distribution,
-                                  volume_cylinders_in_interval)
+    ind_cyl_in_interval <- which(cyl_z_coo >= interval_start &
+                                   cyl_z_coo < interval_end)
+    vol_cyl_in_interval <- sum(cylinder$length[ind_cyl_in_interval] * pi %*%
+                                 cylinder$radius[ind_cyl_in_interval]**2)
+    vol_dist <- append(vol_dist, vol_cyl_in_interval)
   }
-  relative_volume_distribution <- volume_distribution/volume
-  return(relative_volume_distribution[10]/relative_volume_distribution[2])
+  rel_vol_dist <- vol_dist
+  return(rel_vol_dist[10] / rel_vol_dist[2])
 }
 
 #' Crownset TreeQSM
@@ -776,41 +770,41 @@ relative_volume_ratio_qsm <- function(cylinder,treedata){
 #' qsm <- read_tree_qsm(QSM_path)
 #' crown <- crownset_qsm(qsm$cylinder)
 #' }
-crownset_qsm <- function(cylinder){
+crownset_qsm <- function(cylinder) {
   children <- c()
-  for(i in 1:length(cylinder$parent)){
+  for (i in 1:length(cylinder$parent)) {
     c <- list(which(cylinder$parent == i))
-    children <- append(children,c)
+    children <- append(children, c)
   }
-  #STEP 1
+  # STEP 1
   order <- 3
   crownset <- which(cylinder$BranchOrder >= order)
-  while(length(crownset)==0 & order>1){
+  while (length(crownset) == 0 & order > 1) {
     order <- order - 1
     crownset <- which(cylinder$BranchOrder == order)
   }
-  if(length(crownset)>0){
-    #STEp 2
+  if (length(crownset) > 0) {
+    # STEP 2
     parents <- unique(cylinder$parent[crownset])
-    parents <- parents[cylinder$BranchOrder[parents]>0]
-    while(length(parents)>0){
-      crownset <- unique(append(crownset,parents))
+    parents <- parents[cylinder$BranchOrder[parents] > 0]
+    while (length(parents) > 0) {
+      crownset <- unique(append(crownset, parents))
       newparents <- unique(cylinder$parent[parents])
-      newparents <- newparents[cylinder$BranchOrder[newparents]>0]
+      newparents <- newparents[cylinder$BranchOrder[newparents] > 0]
       parents <- newparents
     }
-    #STEP 3
+    # STEP 3
     crownset_parent0 <- crownset[cylinder$BranchOrder
-                                 [cylinder$parent[crownset]]==0]
-    min_height <- min(cylinder$start[crownset_parent0,3])
-    crownset <- unique(append(crownset,which(cylinder$start[,3]>min_height
-                                             & cylinder$BranchOrder>0)))
-    #STEP 4
+                                 [cylinder$parent[crownset]] == 0]
+    min_height <- min(cylinder$start[crownset_parent0, 3])
+    crownset <- unique(append(crownset, which(cylinder$start[, 3] > min_height &
+                                                cylinder$BranchOrder > 0)))
+    # STEP 4
     init_length <- 0
-    while (length(crownset)>init_length){
+    while (length(crownset) > init_length) {
       init_length <- length(crownset)
-      for (i in 1:length(children[crownset])){
-        crownset <- unique(append(crownset,children[crownset][[i]]))
+      for (i in 1:length(children[crownset])) {
+        crownset <- unique(append(crownset, children[crownset][[i]]))
       }
     }
   }
@@ -851,19 +845,19 @@ crownset_qsm <- function(cylinder){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder)
+#' csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' csh <- crown_start_height_qsm(qsm$treedata,qsm$cylinder,pc)
+#' csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder, pc)
 #' }
-crown_start_height_qsm <- function(treedata,cylinder,pc=NA){
+crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
   crownset <- crownset_qsm(cylinder)
-  tree_height <- tree_height(treedata,pc)
+  tree_height <- tree_height(treedata, pc)
   crownset_parent0 <- crownset[cylinder$BranchOrder
-                               [cylinder$parent[crownset]]==0]
-  min_height <- min(cylinder$start[crownset_parent0,3])
-  if(length(crownset)>0){
-    sh <- (min_height-min(cylinder$start[,3]))/tree_height
+                               [cylinder$parent[crownset]] == 0]
+  min_height <- min(cylinder$start[crownset_parent0, 3])
+  if (length(crownset) > 0) {
+    sh <- (min_height - min(cylinder$start[, 3])) / tree_height
   } else {
     sh <- NaN
   }
@@ -905,20 +899,20 @@ crown_start_height_qsm <- function(treedata,cylinder,pc=NA){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' ch <- crown_height_qsm(qsm$treedata,qsm$cylinder)
+#' ch <- crown_height_qsm(qsm$treedata, qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' ch <- crown_height_qsm(qsm$treedata,qsm$cylinder,pc)
+#' ch <- crown_height_qsm(qsm$treedata, qsm$cylinder, pc)
 #' }
-crown_height_qsm <- function(treedata,cylinder,pc=NA){
+crown_height_qsm <- function(treedata, cylinder, pc = NA) {
   crownset <- crownset_qsm(cylinder)
-  tree_height <- tree_height(treedata,pc)
-  if(length(crownset)>0){
-    minz_crown <- min(cylinder$start[crownset,3])
-    maxz_crown <- max(cylinder$start[crownset,3])
-    x <- which(cylinder$start[,3]==maxz_crown)
-    maxz_crown <- maxz_crown+cylinder$length[x]*cylinder$axis[x,3]
-    ch <- (maxz_crown-minz_crown)/tree_height
+  tree_height <- tree_height(treedata, pc)
+  if (length(crownset) > 0) {
+    minz_crown <- min(cylinder$start[crownset, 3])
+    maxz_crown <- max(cylinder$start[crownset, 3])
+    x <- which(cylinder$start[, 3] == maxz_crown)
+    maxz_crown <- maxz_crown + cylinder$length[x] * cylinder$axis[x, 3]
+    ch <- (maxz_crown - minz_crown) / tree_height
   } else {
     ch <- NaN
   }
@@ -954,37 +948,37 @@ crown_height_qsm <- function(treedata,cylinder,pc=NA){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' ce <- crown_evenness_qsm(qsm$cylinder,crown)
+#' ce <- crown_evenness_qsm(qsm$cylinder, crown)
 #' }
-crown_evenness_qsm <- function(cylinder){
+crown_evenness_qsm <- function(cylinder) {
   crownset <- crownset_qsm(cylinder)
-  if(length(crownset)>0){
-    bins <- c(0*2*pi/8-pi,1*2*pi/8-pi,2*2*pi/8-pi,3*2*pi/8-pi,4*2*pi/8-pi,
-              5*2*pi/8-pi,6*2*pi/8-pi,7*2*pi/8-pi,2*pi/1-pi)
-    crownset_bo1 <- crownset[cylinder$BranchOrder[crownset]==1]
-    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[cylinder$parent[
-      crownset_bo1]]==0]
-    center_z <- min(cylinder$start[crownset_bo1_po0,3])
-    center <- crownset_bo1_po0[cylinder$start[crownset_bo1_po0,3] == center_z]
-    center_x <- cylinder$start[center,1]
-    center_y <- cylinder$start[center,2]
-    R <- sqrt(((cylinder$start[crownset,1]-center_x)^2+
-                 (cylinder$start[crownset,2]-center_y)^2))
-    theta <- atan2((cylinder$start[crownset,2]-center_y),
-                   (cylinder$start[crownset,1]-center_x))
+  if (length(crownset) > 0) {
+    bins <- c(0 * 2 * pi / 8 - pi, 1 * 2 * pi / 8 - pi, 2 * 2 * pi / 8 - pi,
+      3 * 2 * pi / 8 - pi, 4 * 2 * pi / 8 - pi, 5 * 2 * pi / 8 - pi,
+      6 * 2 * pi / 8 - pi, 7 * 2 * pi / 8 - pi, 2 * pi / 1 - pi)
+    crownset_bo1 <- crownset[cylinder$BranchOrder[crownset] == 1]
+    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[
+      cylinder$parent[crownset_bo1]] == 0]
+    center_z <- min(cylinder$start[crownset_bo1_po0, 3])
+    center <- crownset_bo1_po0[cylinder$start[crownset_bo1_po0, 3] == center_z]
+    center_x <- cylinder$start[center, 1]
+    center_y <- cylinder$start[center, 2]
+    R <- sqrt(((cylinder$start[crownset, 1] - center_x)^2 +
+                 (cylinder$start[crownset, 2] - center_y)^2))
+    theta <- atan2((cylinder$start[crownset, 2] - center_y),
+                   (cylinder$start[crownset, 1] - center_x))
     minimums <- c()
-    Indices_Bin <- c()
-    for (i in 2:length(bins)){
-      indices_bin <- (theta < bins[i] & theta >= bins[(i-1)])
-      Indices_Bin <- append(Indices_Bin,list(indices_bin))
-      if(sum(indices_bin)>0){
-        minimums <- append(minimums,
-                           min(cylinder$start[crownset[indices_bin],3]))
+    Ind_Bin <- c()
+    for (i in 2:length(bins)) {
+      ind_bin <- (theta < bins[i] & theta >= bins[(i - 1)])
+      Ind_Bin <- append(Ind_Bin, list(ind_bin))
+      if (sum(ind_bin) > 0) {
+        minimums <- append(minimums, min(cylinder$start[crownset[ind_bin], 3]))
       }
     }
-    if(length(minimums)==length(bins)){
-      ce <- (min(minimums)-min(cylinder$start[,3]))/
-        (max(minimums)-min(cylinder$start[,3]))
+    if (length(minimums) == length(bins)) {
+      ce <- (min(minimums) - min(cylinder$start[, 3])) /
+        (max(minimums) - min(cylinder$start[, 3]))
     } else {
       ce <- 0
     }
@@ -1027,41 +1021,41 @@ crown_evenness_qsm <- function(cylinder){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' radii <- vertical_bin_radii_qsm(qsm$treedata,qsm$cylinder)
+#' radii <- vertical_bin_radii_qsm(qsm$treedata, qsm$cylinder)
 #' }
-vertical_bin_radii_qsm <- function(treedata,cylinder){
+vertical_bin_radii_qsm <- function(treedata, cylinder) {
   dbh <- dbh_qsm(treedata)
-  sx <- cylinder$start[,1]
-  sy <- cylinder$start[,2]
-  sz <- cylinder$start[,3]
-  cx <- cylinder$length*cylinder$axis[,1]/2+cylinder$start[,1]
-  cy <- cylinder$length*cylinder$axis[,2]/2+cylinder$start[,2]
-  cz <- cylinder$length*cylinder$axis[,3]/2+cylinder$start[,3]
-  ex <- cylinder$length*cylinder$axis[,1]+cylinder$start[,1]
-  ey <- cylinder$length*cylinder$axis[,2]+cylinder$start[,2]
-  ez <- cylinder$length*cylinder$axis[,3]+cylinder$start[,3]
-  vol <- cylinder$length*cylinder$radius^2*pi
-  height <- max(ez)-min(sz)
+  sx <- cylinder$start[, 1]
+  sy <- cylinder$start[, 2]
+  sz <- cylinder$start[, 3]
+  cx <- cylinder$length * cylinder$axis[, 1] / 2 + cylinder$start[, 1]
+  cy <- cylinder$length * cylinder$axis[, 2] / 2 + cylinder$start[, 2]
+  cz <- cylinder$length * cylinder$axis[, 3] / 2 + cylinder$start[, 3]
+  ex <- cylinder$length * cylinder$axis[, 1] + cylinder$start[, 1]
+  ey <- cylinder$length * cylinder$axis[, 2] + cylinder$start[, 2]
+  ez <- cylinder$length * cylinder$axis[, 3] + cylinder$start[, 3]
+  vol <- cylinder$length * cylinder$radius^2 * pi
+  height <- max(ez) - min(sz)
   bins <- c()
-  for (i in 1:length(ez)){
-    if (ez[i] <= min(sz)+height/3){
-      bins <- append(bins,1)
-    } else if(ez[i] <= min(sz)+height*2/3) {
-      bins <- append(bins,2)
+  for (i in 1:length(ez)) {
+    if (ez[i] <= min(sz) + height / 3) {
+      bins <- append(bins, 1)
+    } else if (ez[i] <= min(sz) + height * 2 / 3) {
+      bins <- append(bins, 2)
     } else {
-      bins <- append(bins,3)
+      bins <- append(bins, 3)
     }
   }
-  bin1 <- which(bins==1)
-  bin2 <- which(bins==2)
-  bin3 <- which(bins==3)
-  stem <- which(cylinder$BranchOrder==0)
+  bin1 <- which(bins == 1)
+  bin2 <- which(bins == 2)
+  bin3 <- which(bins == 3)
+  stem <- which(cylinder$BranchOrder == 0)
   bin1_cx <- mean(cx[stem[stem %in% bin1]])
   bin1_cy <- mean(cy[stem[stem %in% bin1]])
-  if(sum(stem %in% bin2)>0){
+  if (sum(stem %in% bin2) > 0) {
     bin2_cx <- mean(cx[stem[stem %in% bin2]])
     bin2_cy <- mean(cy[stem[stem %in% bin2]])
-    if(sum(stem %in% bin3)>0){
+    if (sum(stem %in% bin3) > 0) {
       bin3_cx <- mean(cx[stem[stem %in% bin3]])
       bin3_cy <- mean(cy[stem[stem %in% bin3]])
     } else {
@@ -1069,17 +1063,17 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
       bin3_cy <- bin2_cy
     }
   } else {
-    bin2_cx <- bin3_cx <-bin1_cx
-    bin2_cy <- bin3_cy <-bin1_cy
+    bin2_cx <- bin3_cx <- bin1_cx
+    bin2_cy <- bin3_cy <- bin1_cy
   }
-  de_bin1 <- sqrt((ex[bin1]-bin1_cx)^2+(ey[bin1]-bin1_cy)^2)
-  de_bin2 <- sqrt((ex[bin2]-bin2_cx)^2+(ey[bin2]-bin2_cy)^2)
-  de_bin3 <- sqrt((ex[bin3]-bin3_cx)^2+(ey[bin3]-bin3_cy)^2)
-  ds_bin1 <- sqrt((sx[bin1]-bin1_cx)^2+(sy[bin1]-bin1_cy)^2)
-  ds_bin2 <- sqrt((sx[bin2]-bin2_cx)^2+(sy[bin2]-bin2_cy)^2)
-  ds_bin3 <- sqrt((sx[bin3]-bin3_cx)^2+(sy[bin3]-bin3_cy)^2)
-  if(sum(!(bin1 %in% stem))==0){
-    if(max(de_bin1)<=dbh/2){
+  de_bin1 <- sqrt((ex[bin1] - bin1_cx)^2 + (ey[bin1] - bin1_cy)^2)
+  de_bin2 <- sqrt((ex[bin2] - bin2_cx)^2 + (ey[bin2] - bin2_cy)^2)
+  de_bin3 <- sqrt((ex[bin3] - bin3_cx)^2 + (ey[bin3] - bin3_cy)^2)
+  ds_bin1 <- sqrt((sx[bin1] - bin1_cx)^2 + (sy[bin1] - bin1_cy)^2)
+  ds_bin2 <- sqrt((sx[bin2] - bin2_cx)^2 + (sy[bin2] - bin2_cy)^2)
+  ds_bin3 <- sqrt((sx[bin3] - bin3_cx)^2 + (sy[bin3] - bin3_cy)^2)
+  if (sum(!(bin1 %in% stem)) == 0) {
+    if (max(de_bin1) <= dbh / 2) {
       r1 <- dbh
     } else {
       r1 <- max(de_bin1)
@@ -1088,22 +1082,22 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
     bin1_branch <- bin1[!(bin1 %in% stem)]
     de_bin1_branch <- de_bin1[which(!(bin1 %in% stem))]
     ds_bin1_branch <- ds_bin1[which(!(bin1 %in% stem))]
-    d_bin1_branch <- de_bin1_branch-ds_bin1_branch
+    d_bin1_branch <- de_bin1_branch - ds_bin1_branch
     p <- max(de_bin1_branch)
     ratio <- 1
-    while(ratio > 0.9){
-      p <- p-0.01
+    while (ratio > 0.9) {
+      p <- p - 0.01
       v1 <- sum(vol[bin1_branch[de_bin1_branch <= p]])
-      v2 <- sum((p-ds_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p])/
-                  (d_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p])*
-                  vol[bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]])
-      vol_p <- v1+v2
-      ratio <- vol_p/sum(vol[bin1_branch])
+      v2 <- sum((p - ds_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]) /
+        (d_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]) *
+        vol[bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]])
+      vol_p <- v1 + v2
+      ratio <- vol_p / sum(vol[bin1_branch])
     }
-    r1 <- p+0.005
+    r1 <- p + 0.005
   }
-  if(sum(!(bin2 %in% stem))==0){
-    if(max(de_bin2)<=max(cylinder$radius[bin2])){
+  if (sum(!(bin2 %in% stem)) == 0) {
+    if (max(de_bin2) <= max(cylinder$radius[bin2])) {
       r2 <- max(cylinder$radius[bin2])
     } else {
       r2 <- max(de_bin2)
@@ -1112,22 +1106,22 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
     bin2_branch <- bin2[!(bin2 %in% stem)]
     de_bin2_branch <- de_bin2[which(!(bin2 %in% stem))]
     ds_bin2_branch <- ds_bin2[which(!(bin2 %in% stem))]
-    d_bin2_branch <- de_bin2_branch-ds_bin2_branch
+    d_bin2_branch <- de_bin2_branch - ds_bin2_branch
     p <- max(de_bin2_branch)
     ratio <- 1
-    while(ratio > 0.9){
-      p <- p-0.01
+    while (ratio > 0.9) {
+      p <- p - 0.01
       v1 <- sum(vol[bin2_branch[de_bin2_branch <= p]])
-      v2 <- sum((p-ds_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p])/
-                  (d_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p])*
-                  vol[bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]])
-      vol_p <- v1+v2
-      ratio <- vol_p/sum(vol[bin2_branch])
+      v2 <- sum((p - ds_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]) /
+        (d_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]) *
+        vol[bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]])
+      vol_p <- v1 + v2
+      ratio <- vol_p / sum(vol[bin2_branch])
     }
-    r2 <- p+0.005
+    r2 <- p + 0.005
   }
-  if(sum(!(bin3 %in% stem))==0){
-    if(max(de_bin3)<=max(cylinder$radius[bin3])){
+  if (sum(!(bin3 %in% stem)) == 0) {
+    if (max(de_bin3) <= max(cylinder$radius[bin3])) {
       r3 <- max(cylinder$radius[bin3])
     } else {
       r3 <- max(de_bin3)
@@ -1136,21 +1130,21 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
     bin3_branch <- bin3[!(bin3 %in% stem)]
     de_bin3_branch <- de_bin3[which(!(bin3 %in% stem))]
     ds_bin3_branch <- ds_bin3[which(!(bin3 %in% stem))]
-    d_bin3_branch <- de_bin3_branch-ds_bin3_branch
+    d_bin3_branch <- de_bin3_branch - ds_bin3_branch
     p <- max(de_bin3_branch)
     ratio <- 1
-    while(ratio > 0.9){
-      p <- p-0.01
+    while (ratio > 0.9) {
+      p <- p - 0.01
       v1 <- sum(vol[bin3_branch[de_bin3_branch <= p]])
-      v2 <- sum((p-ds_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p])/
-                  (d_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p])*
-                  vol[bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]])
-      vol_p <- v1+v2
-      ratio <- vol_p/sum(vol[bin3_branch])
+      v2 <- sum((p - ds_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]) /
+        (d_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]) *
+        vol[bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]])
+      vol_p <- v1 + v2
+      ratio <- vol_p / sum(vol[bin3_branch])
     }
-    r3 <- p+0.005
+    r3 <- p + 0.005
   }
-  return(c(r1,r2,r3))
+  return(c(r1, r2, r3))
 }
 
 #' Crown diameter height ratio TreeQSM
@@ -1189,19 +1183,18 @@ vertical_bin_radii_qsm <- function(treedata,cylinder){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown)
+#' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown,
-#'              pc)
+#' cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder,pc)
 #' }
-crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc=NA){
-  radii <- vertical_bin_radii_qsm(treedata,cylinder)
-  diameter <- max(radii)*2
-  ch  <- crown_height_qsm(treedata,cylinder)
-  tree_height <- tree_height(treedata,pc)
-  height <- ch*tree_height
-  return(diameter/height)
+crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
+  radii <- vertical_bin_radii_qsm(treedata, cylinder)
+  diameter <- max(radii) * 2
+  ch <- crown_height_qsm(treedata, cylinder)
+  tree_height <- tree_height(treedata, pc)
+  height <- ch * tree_height
+  return(diameter / height)
 }
 
 #' DBH minimum tree radius ratio TreeQSM
@@ -1242,16 +1235,15 @@ crown_diameterheight_ratio_qsm <- function(treedata,cylinder,pc=NA){
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder)
+#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc)
-#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata,qsm$cylinder,pc,TRUE)
+#' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
 #' }
-dbh_minradius_ratio_qsm <- function(treedata,cylinder,pc=NA,buttress=FALSE){
-  radii <- vertical_bin_radii_qsm(treedata,cylinder)
-  diameter <- min(radii)*2
-  dbh <- dbh(treedata,pc,buttress)
-  return(dbh/diameter)
+dbh_minradius_ratio_qsm <- function(treedata, cylinder, pc = NA,
+                                    buttress = FALSE) {
+  radii <- vertical_bin_radii_qsm(treedata, cylinder)
+  diameter <- min(radii) * 2
+  dbh <- dbh(treedata, pc, buttress)
+  return(dbh / diameter)
 }
-

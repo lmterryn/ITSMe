@@ -27,6 +27,6 @@ functions \code{\link{dbh_pc}} and \code{\link{dab_pc}}.
 }
 \examples{
 \dontrun{
-center_estimate <- optim(par=c(x_m,y_m), fn=f, x=x_dbh, y=y_dbh)
+center_estimate <- optim(par = c(x_m, y_m), fn = f, x = x_dbh, y = y_dbh)
 }
 }

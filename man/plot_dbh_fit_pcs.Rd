@@ -34,6 +34,6 @@ and plot the circle fitting.
 PCs_path <- "path/to/folder/PCs/"
 extension <- ".txt"
 OUT_path <- "path/to/folder/for/saving/figures/"
-dbh_values <- plot_dbh_fit_pcs(PCs_path,extension,OUT_path)
+dbh_values <- plot_dbh_fit_pcs(PCs_path, extension, OUT_path)
 }
 }

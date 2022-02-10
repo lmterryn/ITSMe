@@ -35,11 +35,10 @@ the tree_height.
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown)
+cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata,qsm$cylinder,crown,
-             pc)
+cdh_ratio <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder,pc)
 }
 }
 \references{

@@ -24,22 +24,24 @@
 #' PCs_path <- "path/to/folder/PCs/"
 #' extension <- ".txt"
 #' OUT_path <- "path/to/folder/for/saving/figures/"
-#' dbh_values <- plot_dbh_fit_pcs(PCs_path,extension,OUT_path)
+#' dbh_values <- plot_dbh_fit_pcs(PCs_path, extension, OUT_path)
 #' }
-plot_dbh_fit_pcs <- function(PCs_path,extension=".txt",OUT_path){
-  file_paths <- list.files(PCs_path, pattern=paste("*",extension,sep=""),
-                           full.names=TRUE)
-  file_names <- list.files(PCs_path, pattern=paste("*",extension,sep=""),
-                           full.names=FALSE)
+plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
+  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = TRUE)
+  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = FALSE)
   DBHs <- c()
-  for (i in 1:length(file_names)){
+  for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    grDevices::jpeg(file=paste(OUT_path,"dbh_",strsplit(file_names[i],extension)[[1]],
-                    ".jpeg",sep = ""))
-    dbh <- dbh_pc(pc,TRUE)
+    grDevices::jpeg(file = paste(OUT_path, "dbh_",
+                                 strsplit(file_names[i], extension)[[1]],
+                                 ".jpeg", sep = ""))
+    dbh <- dbh_pc(pc, TRUE)
     grDevices::dev.off()
-    DBHs <- append(DBHs,dbh)
+    DBHs <- append(DBHs, dbh)
   }
   return(DBHs)
 }
+
