@@ -45,3 +45,62 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
   return(DBHs)
 }
 
+#' Calculate and save figures of dab_pc function
+#'
+#' Calculates  the dab and saves the figures acquired when running
+#' \code{\link{dab_pc}} on multiple tree point clouds in a folder. Use different
+#' values for the thresholdbuttress and maxbuttressheight parameter to optimise
+#' dab calculation for your tree point clouds.
+#'
+#' Uses \code{\link{read_tree_pc}} to read the point clouds and
+#' \code{\link{dab_pc}} with parameter plot = TRUE to calculate the dab and plot
+#' the circle fitting.
+#'
+#' @param PCs_path A character with the path to the folder that contains the
+#'   tree point clouds.
+#' @param extension A character refering to the file extension of the point
+#'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
+#' @param OUT_path A character with the path to the folder where the figures
+#'   should be saved.
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses.
+#' @param maxbuttressheight Numeric value (default=9). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height.
+#'
+#' @return a numeric containing the dbh values for each tree point cloud. Plots
+#'   are saved in the output folder.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' PCs_path <- "path/to/folder/PCs/"
+#' extension <- ".txt"
+#' OUT_path <- "path/to/folder/for/saving/figures/"
+#' dab_values <- plot_dab_fit_pcs(PCs_path, extension, OUT_path)
+#' }
+plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
+                             thresholdbuttress = 0.001, maxbuttressheight = 9) {
+  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = TRUE)
+  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = FALSE)
+  DABs <- c()
+  for (i in 1:length(file_names)) {
+    print(paste("processing ", file_names[i]))
+    pc <- read_tree_pc(file_paths[i])
+    grDevices::jpeg(file = paste(OUT_path, "dab_",
+                                 strsplit(file_names[i], extension)[[1]], "_",
+                                 as.character(thresholdbuttress), "_",
+                                 as.character(maxbuttressheight),
+                                 ".jpeg", sep = ""))
+    dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight, TRUE)
+    grDevices::dev.off()
+    DABs <- append(DABs, dab)
+  }
+  return(DABs)
+}
+
+

@@ -11,11 +11,13 @@ classify_crown_pc(pc, thresholdbranch = 1.5, minheight = 4, plot = FALSE)
 \code{\link{read_tree_pc}}.}
 
 \item{thresholdbranch}{Numeric value (default=1.5) that is multiplied with
-the diameter of the tree (calculated with \code{\link{dab_pc}})
-which determines the cutt-off where a branch emerges and the crown begins.}
+the diameter of the tree (calculated with \code{\link{dab_pc}}) which
+determines the cutt-off where a branch emerges and the crown begins.}
 
 \item{minheight}{Numeric value (default=4) with the minimum height at which
-the crown begins. Should be above the widest part of the buttresses.}
+the crown begins. Should be above the widest part of the buttresses for
+buttressed trees. For non-buttressed trees choose a lower value (such as
+1).}
 
 \item{plot}{Logical (default=FALSE), indicates if the classified tree is
 plotted.}

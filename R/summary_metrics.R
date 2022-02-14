@@ -32,10 +32,14 @@
 #'   projected crown area.
 #' @param alpha Numeric value (default=1). Parameter of the
 #'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
+#' @param OUT_path A character with the path to the folder where the summary csv
+#'   file should be saved. Default is FALSE: in this case no csv file is
+#'   produced.
 #'
 #' @return The summary of the basic structural metrics for multiple tree point
 #'   clouds as a data.frame. Includes the tree height, diameter at breast
 #'   height, diameter above buttresses, projected crown area and crown volume.
+#'   The summary is saved in a csv file if an output folder is provided.
 #'
 #' @export
 #'
@@ -50,7 +54,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              maxbuttressheight = 9,
                                              thresholdbranch = 1.5,
                                              minheight = 4, concavity = 2,
-                                             alpha = 1) {
+                                             alpha = 1, OUT_path = FALSE) {
   trees <- data.frame(
     "tree_id" = character(), "X-position" = double(),
     "Y-position" = double(), "tree_height" = double(),
@@ -77,6 +81,10 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
       "diameter_above_buttresses" = dab,
       "projected_crown_area" = pca, "crown_volume" = cv)
     trees <- rbind(trees, tree)
+    if (is.character(OUT_path)){
+      utils::write.csv(trees,paste(OUT_path,"pointcloud_metrics.csv", sep = ""),
+                       row.names = FALSE)
+    }
   }
   return(trees)
 }

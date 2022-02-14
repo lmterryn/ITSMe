@@ -12,7 +12,8 @@ summary_basic_pointcloud_metrics(
   thresholdbranch = 1.5,
   minheight = 4,
   concavity = 2,
-  alpha = 1
+  alpha = 1,
+  OUT_path = FALSE
 )
 }
 \arguments{
@@ -35,7 +36,8 @@ height.}
 \code{\link{classify_crown_pc}}.}
 
 \item{minheight}{Numeric value (default=4) from
-\code{\link{classify_crown_pc}}.}
+\code{\link{classify_crown_pc}}. The default value is based on tropical,
+buttressed trees. Choose a lower value (e.g. 1) for non buttressed trees.}
 
 \item{concavity}{Numeric value (default=2). Parameter of the
 \code{\link{projected_crown_area_pc}} function used to calculate the
@@ -43,11 +45,16 @@ projected crown area.}
 
 \item{alpha}{Numeric value (default=1). Parameter of the
 \code{\link{volume_crown_pc}} function used to calculate the crown volume.}
+
+\item{OUT_path}{A character with the path to the folder where the summary csv
+file should be saved. Default is FALSE: in this case no csv file is
+produced.}
 }
 \value{
 The summary of the basic structural metrics for multiple tree point
 clouds as a data.frame. Includes the tree height, diameter at breast
 height, diameter above buttresses, projected crown area and crown volume.
+The summary is saved in a csv file if an output folder is provided.
 }
 \description{
 Returns a summary data.frame containing the tree position (X,Y-coordinates),
