@@ -139,8 +139,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   parameter of \code{\link{stem_branch_radius_qsm}}.
 #' @param sbl_normalisation Character (default="treeheight"). Normalisation
 #'   parameter of \code{\link{stem_branch_length_qsm}}.
-#' @param sbd_normalisation Character (default="no"). Normalisation
-#'   parameter of \code{\link{stem_branch_distance_qsm}}.
+#' @param sbd_normalisation Character (default="no"). Normalisation parameter of
+#'   \code{\link{stem_branch_distance_qsm}}.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses.
@@ -152,8 +152,12 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   projected crown area.
 #' @param alpha Numeric value (default=1). Parameter of the
 #'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
+#' @param OUT_path A character with the path to the folder where the summary csv
+#'   file should be saved. Default is FALSE: in this case no csv file is
+#'   produced.
 #'
 #' @return The summary of all metrics from Terryn et al. (2020) as a data.frame.
+#'   The summary is saved in a csv file if an output folder is provided.
 #'
 #' @references Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,
 #'   Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using
@@ -188,7 +192,7 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0", PCs_path = NA,
                                 sbd_normalisation = "no",
                                 thresholdbuttress = 0.001,
                                 maxbuttressheight = 9, concavity = 2,
-                                alpha = 1) {
+                                alpha = 1, OUT_path = FALSE) {
   filenames <- list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
   unique_tree_ids <- c()
   tree_ids <- c()
@@ -206,6 +210,7 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0", PCs_path = NA,
     csh = double(), ch = double(), ce = double(), cdhr = double(),
     dmr = double())
   results <- df
+  summary <- cbind(tree_id = character(), results)
   for (i in 1:length(unique_tree_ids)) {
     print(paste("processing ", unique_tree_ids[i]))
     qsms <- filenames[tree_ids == unique_tree_ids[i]]
@@ -216,6 +221,7 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0", PCs_path = NA,
       pc <- NA
     }
     trees <- df
+    id <- unique_tree_ids[i]
     for (j in 1:length(qsms)) {
       print(paste("processing ", unique_tree_ids[i], as.character(j)))
       qsm <- read_tree_qsm(paste(QSMs_path, qsms[j], sep = ""), version)
@@ -246,8 +252,12 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0", PCs_path = NA,
       trees <- rbind(trees, tree)
     }
     m <- as.data.frame.list(colMeans(trees))
-    results <- rbind(results, m)
-    summary <- cbind(unique_tree_ids, results)
+    results <- cbind(tree_id = id, m)
+    summary <- rbind(summary, results)
+    if (is.character(OUT_path)){
+      utils::write.csv(summary,paste(OUT_path,"Terryn_2020_metrics.csv",
+                                     sep = ""), row.names = FALSE)
+    }
   }
   return(summary)
 }

@@ -16,7 +16,8 @@ summary_Terryn_2020(
   thresholdbuttress = 0.001,
   maxbuttressheight = 9,
   concavity = 2,
-  alpha = 1
+  alpha = 1,
+  OUT_path = FALSE
 )
 }
 \arguments{
@@ -52,8 +53,8 @@ parameter of \code{\link{stem_branch_radius_qsm}}.}
 \item{sbl_normalisation}{Character (default="treeheight"). Normalisation
 parameter of \code{\link{stem_branch_length_qsm}}.}
 
-\item{sbd_normalisation}{Character (default="no"). Normalisation
-parameter of \code{\link{stem_branch_distance_qsm}}.}
+\item{sbd_normalisation}{Character (default="no"). Normalisation parameter of
+\code{\link{stem_branch_distance_qsm}}.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
@@ -69,9 +70,14 @@ projected crown area.}
 
 \item{alpha}{Numeric value (default=1). Parameter of the
 \code{\link{volume_crown_pc}} function used to calculate the crown volume.}
+
+\item{OUT_path}{A character with the path to the folder where the summary csv
+file should be saved. Default is FALSE: in this case no csv file is
+produced.}
 }
 \value{
 The summary of all metrics from Terryn et al. (2020) as a data.frame.
+The summary is saved in a csv file if an output folder is provided.
 }
 \description{
 Returns a summary data.frame containing all the metrics defined by Terryn et

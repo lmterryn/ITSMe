@@ -626,7 +626,7 @@ shedding_ratio_qsm <- function(branch, treedata) {
   if (length(ind_stem_branches) > 0) {
     ind_stem_branches_u3rd <- which(branch$height < tree_height / 3 &
                                     branch$order == 1)
-    if (rapportools::is.empty(ind_stem_branches_u3rd)) {
+    if (length(ind_stem_branches_u3rd)==0) {
       sr <- 0
     } else {
       num_stem_branches_u3rd <- length(ind_stem_branches_u3rd)
