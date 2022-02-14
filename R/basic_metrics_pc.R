@@ -331,10 +331,12 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
 #' @param thresholdbranch Numeric value (default=1.5) that is multiplied with
-#'   the diameter of the tree (calculated with \code{\link{dab_pc}})
-#'   which determines the cutt-off where a branch emerges and the crown begins.
+#'   the diameter of the tree (calculated with \code{\link{dab_pc}}) which
+#'   determines the cutt-off where a branch emerges and the crown begins.
 #' @param minheight Numeric value (default=4) with the minimum height at which
-#'   the crown begins. Should be above the widest part of the buttresses.
+#'   the crown begins. Should be above the widest part of the buttresses for
+#'   buttressed trees. For non-buttressed trees choose a lower value (such as
+#'   1).
 #' @param plot Logical (default=FALSE), indicates if the classified tree is
 #'   plotted.
 #'
@@ -388,7 +390,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 4,
   lh <- lh - dh
   uh <- uh - dh
   pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
-  k1 <- stats::kmeans(pc_slice, centers = 1, nstart = 10)
+  k1 <- stats::kmeans(pc_slice, centers = 1, nstart = 10, algorithm="Lloyd")
   pc_slice$C <- k1$cluster
   center_trunk <- k1$centers
   trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
@@ -407,7 +409,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 4,
     lh <- lh + dh
     uh <- uh + dh
     pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
-    k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25)
+    k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25, algorithm="Lloyd")
     pc_slice$C <- k10$cluster
     distance_to_centers <- c()
     centers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -426,7 +428,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 4,
       stop <- 1
       S_X <- S_Y <- 0
     } else {
-      k1 <- stats::kmeans(trunk_slice, centers = 1, nstart = 25)
+      k1 <- stats::kmeans(trunk_slice, centers = 1, nstart = 25,
+                          algorithm="Lloyd")
       center_trunk <- k1$centers
       S_X <- max(trunk_slice$X) - min(trunk_slice$X)
       S_Y <- max(trunk_slice$Y) - min(trunk_slice$Y)

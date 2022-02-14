@@ -25,7 +25,8 @@
 #' @param thresholdbranch Numeric value (default=1.5) from
 #'   \code{\link{classify_crown_pc}}.
 #' @param minheight Numeric value (default=4) from
-#'   \code{\link{classify_crown_pc}}.
+#'   \code{\link{classify_crown_pc}}. The default value is based on tropical,
+#'   buttressed trees. Choose a lower value (e.g. 1) for non buttressed trees.
 #' @param concavity Numeric value (default=2). Parameter of the
 #'   \code{\link{projected_crown_area_pc}} function used to calculate the
 #'   projected crown area.
