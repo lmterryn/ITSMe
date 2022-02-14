@@ -629,7 +629,7 @@ shedding_ratio_qsm <- function(branch, treedata) {
     if (rapportools::is.empty(ind_stem_branches_u3rd)) {
       sr <- 0
     } else {
-      num_stem_branches_u3 <- length(ind_stem_branches_u3rd)
+      num_stem_branches_u3rd <- length(ind_stem_branches_u3rd)
       num_without_children <- 0
       for (i in 1:num_stem_branches_u3rd) {
         num_children <- sum(branch$parent == ind_stem_branches_u3rd[i])
