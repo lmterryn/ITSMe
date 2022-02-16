@@ -4,7 +4,13 @@
 \alias{dbh_height_ratio_qsm}
 \title{DBH-tree height ratio TreeQSM}
 \usage{
-dbh_height_ratio_qsm(treedata, pc = NA, buttress = FALSE)
+dbh_height_ratio_qsm(
+  treedata,
+  pc = NA,
+  buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7
+)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -16,6 +22,16 @@ cloud is available.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available.}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant if the tree point cloud is available and
+buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant if the tree point cloud is available and buttress
+== TRUE.}
 }
 \value{
 DBH divided by the tree height.

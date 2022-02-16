@@ -15,6 +15,14 @@
 #'   is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point cloud is available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress
+#'   == TRUE.
 #'
 #' @return The dbh or dab in meters.
 #' @export
@@ -23,17 +31,18 @@
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' DBH <- dbh(qsm)
+#' DBH <- dbh(qsm$treedata)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' DBH <- dbh(qsm, pc, TRUE)
+#' DBH <- dbh(qsm$treedata, pc, TRUE)
 #' }
-dbh <- function(treedata, pc = NA, buttress = FALSE) {
+dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdbuttress = 0.001,
+                maxbuttressheight = 7) {
   if (!is.data.frame(pc)) {
     return(dbh_qsm(treedata))
   } else {
     if (buttress) {
-      return(dab_pc(pc))
+      return(dab_pc(pc, thresholdbuttress, maxbuttressheight))
     } else {
       return(dbh_pc(pc))
     }
@@ -62,10 +71,10 @@ dbh <- function(treedata, pc = NA, buttress = FALSE) {
 #' \dontrun{
 #' QSM_path <- "path/to/qsm.mat"
 #' qsm <- read_tree_qsm(QSM_path)
-#' h <- tree_height(qsm)
+#' h <- tree_height(qsm$treedata)
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
-#' h <- tree_height(qsm, pc)
+#' h <- tree_height(qsm$treedata, pc)
 #' }
 tree_height <- function(treedata, pc = NA) {
   if (!is.data.frame(pc)) {
@@ -287,6 +296,15 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available and normalisation equals
 #'   "dbh".
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point cloud is available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress
+#'   == TRUE.
+#'
 #'
 #' @return The stem branch length. Unitless with normalisation, in meters
 #'   without normalisation. NaN when there are no stem branches.
@@ -314,12 +332,13 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #' }
 stem_branch_length_qsm <- function(branch, treedata,
                                    normalisation = "treeheight", pc = NA,
-                                   buttress = FALSE) {
+                                   buttress = FALSE, thresholdbuttress = 0.001,
+                                   maxbuttressheight = 7) {
   ind_stem_branches <- which(branch$order == 1)
   if (length(ind_stem_branches) > 0) {
     branch_len <- branch$length[ind_stem_branches]
     if (normalisation == "dbh") {
-      dbh <- dbh(treedata, pc, buttress)
+      dbh <- dbh(treedata, pc, buttress, thresholdbuttress, maxbuttressheight)
       sbl <- mean(branch_len) / dbh
     } else if (normalisation == "treeheight") {
       tree_height <- tree_height(treedata, pc)
@@ -357,6 +376,14 @@ stem_branch_length_qsm <- function(branch, treedata,
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available and normalisation equals
 #'   "dbh".
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point cloud is available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress
+#'   == TRUE.
 #'
 #' @return The stem branch distance. Unitless with normalisation, in meters
 #'   without normalisation. NaN when there are no stem branches.
@@ -383,7 +410,9 @@ stem_branch_length_qsm <- function(branch, treedata,
 #' sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh", pc, TRUE)
 #' }
 stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
-                                     pc = NA, buttress = FALSE) {
+                                     pc = NA, buttress = FALSE,
+                                     thresholdbuttress = 0.001,
+                                     maxbuttressheight = 7) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
                           cylinder$BranchOrder == 1)
   cyl_heights <- cylinder$start[ind_stem_cyl, 3]
@@ -409,7 +438,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
       }
     }
     if (normalisation == "dbh") {
-      dbh <- dbh(treedata, pc, buttress)
+      dbh <- dbh(treedata, pc, buttress, thresholdbuttress, maxbuttressheight)
       sbd <- mean(average_distance) / dbh
     } else {
       # print("No normalisation")
@@ -435,6 +464,14 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 #'   cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point cloud is available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress
+#'   == TRUE.
 #'
 #' @return DBH divided by the tree height.
 #'
@@ -459,8 +496,10 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 #' ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc)
 #' ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc, TRUE)
 #' }
-dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE) {
-  dbh <- dbh(treedata, pc, buttress)
+dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
+                                 thresholdbuttress = 0.001,
+                                 maxbuttressheight = 7) {
+  dbh <- dbh(treedata, pc, buttress, thresholdbuttress, maxbuttressheight = 7)
   tree_height <- tree_height(treedata, pc)
   return(dbh / tree_height)
 }
@@ -479,6 +518,14 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE) {
 #'   cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point cloud is available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress
+#'   == TRUE.
 #'
 #' @return DBH divided by the tree volume (trunk plus branches) in meters-2.
 #'
@@ -503,8 +550,10 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE) {
 #' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc)
 #' ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc, TRUE)
 #' }
-dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE) {
-  dbh <- dbh(treedata, pc, buttress)
+dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
+                                 thresholdbuttress = 0.001,
+                                 maxbuttressheight = 7) {
+  dbh <- dbh(treedata, pc, buttress, thresholdbuttress, maxbuttressheight)
   volume <- tree_volume_qsm(treedata)
   return(dbh / volume)
 }
@@ -1216,7 +1265,15 @@ crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
-#'   buttresses. Only relevant if pc is available.
+#'   buttresses. Only relevant if pc is
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point cloud is available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress
+#'   == TRUE.
 #'
 #' @return The ratio of the dbh and the minimum tree radius.
 #'
@@ -1241,9 +1298,10 @@ crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
 #' dbh_rad_ratio <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
 #' }
 dbh_minradius_ratio_qsm <- function(treedata, cylinder, pc = NA,
-                                    buttress = FALSE) {
+                                    buttress = FALSE, thresholdbuttress = 0.001,
+                                    maxbuttressheight = 7) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- min(radii) * 2
-  dbh <- dbh(treedata, pc, buttress)
+  dbh <- dbh(treedata, pc, buttress, thresholdbuttress, maxbuttressheight)
   return(dbh / diameter)
 }

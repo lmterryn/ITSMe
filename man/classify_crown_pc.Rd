@@ -7,8 +7,10 @@
 classify_crown_pc(
   pc,
   thresholdbranch = 1.5,
-  minheight = 4,
+  minheight = 1,
   buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7,
   plot = FALSE
 )
 }
@@ -20,14 +22,21 @@ classify_crown_pc(
 the diameter of the tree (calculated with \code{\link{dab_pc}}) which
 determines the cutt-off where a branch emerges and the crown begins.}
 
-\item{minheight}{Numeric value (default=4) with the minimum height at which
+\item{minheight}{Numeric value (default=1) with the minimum height at which
 the crown begins. Should be above the widest part of the buttresses for
-buttressed trees. For non-buttressed trees choose a lower value (such as
-1).}
+buttressed trees (value of 4 is recommended). For non-buttressed trees
+choose a lower value (such as 1).}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
-buttresses (higher than breast height). Only relevant if the tree point
-clouds are available.}
+buttresses (higher than breast height).}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant when buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == TRUE.}
 
 \item{plot}{Logical (default=FALSE), indicates if the classified tree is
 plotted.}

@@ -65,7 +65,7 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses.
-#' @param maxbuttressheight Numeric value (default=9). Parameter of the
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height.
 #'
@@ -82,7 +82,7 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
 #' dab_values <- plot_dab_fit_pcs(PCs_path, extension, OUT_path)
 #' }
 plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
-                             thresholdbuttress = 0.001, maxbuttressheight = 9) {
+                             thresholdbuttress = 0.001, maxbuttressheight = 7) {
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -102,5 +102,3 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
   }
   return(DABs)
 }
-
-

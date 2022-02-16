@@ -4,7 +4,13 @@
 \alias{dbh}
 \title{Diameter at breast height/above buttresses}
 \usage{
-dbh(treedata, pc = NA, buttress = FALSE)
+dbh(
+  treedata,
+  pc = NA,
+  buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7
+)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -16,6 +22,16 @@ is available.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available.}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant if the tree point cloud is available and
+buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant if the tree point cloud is available and buttress
+== TRUE.}
 }
 \value{
 The dbh or dab in meters.
@@ -34,9 +50,9 @@ the dbh is based on the treeQSM with \code{\link{dbh_qsm}}.
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-DBH <- dbh(qsm)
+DBH <- dbh(qsm$treedata)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-DBH <- dbh(qsm, pc, TRUE)
+DBH <- dbh(qsm$treedata, pc, TRUE)
 }
 }

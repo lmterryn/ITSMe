@@ -7,13 +7,13 @@
 summary_basic_pointcloud_metrics(
   PCs_path,
   extension = ".txt",
-  thresholdbuttress = 0.001,
-  maxbuttressheight = 9,
   thresholdbranch = 1.5,
-  minheight = 4,
+  minheight = 1,
   concavity = 2,
   alpha = 1,
   buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7,
   OUT_path = FALSE
 )
 }
@@ -25,20 +25,12 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 relevant if the tree point clouds are available.}
 
-\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
-\code{\link{dab_pc}} function used to calculate the diameter above
-buttresses.}
-
-\item{maxbuttressheight}{Numeric value (default=9). Parameter of the
-\code{\link{dab_pc}} function used to calculate the diameter at breast
-height.}
-
 \item{thresholdbranch}{Numeric value (default=1.5) from
 \code{\link{classify_crown_pc}}.}
 
-\item{minheight}{Numeric value (default=4) from
-\code{\link{classify_crown_pc}}. The default value is based on tropical,
-buttressed trees. Choose a lower value (e.g. 1) for non buttressed trees.}
+\item{minheight}{Numeric value (default=1) from
+\code{\link{classify_crown_pc}}. The default value is based on
+non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.}
 
 \item{concavity}{Numeric value (default=2). Parameter of the
 \code{\link{projected_crown_area_pc}} function used to calculate the
@@ -48,8 +40,15 @@ projected crown area.}
 \code{\link{volume_crown_pc}} function used to calculate the crown volume.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
-buttresses (higher than breast height). Only relevant if the tree point
-clouds are available.}
+buttresses (higher than breast height).}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant when buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == TRUE.}
 
 \item{OUT_path}{A character with the path to the folder where the summary csv
 file should be saved. Default is FALSE: in this case no csv file is

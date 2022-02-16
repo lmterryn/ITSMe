@@ -8,8 +8,10 @@ volume_crown_pc(
   pc,
   alpha = 1,
   thresholdbranch = 1.5,
-  minheight = 4,
+  minheight = 1,
   buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7,
   plot = FALSE
 )
 }
@@ -24,12 +26,20 @@ alpha-shape of the tree crown based on
 \item{thresholdbranch}{Numeric value (default=1.5) from
 \code{\link{classify_crown_pc}}.}
 
-\item{minheight}{Numeric value (default=4) from
+\item{minheight}{Numeric value (default=1) from
 \code{\link{classify_crown_pc}}.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses (higher than breast height). Only relevant if the tree point
 clouds are available.}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant when buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == TRUE.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
@@ -52,7 +62,7 @@ alpha-shape fitted to the crown points obtained with
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path, 1)
 vol_crown <- volume_crown_pc(pc)
-vol_crown <- volume_crown_pc(pc, 0.3, FALSE)
-vol_crown <- volume_crown_pc(pc, 1, TRUE)
+vol_crown <- volume_crown_pc(pc, 0.3)
+vol_crown <- volume_crown_pc(pc, 1, 1.5, 4, TRUE)
 }
 }

@@ -4,7 +4,7 @@
 \alias{dab_pc}
 \title{Diameter above buttresses point cloud}
 \usage{
-dab_pc(pc, thresholdbuttress = 0.001, maxbuttressheight = 9, plot = FALSE)
+dab_pc(pc, thresholdbuttress = 0.001, maxbuttressheight = 7, plot = FALSE)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -19,7 +19,7 @@ exceeds a value of 0.001 times the radius, indicating a non-circular
 process is repeated with a new slice 6 mm higher than the previous one
 until a slice above the buttresses is reached.}
 
-\item{maxbuttressheight}{Numeric value (default=9) that limits the height at
+\item{maxbuttressheight}{Numeric value (default=7) that limits the height at
 which the diameter is measured. When this height is reached (because
 residuals do not become smaller than thresholdbuttress * R), the
 thresholdbuttress value is increased with 0.0005 and the fitting starts
@@ -55,6 +55,6 @@ iterative process is restarted with a "thresholdbuttress" increased with
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
 dab <- dab_pc(pc)
-dab <- dab_pc(pc, 0.001, 9, TRUE)
+dab <- dab_pc(pc, plot = TRUE)
 }
 }

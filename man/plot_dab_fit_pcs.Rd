@@ -9,7 +9,7 @@ plot_dab_fit_pcs(
   extension = ".txt",
   OUT_path,
   thresholdbuttress = 0.001,
-  maxbuttressheight = 9
+  maxbuttressheight = 7
 )
 }
 \arguments{
@@ -26,7 +26,7 @@ should be saved.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses.}
 
-\item{maxbuttressheight}{Numeric value (default=9). Parameter of the
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height.}
 }

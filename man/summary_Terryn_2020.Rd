@@ -7,16 +7,14 @@
 summary_Terryn_2020(
   QSMs_path,
   version = "2.4.0",
-  PCs_path = NA,
-  buttress = FALSE,
-  extension = ".txt",
   sbr_normalisation = "treeheight",
   sbl_normalisation = "treeheight",
   sbd_normalisation = "no",
+  PCs_path = NA,
+  extension = ".txt",
+  buttress = FALSE,
   thresholdbuttress = 0.001,
-  maxbuttressheight = 9,
-  concavity = 2,
-  alpha = 1,
+  maxbuttressheight = 7,
   OUT_path = FALSE
 )
 }
@@ -32,21 +30,6 @@ for that tree as a final value for a certain feature.}
 produce the qsms. Default version is 2.4.0. Other possible versions are
 2.2.0.}
 
-\item{PCs_path}{A character with the path to the folder that contains the
-tree point clouds. Default is NA when the point clouds are not available.
-The point clouds are used to determine the DBH, tree height, projected
-crown area and crown volume. The DBH and tree height obtained from the tree
-point clouds are then used for the normalisation of the other features. The
-point cloud files have to be of the format xxx_000_pc in order to link the
-tree point cloud to its' respective treeQSM.}
-
-\item{buttress}{Logical (default=FALSE), indicates if the trees have
-buttresses. Only relevant if the tree point clouds are available.}
-
-\item{extension}{A character refering to the file extension of the point
-cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
-relevant if the tree point clouds are available.}
-
 \item{sbr_normalisation}{Character (default="treeheight"). Normalisation
 parameter of \code{\link{stem_branch_radius_qsm}}.}
 
@@ -56,20 +39,31 @@ parameter of \code{\link{stem_branch_length_qsm}}.}
 \item{sbd_normalisation}{Character (default="no"). Normalisation parameter of
 \code{\link{stem_branch_distance_qsm}}.}
 
+\item{PCs_path}{A character with the path to the folder that contains the
+tree point clouds. Default is NA when the point clouds are not available.
+The point clouds are used to determine the DBH, tree height, projected
+crown area and crown volume. The DBH and tree height obtained from the tree
+point clouds are then used for the normalisation of the other features. The
+point cloud files have to be of the format xxx_000_pc in order to link the
+tree point cloud to its' respective treeQSM.}
+
+\item{extension}{A character refering to the file extension of the point
+cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
+relevant if the tree point clouds are available.}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses. Only relevant if the tree point clouds are available. Only
+relevant if the tree point clouds are available.}
+
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
-buttresses.}
+buttresses. Only relevant if the tree point clouds are available and
+buttress == TRUE.}
 
-\item{maxbuttressheight}{Numeric value (default=9). Parameter of the
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter at breast
-height.}
-
-\item{concavity}{Numeric value (default=2). Parameter of the
-\code{\link{projected_crown_area_pc}} function used to calculate the
-projected crown area.}
-
-\item{alpha}{Numeric value (default=1). Parameter of the
-\code{\link{volume_crown_pc}} function used to calculate the crown volume.}
+height. Only relevant if the tree point clouds are available and buttress
+== TRUE.}
 
 \item{OUT_path}{A character with the path to the folder where the summary csv
 file should be saved. Default is FALSE: in this case no csv file is

@@ -30,9 +30,9 @@ with \code{\link{tree_height_qsm}}.
 \dontrun{
 QSM_path <- "path/to/qsm.mat"
 qsm <- read_tree_qsm(QSM_path)
-h <- tree_height(qsm)
+h <- tree_height(qsm$treedata)
 PC_path <- "path/to/point_cloud.txt"
 pc <- read_tree_pc(PC_path)
-h <- tree_height(qsm, pc)
+h <- tree_height(qsm$treedata, pc)
 }
 }

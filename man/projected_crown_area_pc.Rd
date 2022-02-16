@@ -8,8 +8,10 @@ projected_crown_area_pc(
   pc,
   concavity = 2,
   thresholdbranch = 1.5,
-  minheight = 4,
+  minheight = 1,
   buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7,
   plot = FALSE
 )
 }
@@ -23,12 +25,19 @@ concave hull based on \code{\link[concaveman]{concaveman}}.}
 \item{thresholdbranch}{Numeric value (default=1.5) from
 \code{\link{classify_crown_pc}}.}
 
-\item{minheight}{Numeric value (default=4) from
+\item{minheight}{Numeric value (default=1) from
 \code{\link{classify_crown_pc}}.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
-buttresses (higher than breast height). Only relevant if the tree point
-clouds are available.}
+buttresses (higher than breast height).}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant when buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == TRUE.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}

@@ -204,7 +204,7 @@ dbh_pc <- function(pc, plot = FALSE) {
 #'   (irregular) stem shape and presumably buttresses, the circle fitting
 #'   process is repeated with a new slice 6 mm higher than the previous one
 #'   until a slice above the buttresses is reached.
-#' @param maxbuttressheight Numeric value (default=9) that limits the height at
+#' @param maxbuttressheight Numeric value (default=7) that limits the height at
 #'   which the diameter is measured. When this height is reached (because
 #'   residuals do not become smaller than thresholdbuttress * R), the
 #'   thresholdbuttress value is increased with 0.0005 and the fitting starts
@@ -222,9 +222,9 @@ dbh_pc <- function(pc, plot = FALSE) {
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path)
 #' dab <- dab_pc(pc)
-#' dab <- dab_pc(pc, 0.001, 9, TRUE)
+#' dab <- dab_pc(pc, plot = TRUE)
 #' }
-dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
+dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
                    plot = FALSE) {
   lh <- 1.27
   uh <- 1.33
@@ -333,13 +333,18 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
 #' @param thresholdbranch Numeric value (default=1.5) that is multiplied with
 #'   the diameter of the tree (calculated with \code{\link{dab_pc}}) which
 #'   determines the cutt-off where a branch emerges and the crown begins.
-#' @param minheight Numeric value (default=4) with the minimum height at which
+#' @param minheight Numeric value (default=1) with the minimum height at which
 #'   the crown begins. Should be above the widest part of the buttresses for
-#'   buttressed trees. For non-buttressed trees choose a lower value (such as
-#'   1).
+#'   buttressed trees (value of 4 is recommended). For non-buttressed trees
+#'   choose a lower value (such as 1).
 #' @param buttress Logical (default=FALSE), indicates if the trees have
-#'   buttresses (higher than breast height). Only relevant if the tree point
-#'   clouds are available.
+#'   buttresses (higher than breast height).
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant when buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == TRUE.
 #' @param plot Logical (default=FALSE), indicates if the classified tree is
 #'   plotted.
 #'
@@ -356,10 +361,11 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
 #' crown_pc <- classify_crown_pc(pc)
 #' crown_pc <- classify_crown_pc(pc, 1.5, 4, TRUE)
 #' }
-classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 4,
-                              buttress = FALSE, plot = FALSE) {
+classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
+                              buttress = FALSE, thresholdbuttress = 0.001,
+                              maxbuttressheight = 7, plot = FALSE) {
   if (buttress) {
-    dab <- dab_pc(pc)
+    dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
   } else {
     dab <- dbh_pc(pc)
   }
@@ -516,11 +522,16 @@ normalize_pc <- function(pc) {
 #'   concave hull based on \code{\link[concaveman]{concaveman}}.
 #' @param thresholdbranch Numeric value (default=1.5) from
 #'   \code{\link{classify_crown_pc}}.
-#' @param minheight Numeric value (default=4) from
+#' @param minheight Numeric value (default=1) from
 #'   \code{\link{classify_crown_pc}}.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
-#'   buttresses (higher than breast height). Only relevant if the tree point
-#'   clouds are available.
+#'   buttresses (higher than breast height).
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant when buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == TRUE.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -538,9 +549,11 @@ normalize_pc <- function(pc) {
 #' pca <- projected_crown_area_pc(pc, 1, 1.5, 4, TRUE)
 #' }
 projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
-                                    minheight = 4, buttress = FALSE,
-                                    plot = FALSE) {
-  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress, FALSE)
+                                    minheight = 1, buttress = FALSE,
+                                    thresholdbuttress = 0.001,
+                                    maxbuttressheight = 7, plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
+                                thresholdbuttress, maxbuttressheight, FALSE)
   points <- sf::st_as_sf(unique(crown_pc[1:2]), coords = c("X", "Y"))
   hull <- concaveman::concaveman(points, concavity)
   pca <- sf::st_area(hull)
@@ -566,11 +579,17 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #'   \code{\link[alphashape3d]{ashape3d}}.
 #' @param thresholdbranch Numeric value (default=1.5) from
 #'   \code{\link{classify_crown_pc}}.
-#' @param minheight Numeric value (default=4) from
+#' @param minheight Numeric value (default=1) from
 #'   \code{\link{classify_crown_pc}}.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height). Only relevant if the tree point
 #'   clouds are available.
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant when buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == TRUE.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -583,12 +602,14 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #' PC_path <- "path/to/point_cloud.txt"
 #' pc <- read_tree_pc(PC_path, 1)
 #' vol_crown <- volume_crown_pc(pc)
-#' vol_crown <- volume_crown_pc(pc, 0.3, FALSE)
-#' vol_crown <- volume_crown_pc(pc, 1, TRUE)
+#' vol_crown <- volume_crown_pc(pc, 0.3)
+#' vol_crown <- volume_crown_pc(pc, 1, 1.5, 4, TRUE)
 #' }
-volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 4,
-                            buttress = FALSE, plot = FALSE) {
-  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress, FALSE)
+volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
+                            buttress = FALSE, thresholdbuttress = 0.001,
+                            maxbuttressheight = 7, plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
+                                thresholdbuttress, maxbuttressheight, FALSE)
   crown_pc_norm <- normalize_pc(crown_pc)
   crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)

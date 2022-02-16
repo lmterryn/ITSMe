@@ -9,7 +9,9 @@ stem_branch_length_qsm(
   treedata,
   normalisation = "treeheight",
   pc = NA,
-  buttress = FALSE
+  buttress = FALSE,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7
 )
 }
 \arguments{
@@ -34,6 +36,16 @@ cloud is available. Only relevant if normalisation equals "dbh" or
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available and normalisation equals
 "dbh".}
+
+\item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant if the tree point cloud is available and
+buttress == TRUE.}
+
+\item{maxbuttressheight}{Numeric value (default=7). Parameter of the
+\code{\link{dab_pc}} function used to calculate the diameter at breast
+height. Only relevant if the tree point cloud is available and buttress
+== TRUE.}
 }
 \value{
 The stem branch length. Unitless with normalisation, in meters

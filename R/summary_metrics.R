@@ -16,25 +16,24 @@
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 #'   relevant if the tree point clouds are available.
-#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
-#'   \code{\link{dab_pc}} function used to calculate the diameter above
-#'   buttresses.
-#' @param maxbuttressheight Numeric value (default=9). Parameter of the
-#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
-#'   height.
 #' @param thresholdbranch Numeric value (default=1.5) from
 #'   \code{\link{classify_crown_pc}}.
-#' @param minheight Numeric value (default=4) from
-#'   \code{\link{classify_crown_pc}}. The default value is based on tropical,
-#'   buttressed trees. Choose a lower value (e.g. 1) for non buttressed trees.
+#' @param minheight Numeric value (default=1) from
+#'   \code{\link{classify_crown_pc}}. The default value is based on
+#'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
 #' @param concavity Numeric value (default=2). Parameter of the
 #'   \code{\link{projected_crown_area_pc}} function used to calculate the
 #'   projected crown area.
 #' @param alpha Numeric value (default=1). Parameter of the
 #'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
-#'   buttresses (higher than breast height). Only relevant if the tree point
-#'   clouds are available.
+#'   buttresses (higher than breast height).
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant when buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == TRUE.
 #' @param OUT_path A character with the path to the folder where the summary csv
 #'   file should be saved. Default is FALSE: in this case no csv file is
 #'   produced.
@@ -54,11 +53,11 @@
 #' summary <- summary_basic_pointcloud_metrics(PCs_path, extension = ".ply")
 #' }
 summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
-                                             thresholdbuttress = 0.001,
-                                             maxbuttressheight = 9,
                                              thresholdbranch = 1.5,
-                                             minheight = 4, concavity = 2,
+                                             minheight = 1, concavity = 2,
                                              alpha = 1, buttress = FALSE,
+                                             thresholdbuttress = 0.001,
+                                             maxbuttressheight = 7,
                                              OUT_path = FALSE) {
   trees <- data.frame(
     "tree_id" = character(), "X_position" = double(),
@@ -66,6 +65,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     "diameter_at_breast_height" = double(),
     "diameter_above_buttresses" = double(),
     "projected_crown_area" = double(), "crown_volume" = double())
+  diameter_above_buttresses <- NULL
   if (buttress == FALSE){
     trees <- subset(trees, select = -diameter_above_buttresses)
   }
@@ -85,8 +85,10 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     }
     dbh <- dbh_pc(pc)
     pca <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
-                                   buttress)
-    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight, buttress)
+                                   buttress, thresholdbuttress,
+                                   maxbuttressheight)
+    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight, buttress,
+                          thresholdbuttress, maxbuttressheight)
     tree <- data.frame(
       "tree_id" = filenames[i], "X_position" = pos[1],
       "Y_position" = pos[2], "tree_height" = h,
@@ -139,6 +141,12 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #' @param version A character indicating the version of TreeQSM that was used to
 #'   produce the qsms. Default version is 2.4.0. Other possible versions are
 #'   2.2.0.
+#' @param sbr_normalisation Character (default="treeheight"). Normalisation
+#'   parameter of \code{\link{stem_branch_radius_qsm}}.
+#' @param sbl_normalisation Character (default="treeheight"). Normalisation
+#'   parameter of \code{\link{stem_branch_length_qsm}}.
+#' @param sbd_normalisation Character (default="no"). Normalisation parameter of
+#'   \code{\link{stem_branch_distance_qsm}}.
 #' @param PCs_path A character with the path to the folder that contains the
 #'   tree point clouds. Default is NA when the point clouds are not available.
 #'   The point clouds are used to determine the DBH, tree height, projected
@@ -146,28 +154,21 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   point clouds are then used for the normalisation of the other features. The
 #'   point cloud files have to be of the format xxx_000_pc in order to link the
 #'   tree point cloud to its' respective treeQSM.
-#' @param buttress Logical (default=FALSE), indicates if the trees have
-#'   buttresses. Only relevant if the tree point clouds are available.
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 #'   relevant if the tree point clouds are available.
-#' @param sbr_normalisation Character (default="treeheight"). Normalisation
-#'   parameter of \code{\link{stem_branch_radius_qsm}}.
-#' @param sbl_normalisation Character (default="treeheight"). Normalisation
-#'   parameter of \code{\link{stem_branch_length_qsm}}.
-#' @param sbd_normalisation Character (default="no"). Normalisation parameter of
-#'   \code{\link{stem_branch_distance_qsm}}.
+#' @param buttress Logical (default=FALSE), indicates if the trees have
+#'   buttresses. Only relevant if the tree point clouds are available. Only
+#'   relevant if the tree point clouds are available.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
-#'   buttresses.
-#' @param maxbuttressheight Numeric value (default=9). Parameter of the
+#'   buttresses. Only relevant if the tree point clouds are available and
+#'   buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
-#'   height.
-#' @param concavity Numeric value (default=2). Parameter of the
-#'   \code{\link{projected_crown_area_pc}} function used to calculate the
-#'   projected crown area.
-#' @param alpha Numeric value (default=1). Parameter of the
-#'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
+#'   height. Only relevant if the tree point clouds are available and buttress
+#'   == TRUE.
+#'
 #' @param OUT_path A character with the path to the folder where the summary csv
 #'   file should be saved. Default is FALSE: in this case no csv file is
 #'   produced.
@@ -201,14 +202,13 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   maxbuttressheight = 9, concavity = 2, alpha = 1
 #' )
 #' }
-summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0", PCs_path = NA,
-                                buttress = FALSE, extension = ".txt",
+summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
                                 sbr_normalisation = "treeheight",
                                 sbl_normalisation = "treeheight",
                                 sbd_normalisation = "no",
-                                thresholdbuttress = 0.001,
-                                maxbuttressheight = 9, concavity = 2,
-                                alpha = 1, OUT_path = FALSE) {
+                                PCs_path = NA, extension = ".txt",
+                                buttress = FALSE, thresholdbuttress = 0.001,
+                                maxbuttressheight = 7, OUT_path = FALSE) {
   filenames <- list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
   unique_tree_ids <- c()
   tree_ids <- c()
