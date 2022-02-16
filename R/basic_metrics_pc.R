@@ -337,6 +337,9 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
 #'   the crown begins. Should be above the widest part of the buttresses for
 #'   buttressed trees. For non-buttressed trees choose a lower value (such as
 #'   1).
+#' @param buttress Logical (default=FALSE), indicates if the trees have
+#'   buttresses (higher than breast height). Only relevant if the tree point
+#'   clouds are available.
 #' @param plot Logical (default=FALSE), indicates if the classified tree is
 #'   plotted.
 #'
@@ -354,8 +357,12 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 9,
 #' crown_pc <- classify_crown_pc(pc, 1.5, 4, TRUE)
 #' }
 classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 4,
-                              plot = FALSE) {
-  dab <- dab_pc(pc)
+                              buttress = FALSE, plot = FALSE) {
+  if (buttress) {
+    dab <- dab_pc(pc)
+  } else {
+    dab <- dbh_pc(pc)
+  }
   d <- thresholdbranch * dab + 0.1
   dh <- 0.25
   lh <- minheight - dh # initiation first slice
@@ -511,6 +518,9 @@ normalize_pc <- function(pc) {
 #'   \code{\link{classify_crown_pc}}.
 #' @param minheight Numeric value (default=4) from
 #'   \code{\link{classify_crown_pc}}.
+#' @param buttress Logical (default=FALSE), indicates if the trees have
+#'   buttresses (higher than breast height). Only relevant if the tree point
+#'   clouds are available.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -528,8 +538,9 @@ normalize_pc <- function(pc) {
 #' pca <- projected_crown_area_pc(pc, 1, 1.5, 4, TRUE)
 #' }
 projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
-                                    minheight = 4, plot = FALSE) {
-  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, FALSE)
+                                    minheight = 4, buttress = FALSE,
+                                    plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress, FALSE)
   points <- sf::st_as_sf(unique(crown_pc[1:2]), coords = c("X", "Y"))
   hull <- concaveman::concaveman(points, concavity)
   pca <- sf::st_area(hull)
@@ -557,6 +568,9 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #'   \code{\link{classify_crown_pc}}.
 #' @param minheight Numeric value (default=4) from
 #'   \code{\link{classify_crown_pc}}.
+#' @param buttress Logical (default=FALSE), indicates if the trees have
+#'   buttresses (higher than breast height). Only relevant if the tree point
+#'   clouds are available.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -573,8 +587,8 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #' vol_crown <- volume_crown_pc(pc, 1, TRUE)
 #' }
 volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 4,
-                            plot = FALSE) {
-  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, FALSE)
+                            buttress = FALSE, plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress, FALSE)
   crown_pc_norm <- normalize_pc(crown_pc)
   crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)

@@ -13,6 +13,7 @@ summary_basic_pointcloud_metrics(
   minheight = 4,
   concavity = 2,
   alpha = 1,
+  buttress = FALSE,
   OUT_path = FALSE
 )
 }
@@ -45,6 +46,10 @@ projected crown area.}
 
 \item{alpha}{Numeric value (default=1). Parameter of the
 \code{\link{volume_crown_pc}} function used to calculate the crown volume.}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses (higher than breast height). Only relevant if the tree point
+clouds are available.}
 
 \item{OUT_path}{A character with the path to the folder where the summary csv
 file should be saved. Default is FALSE: in this case no csv file is

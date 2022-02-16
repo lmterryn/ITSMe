@@ -32,9 +32,13 @@
 #'   projected crown area.
 #' @param alpha Numeric value (default=1). Parameter of the
 #'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
+#' @param buttress Logical (default=FALSE), indicates if the trees have
+#'   buttresses (higher than breast height). Only relevant if the tree point
+#'   clouds are available.
 #' @param OUT_path A character with the path to the folder where the summary csv
 #'   file should be saved. Default is FALSE: in this case no csv file is
 #'   produced.
+#'
 #'
 #' @return The summary of the basic structural metrics for multiple tree point
 #'   clouds as a data.frame. Includes the tree height, diameter at breast
@@ -54,13 +58,17 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              maxbuttressheight = 9,
                                              thresholdbranch = 1.5,
                                              minheight = 4, concavity = 2,
-                                             alpha = 1, OUT_path = FALSE) {
+                                             alpha = 1, buttress = FALSE,
+                                             OUT_path = FALSE) {
   trees <- data.frame(
-    "tree_id" = character(), "X-position" = double(),
-    "Y-position" = double(), "tree_height" = double(),
+    "tree_id" = character(), "X_position" = double(),
+    "Y_position" = double(), "tree_height" = double(),
     "diameter_at_breast_height" = double(),
     "diameter_above_buttresses" = double(),
     "projected_crown_area" = double(), "crown_volume" = double())
+  if (buttress == FALSE){
+    trees <- subset(trees, select = -diameter_above_buttresses)
+  }
   filepaths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                           full.names = TRUE)
   filenames <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -70,16 +78,24 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     pc <- read_tree_pc(filepaths[i])
     pos <- tree_position_pc(pc)
     h <- tree_height_pc(pc)
-    dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+    if (buttress){
+      dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+    } else {
+      dab <- NA
+    }
     dbh <- dbh_pc(pc)
-    pca <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight)
-    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight)
+    pca <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
+                                   buttress)
+    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight, buttress)
     tree <- data.frame(
-      "tree_id" = filenames[i], "X-position" = pos[1],
-      "Y-position" = pos[2], "tree_height" = h,
+      "tree_id" = filenames[i], "X_position" = pos[1],
+      "Y_position" = pos[2], "tree_height" = h,
       "diameter_at_breast_height" = dbh,
       "diameter_above_buttresses" = dab,
       "projected_crown_area" = pca, "crown_volume" = cv)
+    if (buttress == FALSE){
+      tree <- subset(tree, select = -diameter_above_buttresses)
+    }
     trees <- rbind(trees, tree)
     if (is.character(OUT_path)){
       utils::write.csv(trees,paste(OUT_path,"pointcloud_metrics.csv", sep = ""),

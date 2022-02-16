@@ -4,7 +4,13 @@
 \alias{classify_crown_pc}
 \title{Crown classification point cloud}
 \usage{
-classify_crown_pc(pc, thresholdbranch = 1.5, minheight = 4, plot = FALSE)
+classify_crown_pc(
+  pc,
+  thresholdbranch = 1.5,
+  minheight = 4,
+  buttress = FALSE,
+  plot = FALSE
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -18,6 +24,10 @@ determines the cutt-off where a branch emerges and the crown begins.}
 the crown begins. Should be above the widest part of the buttresses for
 buttressed trees. For non-buttressed trees choose a lower value (such as
 1).}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses (higher than breast height). Only relevant if the tree point
+clouds are available.}
 
 \item{plot}{Logical (default=FALSE), indicates if the classified tree is
 plotted.}

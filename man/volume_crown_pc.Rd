@@ -9,6 +9,7 @@ volume_crown_pc(
   alpha = 1,
   thresholdbranch = 1.5,
   minheight = 4,
+  buttress = FALSE,
   plot = FALSE
 )
 }
@@ -25,6 +26,10 @@ alpha-shape of the tree crown based on
 
 \item{minheight}{Numeric value (default=4) from
 \code{\link{classify_crown_pc}}.}
+
+\item{buttress}{Logical (default=FALSE), indicates if the trees have
+buttresses (higher than breast height). Only relevant if the tree point
+clouds are available.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}

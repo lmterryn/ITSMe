@@ -26,7 +26,10 @@ devtools::install_github("lmterryn/ITSMe")
 
 The functions are developed for tree point clouds obtained with TLS and
 quantitative structure models (QSMs) obtained with TreeQSM
-(<https://github.com/InverseTampere/TreeQSM>).
+(<https://github.com/InverseTampere/TreeQSM>). The tree point cloud
+based functions can also be used for tree point clouds obtained from MLS
+and UAV-LS if their point densities are high enough (e.g. sufficient
+stem points for dbh/dab estimation).
 
 ## Individual tree structural metrics
 
@@ -137,7 +140,7 @@ clouds in a specific folder:
 library(ITSMe)
 #Specify the path to the folder containing multiple tree point cloud files
 PCs_path <- "path/to/point/cloud/folder/"
-#Run summary function 
+#Run summary function with default parameter settings
 basic_summary <- summary_basic_pointcloud_metrics(PCs_path = PCs_path, 
                                                   extension = ".txt")
 ```
