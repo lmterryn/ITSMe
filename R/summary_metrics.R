@@ -32,8 +32,8 @@
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
 #' @param maxbuttressheight Numeric value (default=7). Parameter of the
-#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant when buttress == TRUE.
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant when buttress == TRUE.
 #' @param OUT_path A character with the path to the folder where the summary csv
 #'   file should be saved. Default is FALSE: in this case no csv file is
 #'   produced.
@@ -165,9 +165,9 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   buttresses. Only relevant if the tree point clouds are available and
 #'   buttress == TRUE.
 #' @param maxbuttressheight Numeric value (default=7). Parameter of the
-#'   \code{\link{dab_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant if the tree point clouds are available and buttress
-#'   == TRUE.
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses. Only relevant if the tree point clouds are available and
+#'   buttress == TRUE.
 #'
 #' @param OUT_path A character with the path to the folder where the summary csv
 #'   file should be saved. Default is FALSE: in this case no csv file is

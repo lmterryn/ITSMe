@@ -47,8 +47,8 @@ buttresses (higher than breast height).}
 buttresses. Only relevant when buttress == TRUE.}
 
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
-\code{\link{dab_pc}} function used to calculate the diameter at breast
-height. Only relevant when buttress == TRUE.}
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses. Only relevant when buttress == TRUE.}
 
 \item{OUT_path}{A character with the path to the folder where the summary csv
 file should be saved. Default is FALSE: in this case no csv file is

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting_metrics_pc.R
 \name{plot_dbh_fit_pcs}
 \alias{plot_dbh_fit_pcs}
-\title{Calculate and save figures of dbh_pc function}
+\title{Calculate and save figures of \code{\link{dbh_pc}} function}
 \usage{
 plot_dbh_fit_pcs(PCs_path, extension = ".txt", OUT_path)
 }
@@ -17,8 +17,8 @@ cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 should be saved.}
 }
 \value{
-a numeric containing the dbh values for each tree point cloud. Plots
-are saved in the output folder.
+a numeric containing the dbh values for each tree point cloud.
+Figures are saved in the output folder.
 }
 \description{
 Calculates  the dbh and saves the figures acquired when running
@@ -26,8 +26,8 @@ Calculates  the dbh and saves the figures acquired when running
 }
 \details{
 Uses \code{\link{read_tree_pc}} to read the point clouds and
-\code{\link{dbh_pc}} with parameter plot = TRUE to calculate the dbh
-and plot the circle fitting.
+\code{\link{dbh_pc}} with parameter plot = TRUE to calculate the dbh and plot
+the circle fitting.
 }
 \examples{
 \dontrun{

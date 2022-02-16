@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting_metrics_pc.R
 \name{plot_dab_fit_pcs}
 \alias{plot_dab_fit_pcs}
-\title{Calculate and save figures of dab_pc function}
+\title{Calculate and save figures of \code{\link{dab_pc}} function}
 \usage{
 plot_dab_fit_pcs(
   PCs_path,
@@ -27,15 +27,15 @@ should be saved.}
 buttresses.}
 
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
-\code{\link{dab_pc}} function used to calculate the diameter at breast
-height.}
+\code{\link{dab_pc}} function used to calculate the diameter above
+buttresses.}
 }
 \value{
-a numeric containing the dbh values for each tree point cloud. Plots
-are saved in the output folder.
+a numeric containing the dbh values for each tree point cloud.
+Figures are saved in the output folder.
 }
 \description{
-Calculates  the dab and saves the figures acquired when running
+Calculates the dab and saves the figures acquired when running
 \code{\link{dab_pc}} on multiple tree point clouds in a folder. Use different
 values for the thresholdbuttress and maxbuttressheight parameter to optimise
 dab calculation for your tree point clouds.
