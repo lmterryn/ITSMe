@@ -199,7 +199,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   sbl_normalisation = "treeheight",
 #'   sbd_normalisation = "no",
 #'   thresholdbuttress = 0.001,
-#'   maxbuttressheight = 9, concavity = 2, alpha = 1
+#'   maxbuttressheight = 7, concavity = 2, alpha = 1
 #' )
 #' }
 summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
