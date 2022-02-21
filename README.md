@@ -100,18 +100,24 @@ PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
 #Read the point cloud file
 pc <- read_tree_pc(path = PC_path)
 #Use dbh_pc function with default parameters and plot the fit
-dbh <- dbh_pc(pc = pc,plot = TRUE)
+dbh <- dbh_pc(pc = pc, plot = TRUE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
 ``` r
 #Use dab_pc function with default parameters and plot the fit
-dab <- dab_pc(pc = pc,thresholdbuttress = 0.001,maxbuttressheight = 9,
+dab <- dab_pc(pc = pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
               plot = TRUE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
+
+If you want to determine the dbh or dab for several tree point clouds
+(in the same folder) and visually check the circle fitting, use the and
+functions. The function can also be used to optimise the parameters by
+changing them and visually checking the results. This is also the case
+for and .
 
 Calculating the stem branch distance of a TreeQSM:
 
@@ -122,13 +128,14 @@ QSM_path <- system.file("extdata", "example_qsm_1_1.mat", package = "ITSMe")
 #Read the TreeQSM file
 qsm <- read_tree_qsm(path = QSM_path)
 #Use stem_branch_distance_qsm function
-sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,treedata = qsm$treedata,
-                                normalisation = "dbh")
+sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
+                                treedata = qsm$treedata, normalisation = "dbh")
 #Using the point cloud information for more accurate dbh normalisation
 PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
 pc <- read_tree_pc(path = PC_path)
-sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,treedata = qsm$treedata,
-                                normalisation = "dbh",pc = pc,buttress = TRUE)
+sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
+                                treedata = qsm$treedata, normalisation = "dbh", 
+                                pc = pc, buttress = TRUE)
 ```
 
 Calculating a summary data.frame with the basic structural metrics (tree
@@ -156,7 +163,7 @@ QSMs_path <- "path/to/QSM/folder/"
 #Specify the path to the folder containing the respective tree point cloud files
 PCs_path <- "path/to/point/cloud/folder/"
 #Run summary function with default parameter settings
-Terryn_summary <- summary_Terryn_2020(QSMs_path = QSMs_path,version = "2.4.0",
-                                      PCs_path = PCs_path,buttress = TRUE, 
+Terryn_summary <- summary_Terryn_2020(QSMs_path = QSMs_path, version = "2.4.0",
+                                      PCs_path = PCs_path, buttress = TRUE, 
                                       extension = ".txt")
 ```
