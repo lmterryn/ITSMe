@@ -115,10 +115,10 @@ dab <- dab_pc(pc = pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 
 If you want to determine the dbh or dab for several tree point clouds
 (in the same folder) and visually check the circle fitting, use the
-*plot_dbh_fit_pcs* and *plot_dab_fit_pcs* functions. The
-*plot_dab_fit_pcs* function can also be used to optimise the parameters
-by changing them and visually checking the results. This is also the
-case for *plot_crown_classification_pcs* and *plot_pca_pcs*.
+plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs
+function can also be used to optimise the parameters by changing them
+and visually checking the results. This is also the case for
+plot_crown_classification_pcs and plot_pca_pcs.
 
 Calculating the stem branch distance of a TreeQSM:
 
