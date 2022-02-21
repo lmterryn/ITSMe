@@ -4,6 +4,8 @@
 <img src="man/figures/logo.png" height="200" >
 </p>
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/lmterryn/ITSMe/workflows/R-CMD-check/badge.svg)](https://github.com/lmterryn/ITSMe/actions)
 <!-- badges: end -->
 
 ## Goal
