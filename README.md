@@ -96,22 +96,22 @@ buttresses of a tree:
 ``` r
 library(ITSMe)
 #Specify path to the tree point cloud file
-PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
+PC_path <- "path/to/point/cloud"
 #Read the point cloud file
 pc <- read_tree_pc(path = PC_path)
 #Use dbh_pc function with default parameters and plot the fit
 dbh <- dbh_pc(pc = pc, plot = TRUE)
-```
-
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
-
-``` r
 #Use dab_pc function with default parameters and plot the fit
 dab <- dab_pc(pc = pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
               plot = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
+<p align="center">
+<img src="man/figures/dbh_example.png" height="200" >
+</p>
+<p align="center">
+<img src="man/figures/dab_example.png" height="200" >
+</p>
 
 If you want to determine the dbh or dab for several tree point clouds
 (in the same folder) and visually check the circle fitting, use the
@@ -125,7 +125,7 @@ Calculating the stem branch distance of a TreeQSM:
 ``` r
 library(ITSMe)
 #Specify path to the TreeQSM file
-QSM_path <- system.file("extdata", "example_qsm_1_1.mat", package = "ITSMe")
+QSM_path <- "path/to/QSM"
 #Read the TreeQSM file
 qsm <- read_tree_qsm(path = QSM_path)
 #Use stem_branch_distance_qsm function
