@@ -31,9 +31,9 @@ child cylinders of the crown set.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-crown <- crownset_qsm(qsm$cylinder)
+# Read tree qsm and extract the crownset
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+crown <- crownset_qsm(cylinder = qsm$cylinder)
 }
 }
 \references{

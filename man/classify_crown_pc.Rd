@@ -19,8 +19,9 @@ classify_crown_pc(
 \code{\link{read_tree_pc}}.}
 
 \item{thresholdbranch}{Numeric value (default=1.5) that is multiplied with
-the diameter of the tree (calculated with \code{\link{dab_pc}}) which
-determines the cutt-off where a branch emerges and the crown begins.}
+the diameter of the tree (calculated with \code{\link{dbh_pc}} or
+\code{\link{dab_pc}} when buttress =TRUE) which determines the cutt-off
+where a branch emerges and the crown begins.}
 
 \item{minheight}{Numeric value (default=1) with the minimum height at which
 the crown begins. Should be above the widest part of the buttresses for
@@ -56,9 +57,13 @@ when the first branch is reached with increasing height.
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-crown_pc <- classify_crown_pc(pc)
-crown_pc <- classify_crown_pc(pc, 1.5, 4, TRUE)
+# Read tree point cloud and extract the crown points
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+crown_pc <- classify_crown_pc(pc = pc_tree)
+# and plot the classification results
+crown_pc <- classify_crown_pc(pc = pc_tree, plot = TRUE)
+# with non-default settings for a buttressed tree
+crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE,
+                              plot = TRUE)
 }
 }

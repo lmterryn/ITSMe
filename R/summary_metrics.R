@@ -35,7 +35,7 @@
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
 #' @param OUT_path A character with the path to the folder where the summary csv
-#'   file should be saved. Default is FALSE: in this case no csv file is
+#'   file should be saved or logical (default=FALSE) in this case no csv file is
 #'   produced.
 #'
 #'
@@ -48,9 +48,15 @@
 #'
 #' @examples
 #' \dontrun{
-#' PCs_path <- "path/to/folder/PCs/"
-#' summary <- summary_basic_pointcloud_metrics(PCs_path)
-#' summary <- summary_basic_pointcloud_metrics(PCs_path, extension = ".ply")
+#' # Calculate the summary with default parameters and export to csv
+#' # recommended for non-buttressed trees
+#' summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
+#'                                             OUT_path = "path/to/out/folder/")
+#' # Calculate the summary with non-default parameter values
+#' # recommended for buttressed trees
+#' summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
+#'                                             extension = ".ply",
+#'                                             minheight = 4, buttress = TRUE)
 #' }
 summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              thresholdbranch = 1.5,
@@ -168,9 +174,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point clouds are available and
 #'   buttress == TRUE.
-#'
 #' @param OUT_path A character with the path to the folder where the summary csv
-#'   file should be saved. Default is FALSE: in this case no csv file is
+#'   file should be saved or logical (default=FALSE) in this case no csv file is
 #'   produced.
 #'
 #' @return The summary of all metrics from Terryn et al. (2020) as a data.frame.
@@ -185,22 +190,21 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'
 #' @examples
 #' \dontrun{
-#' QSMs_path <- "path/to/folder/QSMs/"
-#' PCs_path <- "path/to/folder/PCs/"
-#' summary <- summary_Terryn_2020(QSMs_path)
-#' summary <- summary_Terryn_2020(QSMs_path,
-#'   version = "2.4.0", PCs_path,
-#'   buttress = TRUE, extension = ".txt"
-#' )
-#' summary <- summary_Terryn_2020(QSMs_path,
-#'   version = "2.4.0", PCs_path,
-#'   buttress = TRUE, extension = ".txt",
-#'   sbr_normalisation = "dbh",
-#'   sbl_normalisation = "treeheight",
-#'   sbd_normalisation = "no",
-#'   thresholdbuttress = 0.001,
-#'   maxbuttressheight = 7, concavity = 2, alpha = 1
-#' )
+#' # Calculate the summary with default parameters and export to csv
+#' # recommended for non-buttressed trees
+#' summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
+#'                                OUT_path = "path/to/out/folder/")
+#' # also using point cloud info
+#' summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
+#'                                PCs_path = "path/to/folder/PCs/",
+#'                                extension = ".txt"
+#'                                OUT_path = "path/to/out/folder/")
+#' # Calculate the summary with non-default parameter values
+#' # recommended for buttressed trees
+#' summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
+#'                                PCs_path = "path/to/folder/PCs/",
+#'                                extension = ".txt", buttress = TRUE,
+#'                                OUT_path = "path/to/out/folder/")
 #' }
 summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
                                 sbr_normalisation = "treeheight",

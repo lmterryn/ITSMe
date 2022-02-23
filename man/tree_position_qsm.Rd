@@ -19,8 +19,8 @@ first cylinder that is higher than 1.3 m above ground.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-pos <- tree_position_qsm(qsm$cylinder)
+# Read tree qsm and calculate tree position
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+pos <- tree_position_qsm(cylinder = qsm$cylinder)
 }
 }

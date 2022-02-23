@@ -52,9 +52,13 @@ iterative process is restarted with a "thresholdbuttress" increased with
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-dab <- dab_pc(pc)
-dab <- dab_pc(pc, plot = TRUE)
+# Read tree point cloud and calculate the DAB
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+dab <- dab_pc(pc = pc_tree)
+# and plot the circle fitting
+dab <- dab_pc(pc = pc_tree, plot = TRUE)
+# with non-default settings
+dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5,
+              plot = TRUE)
 }
 }

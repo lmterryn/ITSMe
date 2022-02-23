@@ -23,9 +23,9 @@ al., 2020).
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-len_vol_ratio <- cylinder_length_volume_ratio_qsm(qsm$treedata)
+# Read tree qsm and calculate the cylinder length volume ratio
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+clvr <- cylinder_length_volume_ratio_qsm(treedata = qsm$treedata)
 }
 }
 \references{

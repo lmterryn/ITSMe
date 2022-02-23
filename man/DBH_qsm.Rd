@@ -14,17 +14,17 @@ dbh_qsm(treedata)
 The DBH of the TreeQSM in meters.
 }
 \description{
-Extracts the dbh from the treedata of a TreeQSM.
+Extracts the DBH from the treedata of a TreeQSM.
 }
 \details{
-The dbh is calculated as the diameter of the cylinder in the QSM at the right
+The DBH is calculated as the diameter of the cylinder in the QSM at the right
 height (cylinder at 1.3 m). If the trunk was modeled with triangulation the
-dbh is calculated as mean length of the diagonals in the triangulation.
+DBH is calculated as mean length of the diagonals in the triangulation.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-dbh <- dbh_qsm(qsm$treedata)
+# Read tree qsm and extract DBH
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+dbh <- dbh_qsm(treedata = qsm$treedata)
 }
 }

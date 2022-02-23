@@ -19,8 +19,8 @@ Extracts the total cylinder length from the treedata of a TreeQSM.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-tot_len <- total_cyl_length_qsm(qsm$treedata)
+# Read tree qsm and extract total cylinder length
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+tot_len <- total_cyl_length_qsm(treedata = qsm$treedata)
 }
 }

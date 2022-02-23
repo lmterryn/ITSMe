@@ -24,9 +24,9 @@ with the trunk)" (Akerblom et al., 2017 & Terryn et al., 2020).
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-sba <- stem_branch_angle_qsm(qsm$branch)
+# Read tree qsm and calculate the stem branch angle
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+sba <- stem_branch_angle_qsm(branch = qsm$branch)
 }
 }
 \references{

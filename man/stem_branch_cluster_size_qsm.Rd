@@ -24,9 +24,9 @@ can only belong to one interval" (Akerblom et al., 2017 & Terryn et al.,
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
+# Read tree qsm and calculate the stem branch cluster size
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+sbcs <- stem_branch_cluster_size_qsm(cylinder = qsm$cylinder)
 }
 }
 \references{

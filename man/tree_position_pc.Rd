@@ -20,8 +20,8 @@ value of the points within a 6mm thick horizontal slice at breast height
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-pos <- tree_position_pc(pc)
+# Read tree point cloud and calculate the tree position
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+pos <- tree_position_pc(pc = pc_tree)
 }
 }

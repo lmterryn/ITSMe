@@ -18,8 +18,8 @@ Extracts the total branch volume from the treedata of a TreeQSM.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-branchvol <- total_branch_volume_qsm(qsm$treedata)
+# Read tree qsm and extract total branch volume
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+branchvol <- total_branch_volume_qsm(treedata = qsm$treedata)
 }
 }

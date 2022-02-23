@@ -23,9 +23,9 @@ angles of the 1st order branches and 2nd order branches" (Terryn et al.,
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-ba_ratio <- branch_angle_ratio_qsm(qsm$branch)
+# Read tree qsm and calculate the branch angle ratio
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+br <- branch_angle_ratio_qsm(branch = qsm$branch)
 }
 }
 \references{

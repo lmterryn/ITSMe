@@ -59,13 +59,22 @@ no normalisation. DBH is calculated with \code{\link{dbh}}.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata)
-sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh")
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata, "dbh", pc, TRUE)
+# Read tree qsm and calculate the stem branch distance
+# from Akerblom et al. (2017)
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
+                                treedata = qsm$treedata,
+                                normalisation = "dbh")
+# with point cloud data for buttressed trees
+pc <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
+                                treedata = qsm$treedata,
+                                normalisation = "dbh", pc = tree_pc,
+                                buttress = TRUE)
+# from Terryn et al. (2020)
+sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
+                                treedata = qsm$treedata,
+                                normalisation = "no")
 }
 }
 \references{

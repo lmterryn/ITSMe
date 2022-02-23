@@ -13,14 +13,29 @@
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
-#' pos <- tree_position_pc(pc)
+#' # Read tree point cloud and calculate the tree position
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' pos <- tree_position_pc(pc = pc_tree)
 #' }
 tree_position_pc <- function(pc) {
-  pc_bh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33), ]
-  X_mean <- mean(pc_bh$X)
-  Y_mean <- mean(pc_bh$Y)
+  slice_height <- 1.3
+  slice_thickness <- 0.06
+  pc_dbh <- pc[(pc$Z > min(pc$Z) + slice_height-slice_thickness/2) &
+                 (pc$Z < min(pc$Z) + slice_height+slice_thickness/2), ]
+  xy_dbh <- pc_dbh[, c("X", "Y")]
+  XY_dbh <- data.matrix(xy_dbh)
+  k <- 2
+  knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
+  knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
+  knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
+  remove <- which(knn_dist[, k - 1] > 0.05)
+  if (length(remove) != 0) {
+    xy_dbh <- xy_dbh[-remove, ]
+  }
+  x_dbh <- xy_dbh$X
+  y_dbh <- xy_dbh$Y
+  X_mean <- mean(x_dbh) # first estimate of the center
+  Y_mean <- mean(y_dbh)
   return(c(X_mean, Y_mean))
 }
 
@@ -40,9 +55,9 @@ tree_position_pc <- function(pc) {
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
-#' tree_height <- tree_height_pc(pc)
+#' # Read tree point cloud and calculate the tree height
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' tree_height <- tree_height_pc(pc = pc_tree)
 #' }
 tree_height_pc <- function(pc) {
   return(max(pc$Z) - min(pc$Z))
@@ -118,14 +133,18 @@ f <- function(c, x, y) {
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
-#' dbh <- dbh_pc(pc)
-#' dbh <- dbh_pc(pc, TRUE)
+#' # Read tree point cloud and calculate the DBH
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' dbh <- dbh_pc(pc = pc_tree)
+#' # and plot the circle fitting
+#' dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
 #' }
 dbh_pc <- function(pc, plot = FALSE) {
-  if (max(pc$Z) - min(pc$Z) > 1.3) {
-    pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.27) & (pc$Z < min(pc$Z) + 1.33), ]
+  slice_height <- 1.3
+  slice_thickness <- 0.06
+  if (max(pc$Z) - min(pc$Z) > slice_height) {
+    pc_dbh <- pc[(pc$Z > min(pc$Z) + slice_height-slice_thickness/2) &
+                   (pc$Z < min(pc$Z) + slice_height+slice_thickness/2), ]
     xy_dbh <- pc_dbh[, c("X", "Y")]
     XY_dbh <- data.matrix(xy_dbh)
     k <- 2
@@ -219,10 +238,14 @@ dbh_pc <- function(pc, plot = FALSE) {
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
-#' dab <- dab_pc(pc)
-#' dab <- dab_pc(pc, plot = TRUE)
+#' # Read tree point cloud and calculate the DAB
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' dab <- dab_pc(pc = pc_tree)
+#' # and plot the circle fitting
+#' dab <- dab_pc(pc = pc_tree, plot = TRUE)
+#' # with non-default settings
+#' dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5,
+#'               plot = TRUE)
 #' }
 dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
                    plot = FALSE) {
@@ -277,7 +300,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         dbh <- NaN
       }
     }
-    if (uh < 9) {
+    if (uh < maxbuttressheight) {
       lh <- lh - 0.06
       uh <- uh - 0.06
       loop <- 0
@@ -331,8 +354,9 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
 #' @param thresholdbranch Numeric value (default=1.5) that is multiplied with
-#'   the diameter of the tree (calculated with \code{\link{dab_pc}}) which
-#'   determines the cutt-off where a branch emerges and the crown begins.
+#'   the diameter of the tree (calculated with \code{\link{dbh_pc}} or
+#'   \code{\link{dab_pc}} when buttress =TRUE) which determines the cutt-off
+#'   where a branch emerges and the crown begins.
 #' @param minheight Numeric value (default=1) with the minimum height at which
 #'   the crown begins. Should be above the widest part of the buttresses for
 #'   buttressed trees (value of 4 is recommended). For non-buttressed trees
@@ -356,10 +380,14 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
-#' crown_pc <- classify_crown_pc(pc)
-#' crown_pc <- classify_crown_pc(pc, 1.5, 4, TRUE)
+#' # Read tree point cloud and extract the crown points
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' crown_pc <- classify_crown_pc(pc = pc_tree)
+#' # and plot the classification results
+#' crown_pc <- classify_crown_pc(pc = pc_tree, plot = TRUE)
+#' # with non-default settings for a buttressed tree
+#' crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE,
+#'                               plot = TRUE)
 #' }
 classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                               buttress = FALSE, thresholdbuttress = 0.001,
@@ -496,8 +524,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
+#' # Read tree point cloud and normalise the point cloud
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' pc_norm <- normalize_pc(pc)
 #' }
 normalize_pc <- function(pc) {
@@ -542,11 +570,14 @@ normalize_pc <- function(pc) {
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path)
-#' pca <- projected_crown_area_pc(pc)
-#' pca <- projected_crown_area_pc(pc, 0.3)
-#' pca <- projected_crown_area_pc(pc, 1, 1.5, 4, TRUE)
+#' # Read tree point cloud and calculate the projected crown area
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' pca <- projected_crown_area_pc(pc = pc_tree)
+#' # and plot the concave hull fitting
+#' pca <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
+#' # with non-default settings for a buttressed tree
+#' pca <- projected_crown_area_pc(pc = pc_tree, concavity = 3, minheight = 4,
+#'                                buttress = TRUE)
 #' }
 projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
                                     minheight = 1, buttress = FALSE,
@@ -599,11 +630,14 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #'
 #' @examples
 #' \dontrun{
-#' PC_path <- "path/to/point_cloud.txt"
-#' pc <- read_tree_pc(PC_path, 1)
-#' vol_crown <- volume_crown_pc(pc)
-#' vol_crown <- volume_crown_pc(pc, 0.3)
-#' vol_crown <- volume_crown_pc(pc, 1, 1.5, 4, TRUE)
+#' # Read tree point cloud and calculate the crown volume
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' vol_crown <- volume_crown_pc(pc = pc_tree)
+#' # and plot the 3D alpha-shape
+#' vol_crown <- volume_crown_pc(pc = pc_tree, plot = TRUE)
+#' # with non-default settings for a buttressed tree
+#' vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4,
+#'                              buttress = TRUE)
 #' }
 volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
                             buttress = FALSE, thresholdbuttress = 0.001,

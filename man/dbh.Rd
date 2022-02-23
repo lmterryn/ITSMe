@@ -48,11 +48,9 @@ the dbh is based on the treeQSM with \code{\link{dbh_qsm}}.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-DBH <- dbh(qsm$treedata)
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-DBH <- dbh(qsm$treedata, pc, TRUE)
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+DBH <- dbh(treedata = qsm$treedata)
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+DBH <- dbh(treedata = qsm$treedata, pc = pc_tree, buttress = TRUE)
 }
 }

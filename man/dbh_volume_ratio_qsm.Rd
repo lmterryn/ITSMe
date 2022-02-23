@@ -45,13 +45,15 @@ DBH and tree volume are calculated with \code{\link{dbh}} and
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata)
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc)
-ratio_vol <- dbh_volume_ratio_qsm(qsm$treedata, pc, TRUE)
+# Read tree qsm and calculate the dbh volume ratio
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata)
+# with point cloud data
+pc_tree <- read_tree_pc("path/to/point_cloud.txt")
+dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = pc_tree)
+# for buttressed trees
+dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = pc_tree,
+                            buttress = TRUE)
 }
 }
 \references{

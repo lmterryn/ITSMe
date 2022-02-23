@@ -22,8 +22,8 @@ highest and lowest point of the tree point cloud.
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-tree_height <- tree_height_pc(pc)
+# Read tree point cloud and calculate the tree height
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+tree_height <- tree_height_pc(pc = pc_tree)
 }
 }

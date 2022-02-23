@@ -31,9 +31,10 @@ Terryn et al., 2020).
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-radii <- vertical_bin_radii_qsm(qsm$treedata, qsm$cylinder)
+# Read tree qsm and calculate the vertical bin radii
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+radii <- vertical_bin_radii_qsm(treedata = qsm$treedata,
+                                cylinder = qsm$cylinder)
 }
 }
 \references{

@@ -57,10 +57,13 @@ hull fitted to the crown points obtained with
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-pca <- projected_crown_area_pc(pc)
-pca <- projected_crown_area_pc(pc, 0.3)
-pca <- projected_crown_area_pc(pc, 1, 1.5, 4, TRUE)
+# Read tree point cloud and calculate the projected crown area
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+pca <- projected_crown_area_pc(pc = pc_tree)
+# and plot the concave hull fitting
+pca <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
+# with non-default settings for a buttressed tree
+pca <- projected_crown_area_pc(pc = pc_tree, concavity = 3, minheight = 4,
+                               buttress = TRUE)
 }
 }

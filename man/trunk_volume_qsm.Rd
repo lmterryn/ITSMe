@@ -20,8 +20,8 @@ Extracts the total trunk volume from the treedata of a TreeQSM.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-trunkvol <- trunk_volume_qsm(qsm$treedata)
+# Read tree qsm and extract trunk volume
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+trunkvol <- trunk_volume_qsm(treedata = qsm$treedata)
 }
 }

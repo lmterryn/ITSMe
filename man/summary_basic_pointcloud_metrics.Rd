@@ -51,7 +51,7 @@ buttresses. Only relevant when buttress == TRUE.}
 buttresses. Only relevant when buttress == TRUE.}
 
 \item{OUT_path}{A character with the path to the folder where the summary csv
-file should be saved. Default is FALSE: in this case no csv file is
+file should be saved or logical (default=FALSE) in this case no csv file is
 produced.}
 }
 \value{
@@ -75,8 +75,14 @@ respectively.
 }
 \examples{
 \dontrun{
-PCs_path <- "path/to/folder/PCs/"
-summary <- summary_basic_pointcloud_metrics(PCs_path)
-summary <- summary_basic_pointcloud_metrics(PCs_path, extension = ".ply")
+# Calculate the summary with default parameters and export to csv
+# recommended for non-buttressed trees
+summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
+                                            OUT_path = "path/to/out/folder/")
+# Calculate the summary with non-default parameter values
+# recommended for buttressed trees
+summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
+                                            extension = ".ply",
+                                            minheight = 4, buttress = TRUE)
 }
 }

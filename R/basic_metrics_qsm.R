@@ -11,9 +11,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' pos <- tree_position_qsm(qsm$cylinder)
+#' # Read tree qsm and calculate tree position
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' pos <- tree_position_qsm(cylinder = qsm$cylinder)
 #' }
 tree_position_qsm <- function(cylinder) {
   j <- 0
@@ -39,9 +39,9 @@ tree_position_qsm <- function(cylinder) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' tot_len <- total_cyl_length_qsm(qsm$treedata)
+#' # Read tree qsm and extract total cylinder length
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' tot_len <- total_cyl_length_qsm(treedata = qsm$treedata)
 #' }
 total_cyl_length_qsm <- function(treedata) {
   return(treedata$TotalLength[1])
@@ -63,9 +63,9 @@ total_cyl_length_qsm <- function(treedata) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' tot_vol <- tree_volume_qsm(qsm$treedata)
+#' # Read tree qsm and extract tree volume
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
 #' }
 tree_volume_qsm <- function(treedata) {
   if (length(treedata) > 83) {
@@ -91,9 +91,9 @@ tree_volume_qsm <- function(treedata) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' trunkvol <- trunk_volume_qsm(qsm$treedata)
+#' # Read tree qsm and extract trunk volume
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' trunkvol <- trunk_volume_qsm(treedata = qsm$treedata)
 #' }
 trunk_volume_qsm <- function(treedata) {
   if (length(treedata) > 83) {
@@ -117,9 +117,9 @@ trunk_volume_qsm <- function(treedata) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' branchvol <- total_branch_volume_qsm(qsm$treedata)
+#' # Read tree qsm and extract total branch volume
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' branchvol <- total_branch_volume_qsm(treedata = qsm$treedata)
 #' }
 total_branch_volume_qsm <- function(treedata) {
   return(treedata$BranchVolume[1])
@@ -138,9 +138,9 @@ total_branch_volume_qsm <- function(treedata) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' branchlen <- total_branch_length_qsm(qsm$treedata)
+#' # Read tree qsm and extract total branch length
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' branchlen <- total_branch_length_qsm(treedata = qsm$treedata)
 #' }
 total_branch_length_qsm <- function(treedata) {
   return(treedata$BranchLength[1])
@@ -159,9 +159,9 @@ total_branch_length_qsm <- function(treedata) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' height <- tree_height_qsm(qsm$treedata)
+#' # Read tree qsm and extract tree height
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' height <- tree_height_qsm(treedata = qsm$treedata)
 #' }
 tree_height_qsm <- function(treedata) {
   return(treedata$TreeHeight[1])
@@ -169,11 +169,11 @@ tree_height_qsm <- function(treedata) {
 
 #' Diameter at breast height TreeQSM
 #'
-#' Extracts the dbh from the treedata of a TreeQSM.
+#' Extracts the DBH from the treedata of a TreeQSM.
 #'
-#' The dbh is calculated as the diameter of the cylinder in the QSM at the right
+#' The DBH is calculated as the diameter of the cylinder in the QSM at the right
 #' height (cylinder at 1.3 m). If the trunk was modeled with triangulation the
-#' dbh is calculated as mean length of the diagonals in the triangulation.
+#' DBH is calculated as mean length of the diagonals in the triangulation.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -184,9 +184,9 @@ tree_height_qsm <- function(treedata) {
 #'
 #' @examples
 #' \dontrun{
-#' QSM_path <- "path/to/qsm.mat"
-#' qsm <- read_tree_qsm(QSM_path)
-#' dbh <- dbh_qsm(qsm$treedata)
+#' # Read tree qsm and extract DBH
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' dbh <- dbh_qsm(treedata = qsm$treedata)
 #' }
 dbh_qsm <- function(treedata) {
   if (length(treedata) > 83) {

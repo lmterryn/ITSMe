@@ -59,10 +59,13 @@ alpha-shape fitted to the crown points obtained with
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path, 1)
-vol_crown <- volume_crown_pc(pc)
-vol_crown <- volume_crown_pc(pc, 0.3)
-vol_crown <- volume_crown_pc(pc, 1, 1.5, 4, TRUE)
+# Read tree point cloud and calculate the crown volume
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+vol_crown <- volume_crown_pc(pc = pc_tree)
+# and plot the 3D alpha-shape
+vol_crown <- volume_crown_pc(pc = pc_tree, plot = TRUE)
+# with non-default settings for a buttressed tree
+vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4,
+                             buttress = TRUE)
 }
 }

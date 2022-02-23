@@ -45,13 +45,15 @@ DBH and tree height are calculated with \code{\link{dbh}} and
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-ratio_height <- dbh_height_ratio_qsm(qsm$treedata)
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc)
-ratio_height <- dbh_height_ratio_qsm(qsm$treedata, pc, TRUE)
+# Read tree qsm and calculate the dbh height ratio
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata)
+# with point cloud data
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = pc_tree)
+# for buttressed trees
+dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = pc_tree,
+                            buttress = TRUE)
 }
 }
 \references{

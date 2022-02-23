@@ -24,9 +24,9 @@ with \code{\link{crownset_qsm}}.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-ce <- crown_evenness_qsm(qsm$cylinder, crown)
+# Read tree qsm and calculate the crown evenness
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+ce <- crown_evenness_qsm(cylinder = qsm$cylinder)
 }
 }
 \references{

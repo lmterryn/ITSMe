@@ -7,8 +7,9 @@
 read_tree_qsm(path, version = "2.4.0", global = FALSE)
 }
 \arguments{
-\item{path}{The path to the TreeQSM mat file. This file contains 1 QSM
-produced with \url{https://github.com/InverseTampere/TreeQSM} in matlab.}
+\item{path}{A character with the path to the TreeQSM mat file. This file
+contains one QSM produced with
+\url{https://github.com/InverseTampere/TreeQSM} in matlab.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
 produce the TreeQSMs. Default version is "2.4.0" Other possible versions
@@ -33,9 +34,11 @@ the value of attributes not found in the older version is set NA.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-qsm <- read_tree_qsm(QSM_path, version = "2.0")
-qsm <- read_tree_qsm(QSM_path, version = "2.4.0", global = TRUE)
+# Read a TreeQSM.mat file with default settings
+qsm <- read_tree_qsm(QSM_path = "path/to/TreeQSM.mat")
+# Read a TreeQSM.mat file of version 2.0
+qsm <- read_tree_qsm(QSM_path = "path/to/TreeQSM.mat", version = "2.0")
+# Read a TreeQSM.mat file with into the global environment
+qsm <- read_tree_qsm(QSM_path = "path/to/TreeQSM.mat", global = TRUE)
 }
 }

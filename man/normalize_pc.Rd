@@ -19,8 +19,8 @@ the min value (e.g. all X-values - min(all X-values)).
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
+# Read tree point cloud and normalise the point cloud
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 pc_norm <- normalize_pc(pc)
 }
 }

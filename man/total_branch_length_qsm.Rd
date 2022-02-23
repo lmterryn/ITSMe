@@ -18,8 +18,8 @@ Extracts the total branch length from the treedata of a TreeQSM.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-branchlen <- total_branch_length_qsm(qsm$treedata)
+# Read tree qsm and extract total branch length
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+branchlen <- total_branch_length_qsm(treedata = qsm$treedata)
 }
 }

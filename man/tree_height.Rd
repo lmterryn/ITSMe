@@ -28,11 +28,9 @@ with \code{\link{tree_height_qsm}}.
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-h <- tree_height(qsm$treedata)
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-h <- tree_height(qsm$treedata, pc)
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+h <- tree_height(treedata = qsm$treedata)
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+h <- tree_height(treedata = qsm$treedata, pc = pc_tree)
 }
 }

@@ -45,13 +45,22 @@ the stem radius at respective height" (Akerblom et al., 2017 & Terryn et al.,
 }
 \examples{
 \dontrun{
-QSM_path <- "path/to/qsm.mat"
-qsm <- read_tree_qsm(QSM_path)
-sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "parentcyl")
-sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata)
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata, "treeheight", pc)
+# Read tree qsm and calculate the stem branch radius
+# from Akerblom et al. (2017)
+qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder,
+                              treedata = qsm$treedata,
+                              normalisation = "parentcyl")
+# from Terryn et al. (2020)
+sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder,
+                              treedata = qsm$treedata,
+                              normalisation = "treeheight")
+# with point cloud data
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder,
+                              treedata = qsm$treedata,
+                              normalisation = "treeheight",
+                              pc = pc_tree)
 }
 }
 \references{

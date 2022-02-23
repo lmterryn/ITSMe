@@ -33,10 +33,12 @@ of points for quicker plotting.
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-PC_path <- "path/to/point_cloud.ply"
-PC_path <- "path/to/point_cloud.las"
-pc <- read_tree_pc(PC_path)
-pc <- read_tree_pc(PC_path, 0.2)
+# Read a tree point cloud file of the txt format
+pc_txt <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+# Read a tree point cloud file of the ply format
+pc_ply <- read_tree_pc(PC_path = "path/to/point_cloud.ply")
+# Read a tree point cloud file of the las format
+# and subsample to 20 percent of the points
+pc_las <- read_tree_pc(PC_path = "path/to/point_cloud.las", 0.2)
 }
 }

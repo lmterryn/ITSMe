@@ -29,9 +29,10 @@ optimal fit.
 }
 \examples{
 \dontrun{
-PC_path <- "path/to/point_cloud.txt"
-pc <- read_tree_pc(PC_path)
-dbh <- dbh_pc(pc)
-dbh <- dbh_pc(pc, TRUE)
+# Read tree point cloud and calculate the DBH
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+dbh <- dbh_pc(pc = pc_tree)
+# and plot the circle fitting
+dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
 }
 }
