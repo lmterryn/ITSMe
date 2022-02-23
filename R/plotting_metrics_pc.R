@@ -21,10 +21,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' PCs_path <- "path/to/folder/PCs/"
-#' extension <- ".txt"
-#' OUT_path <- "path/to/folder/for/saving/figures/"
-#' dbh_values <- plot_dbh_fit_pcs(PCs_path, extension, OUT_path)
+#' # Calculate DBHs and save circle fitting figures
+#' dbh_values <- plot_dbh_fit_pcs(PCs_path = "path/to/folder/PCs/",
+#'                                extension = ".txt",
+#'                                OUT_path = "path/to/figure/folder/")
 #' }
 plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -76,10 +76,16 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
 #'
 #' @examples
 #' \dontrun{
-#' PCs_path <- "path/to/folder/PCs/"
-#' extension <- ".txt"
-#' OUT_path <- "path/to/folder/for/saving/figures/"
-#' dab_values <- plot_dab_fit_pcs(PCs_path, extension, OUT_path)
+#' # Calculate DABs with default settings and save circle fitting figures
+#' dab_values <- plot_dab_fit_pcs(PCs_path = "path/to/folder/PCs/",
+#'                                extension = ".txt",
+#'                                OUT_path = "path/to/figure/folder/")
+#' # Calculate DABs with non-default settings and save circle fitting figures
+#' dab_values <- plot_dab_fit_pcs(PCs_path = "path/to/folder/PCs/",
+#'                                extension = ".txt",
+#'                                OUT_path = "path/to/figure/folder/",
+#'                                thresholdbuttress = 0.002,
+#'                                maxbuttressheight = 5)
 #' }
 plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
                              thresholdbuttress = 0.001, maxbuttressheight = 7) {
@@ -147,10 +153,23 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
 #'
 #' @examples
 #' \dontrun{
-#' PCs_path <- "path/to/folder/PCs/"
-#' extension <- ".txt"
-#' OUT_path <- "path/to/folder/for/saving/figures/"
-#' plot_crown_classification_pcs(PCs_path, extension, OUT_path)
+#' # Run the crown classification with default settings and save figures
+#' plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
+#'                               extension = ".txt",
+#'                               OUT_path = "path/to/figure/folder/")
+#' # Run the crown classification with non-default settings and save figures
+#' plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
+#'                               extension = ".txt",
+#'                               OUT_path = "path/to/figure/folder/",
+#'                               thresholdbranch = 2, minheight = 4)
+#' # Run the crown classification with non-default settings and save figures
+#' # for buttressed trees
+#' plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
+#'                               extension = ".txt",
+#'                               OUT_path = "path/to/figure/folder/",
+#'                               thresholdbranch = 2, minheight = 4,
+#'                               buttress = TRUE, thresholdbuttress = 0.002,
+#'                               maxbuttressheight = 5)
 #' }
 plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                                           OUT_path, thresholdbranch = 1.5,
@@ -221,10 +240,17 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'
 #' @examples
 #' \dontrun{
-#' PCs_path <- "path/to/folder/PCs/"
-#' extension <- ".txt"
-#' OUT_path <- "path/to/folder/for/saving/figures/"
-#' plot_pca_pcs(PCs_path, extension, OUT_path)
+#' # Calculate PCA with default settings and save projection figures
+#' pcas <- plot_pca_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'                      OUT_path = "path/to/figure/folder/")
+#' # Calculate PCA with non-default settings and save projection figures
+#' pcas <- plot_pca_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'                      OUT_path = "path/to/figure/folder/", concavity = 3)
+#' # Calculate PCA with non-default settings and save projection figures
+#' # for buttressed trees
+#' pcas <- plot_pca_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'                      OUT_path = "path/to/figure/folder/", concavity = 3,
+#'                      minheight = 4, buttress = TRUE)
 #' }
 plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
                          thresholdbranch = 1.5, minheight = 1, buttress = FALSE,
@@ -247,4 +273,85 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
     PCAs <- append(PCAs, pca)
   }
   return(PCAs)
+}
+
+#' Calculate and save figures of \code{\link{volume_crown_pc}} function
+#'
+#' Calculates the crown volume and saves the figures acquired when running
+#' \code{\link{volume_crown_pc}} on multiple tree point clouds in a folder.
+#'
+#' Uses \code{\link{read_tree_pc}} to read the point clouds and
+#' \code{\link{volume_crown_pc}} with parameter plot = TRUE to calculate the
+#' crown volume and plot the crown and 3D the alpha-shape fitting. For
+#' buttressed trees, first optimise the thresholdbuttress, maxbuttressheight,
+#' thresholdbranch and minheight parameter values using
+#' \code{\link{plot_dab_fit_pcs}} and
+#' \code{\link{plot_crown_classification_pcs}} and use those optimised values in
+#' this function.
+#'
+#' @param PCs_path A character with the path to the folder that contains the
+#'   tree point clouds.
+#' @param extension A character refering to the file extension of the point
+#'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
+#' @param OUT_path A character with the path to the folder where the figures
+#'   should be saved.
+#' @param alpha Numeric value (default=1) alpha for the computation of the 3D
+#'   alpha-shape of the tree crown based on \code{\link[alphashape3d]{ashape3d}}
+#'   in \code{\link{volume_crown_pc}}.
+#' @param thresholdbranch Numeric value (default=1.5) from
+#'   \code{\link{classify_crown_pc}}.
+#' @param minheight Numeric value (default=1) from
+#'   \code{\link{classify_crown_pc}}. The default value is based on
+#'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
+#' @param buttress Logical (default=FALSE), indicates if the trees have
+#'   buttresses (higher than breast height).
+#' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
+#'   when buttress == TRUE.
+#' @param maxbuttressheight Numeric value (default=7). Parameter of the
+#'   \code{\link{dab_pc}} function used to calculate the diameter above
+#'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
+#'   when buttress == TRUE.
+#'
+#' @return a numeric containing the crown volume values for each tree point
+#'   cloud. Figures are saved in the output folder.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Calculate CV with default settings and save alpha shape figures
+#' cvs <- plot_cv_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'                    OUT_path = "path/to/figure/folder/")
+#' # Calculate CV with non-default settings and save alpha shape figures
+#' cvs <- plot_cv_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'                    OUT_path = "path/to/figure/folder/", alpha = 2)
+#' # Calculate CV with non-default settings and save alpha shape figures
+#' # for buttressed trees
+#' cvs <- plot_cv_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'                    OUT_path = "path/to/figure/folder/", alpha = 2,
+#'                    minheight = 4, buttress = TRUE)
+#' }
+plot_cv_pcs <- function(PCs_path, extension = ".txt", OUT_path, alpha = 1,
+                         thresholdbranch = 1.5, minheight = 1, buttress = FALSE,
+                         thresholdbuttress = 0.001, maxbuttressheight = 7){
+  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = TRUE)
+  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = FALSE)
+  CVs <- c()
+  for (i in 1:length(file_names)) {
+    print(paste("processing ", file_names[i]))
+    pc <- read_tree_pc(file_paths[i])
+    fig_name <- paste(OUT_path, "cv_", strsplit(file_names[i], extension)[[1]],
+                      "_", as.character(alpha), ".png", sep = "")
+    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight,
+                                   buttress, thresholdbuttress,
+                                   maxbuttressheight, TRUE)
+    rgl::rgl.snapshot(fig_name, fmt = 'png')
+    rgl::rgl.close()
+    CVs <- append(CVs, cv)
+  }
+  return(CVs)
 }

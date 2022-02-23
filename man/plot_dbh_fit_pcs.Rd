@@ -31,9 +31,9 @@ the circle fitting.
 }
 \examples{
 \dontrun{
-PCs_path <- "path/to/folder/PCs/"
-extension <- ".txt"
-OUT_path <- "path/to/folder/for/saving/figures/"
-dbh_values <- plot_dbh_fit_pcs(PCs_path, extension, OUT_path)
+# Calculate DBHs and save circle fitting figures
+dbh_values <- plot_dbh_fit_pcs(PCs_path = "path/to/folder/PCs/",
+                               extension = ".txt",
+                               OUT_path = "path/to/figure/folder/")
 }
 }
