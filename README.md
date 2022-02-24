@@ -27,11 +27,11 @@ devtools::install_github("lmterryn/ITSMe")
 ## Input
 
 The functions are developed for tree point clouds obtained with TLS and
-quantitative structure models (QSMs) obtained with TreeQSM
-(<https://github.com/InverseTampere/TreeQSM>). The tree point cloud
-based functions can also be used for tree point clouds obtained from MLS
-and UAV-LS if their point densities are high enough (e.g. sufficient
-stem points for dbh/dab estimation).
+quantitative structure models (QSMs) obtained with
+[TreeQSM](https://github.com/InverseTampere/TreeQSM). The tree point
+cloud based functions can also be used for tree point clouds obtained
+from MLS and UAV-LS if their point densities are high enough
+(e.g. sufficient stem points for dbh/dab estimation).
 
 ## Individual tree structural metrics
 
@@ -57,18 +57,18 @@ summarized in the tables below.
 
 These are the metrics defined in [Terryn et
 al. (2020)](https://doi.org/10.1016/j.isprsjprs.2020.08.009) and were
-copied and adapted from [Akerblom et al.,
-(2017)](https://doi.org/10.1016/j.rse.2016.12.002) except for the branch
-angle ratio and the relative volume ratio. Definitions of the metrics
-can be found in the help files of the functions and the papers of Terryn
-et al. (2020) and Akerblom et al. (2017). Normalisation according to
-Terryn et al. (2020) as well as Akerblom et al. (2017) is possible
-through the normalisation parameter included in the functions of the
-metrics that were adapted by Terryn et al. (2020). If the tree point
-cloud is provided along with the TreeQSM in the functions, dbh and tree
-height values are based on the point clouds rather than the QSMs. When
-the buttress parameter is indicated “TRUE” the diameter above buttresses
-rather than the dbh is used.
+copied and adapted from [Akerblom et
+al. (2017)](https://doi.org/10.1016/j.rse.2016.12.002) except for the
+branch angle ratio and the relative volume ratio. Definitions of the
+metrics can be found in the help files of the functions and the papers
+of Terryn et al. (2020) and Akerblom et al. (2017). Normalisation
+according to Terryn et al. (2020) as well as Akerblom et al. (2017) is
+possible through the normalisation parameter included in the functions
+of the metrics that were adapted by Terryn et al. (2020). If the tree
+point cloud is provided along with the TreeQSM in the functions, dbh and
+tree height values are based on the point clouds rather than the QSMs.
+When the buttress parameter is indicated “TRUE” the diameter above
+buttresses rather than the dbh is used.
 
 | structural metric                             |          function name           |              input |
 |-----------------------------------------------|:--------------------------------:|-------------------:|
@@ -92,20 +92,19 @@ rather than the dbh is used.
 
 ## Examples
 
+For complete workflows, have a look at the ITSMe vignette.
+
 Calculating the diameter at breast height versus the diameter above
 buttresses of a tree:
 
 ``` r
 library(ITSMe)
-#Specify path to the tree point cloud file
-PC_path <- "path/to/point/cloud"
-#Read the point cloud file
-pc <- read_tree_pc(path = PC_path)
-#Use dbh_pc function with default parameters and plot the fit
-dbh <- dbh_pc(pc = pc, plot = TRUE)
-#Use dab_pc function with default parameters and plot the fit
-dab <- dab_pc(pc = pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
-              plot = TRUE)
+# Read the point cloud file from the Specified path to the tree point cloud file
+pc_tree <- read_tree_pc(path = "path/to/point/cloud.txt")
+# Use dbh_pc function with default parameters and plot the fit
+dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
+# Use dab_pc function with default parameters and plot the fit
+dab <- dab_pc(pc = pc_tree, plot = TRUE)
 ```
 
 <p align="center">
@@ -118,27 +117,34 @@ dab <- dab_pc(pc = pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 If you want to determine the dbh or dab for several tree point clouds
 (in the same folder) and visually check the circle fitting, use the
 plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs
-function can also be used to optimise the parameters by changing them
-and visually checking the results. This is also the case for
-plot_crown_classification_pcs and plot_pca_pcs.
+function can also be used to optimise the parameters of the dab_pc
+function when default values do not give the desired results: 1. Run
+plot_dab_fit_pcs with default values (thresholdbuttress = 0.001,
+maxbuttressheight = 7). 2. Check the generated figures in your OUT_path.
+3. Increase/decrease maxbuttressheight if buttresses on your trees reach
+higher/lower heights. 4. Increase/decrease thresholdbuttress if the
+diameter is taken too high/low.
+
+Use plot_crown_classification_pcs to check the crown classification that
+is used for the projected_crown_area_pc and crown_volume_pc functions.
+The plot_pca_pcs and plot_cv_pcs can help to determine the desired
+concavity and alpha values to calculate the projected crown area and
+crown volume respectively.
 
 Calculating the stem branch distance of a TreeQSM:
 
 ``` r
 library(ITSMe)
-#Specify path to the TreeQSM file
-QSM_path <- "path/to/QSM"
-#Read the TreeQSM file
-qsm <- read_tree_qsm(path = QSM_path)
-#Use stem_branch_distance_qsm function
+# Read the TreeQSM file from the Specified path to the TreeQSM file
+qsm <- read_tree_qsm(path = "path/to/QSM.mat")
+# Use stem_branch_distance_qsm function
 sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
                                 treedata = qsm$treedata, normalisation = "dbh")
-#Using the point cloud information for more accurate dbh normalisation
-PC_path <- system.file("extdata", "example_pointcloud_1.ply", package = "ITSMe")
-pc <- read_tree_pc(path = PC_path)
+# Using the point cloud information for more accurate dbh normalisation
+pc_tree <- read_tree_pc(path = "path/to/point/cloud.txt")
 sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
                                 treedata = qsm$treedata, normalisation = "dbh", 
-                                pc = pc, buttress = TRUE)
+                                pc = pc_tree, buttress = TRUE)
 ```
 
 Calculating a summary data.frame with the basic structural metrics (tree
@@ -149,9 +155,9 @@ clouds in a specific folder:
 ``` r
 library(ITSMe)
 #Specify the path to the folder containing multiple tree point cloud files
-PCs_path <- "path/to/point/cloud/folder/"
+PCs_path <- 
 #Run summary function with default parameter settings
-basic_summary <- summary_basic_pointcloud_metrics(PCs_path = PCs_path, 
+basic_summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/cloud/folder/", 
                                                   extension = ".txt")
 ```
 
@@ -161,12 +167,11 @@ Terryn et al. (2020) for all TreeQSMs in a specific folder:
 ``` r
 library(ITSMe)
 #Specify the path to the folder containing the respective tree point cloud files
-QSMs_path <- "path/to/QSM/folder/"
-#If you cant DBH/DAB and height to be calculated based on tree point clouds:
+#If you want dbh/dab and height to be calculated based on tree point clouds:
 #Specify the path to the folder containing the respective tree point cloud files
-PCs_path <- "path/to/point/cloud/folder/"
 #Run summary function with default parameter settings
-Terryn_summary <- summary_Terryn_2020(QSMs_path = QSMs_path, version = "2.4.0",
-                                      PCs_path = PCs_path, buttress = TRUE, 
+Terryn_summary <- summary_Terryn_2020(QSMs_path = "path/to/QSM/folder/", 
+                                      version = "2.3.0",
+                                      PCs_path = "path/to/point/cloud/folder/", 
                                       extension = ".txt")
 ```
