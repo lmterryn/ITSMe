@@ -104,7 +104,7 @@ diameter above buttresses rather than the dbh is used.
 | dbh minimum tree radius ratio             | dbh_minradius_ratio_qsm           | QSM (+point cloud) |
 
 ## Examples
-For complete workflows, have a look at the ITSMe vignette with: 
+For complete workflows, have a look at the [ITSMe website](https://lmterryn.github.io/ITSMe/articles/ITSMe.html) or vignette with: 
 ```{r eval = FALSE}
 vignette("ITSMe")
 ```

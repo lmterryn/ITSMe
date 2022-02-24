@@ -92,7 +92,9 @@ buttresses rather than the dbh is used.
 
 ## Examples
 
-For complete workflows, have a look at the ITSMe vignette with:
+For complete workflows, have a look at the [ITSMe
+website](https://lmterryn.github.io/ITSMe/articles/ITSMe.html) or
+vignette with:
 
 ``` r
 vignette("ITSMe")
