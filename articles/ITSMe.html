@@ -167,17 +167,14 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure DBH from the tree point cloud and plot the circle fitting</span>
 <span class="va">DBH</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p align="center">
-<img src="dbh_example.jpeg" height="500"></p>
-For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could result in:
-<p align="center">
-<img src="dbh_example_buttress.jpeg" height="500"></p>
+<p><img src="../reference/figures/dbh_example.jpeg"></p>
+<p>For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could result in:</p>
+<p><img src="../reference/figures/dbh_example_buttress.jpeg"></p>
 <p>In this case determining the DAB with <code>dab_pc</code> is the better option. With <code>dab_pc</code>, the diameter (from the optimal circle fitted through a 6mm thick horizontal slice) is measured above the buttresses. The height at which the horizontal slice is taken (the height above buttresses), is determined iteratively, starting at breast height. The average residual between the points and the fitted circle is calculated. When the average residual exceeds a value of <em>thresholdbuttress</em> times the radius, indicating a non-circular (irregular) stem shape and presumably buttresses, and the <em>maxbuttressheight</em> is not exceeded, the process is repeated with a new slice 6 mm higher than the previous one. When the <em>maxbuttressheight</em> is exceeded the iterative process is restarted with a <em>thresholdbuttress</em> increased with 0.0005.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure DAB from the tree point cloud with default settings and plot the circle fitting</span>
 <span class="va">DAB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dab_pc.html">dab_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p align="center">
-<img src="dab_example.jpeg" height="500"></p>
+<p><img src="../reference/figures/dab_example.jpeg"></p>
 <p>Optimise the values of <em>thresholdbuttress</em> and or <em>maxbuttressheight</em> for your tree if default values do not lead to the desired results:</p>
 <ul>
 <li>reduce/increase <em>thresholdbuttress</em> if the height above buttresses is consistenly too low/high.</li>
@@ -193,8 +190,7 @@ For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could re
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Classify the tree point cloud with default settings and plot the classification results</span>
 <span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p align="center">
-<img src="crown_example.jpeg" height="500"></p>
+<p><img src="../reference/figures/crown_example.jpeg"></p>
 <p>Optimise the values of <em>thresholdbranch</em> and or <em>minheight</em> for your tree if default values do not lead to the desired results:</p>
 <ul>
 <li>reduce/increase <em>thresholdbranch</em> if the crown height is consistently determined too high/low.</li>
@@ -206,8 +202,7 @@ For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could re
 <code class="sourceCode R"><span class="co"># Classify the tree point cloud of a buttressed tree and plot the classification results</span>
 <span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
                               plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p align="center">
-<img src="crown_example_tropical.jpeg" height="500"></p>
+<p><img src="../reference/figures/crown_example_tropical.jpeg"></p>
 </div>
 <div class="section level4">
 <h4 id="measure-the-projected-crown-area">Measure the projected crown area<a class="anchor" aria-label="anchor" href="#measure-the-projected-crown-area"></a>
@@ -217,8 +212,7 @@ For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could re
 <code class="sourceCode R"><span class="co"># Measure the pca of a tree point cloud of a buttressed tree and plot the result</span>
 <span class="va">PCA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/projected_crown_area_pc.html">projected_crown_area_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
                               plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p align="center">
-<img src="pca_example.jpeg" height="500"></p>
+<p><img src="../reference/figures/pca_example.jpeg"></p>
 </div>
 <div class="section level4">
 <h4 id="measure-the-crown-volume">Measure the crown volume<a class="anchor" aria-label="anchor" href="#measure-the-crown-volume"></a>
@@ -227,8 +221,7 @@ For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could re
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure the crown volume of a tree point cloud of a buttressed tree and generate 3D plot</span>
 <span class="va">CV</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/volume_crown_pc.html">volume_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p align="center">
-<img src="cv_example.jpeg" height="500"></p>
+<p><img src="../reference/figures/cv_example.jpeg"></p>
 </div>
 </div>
 <div class="section level3">
@@ -518,7 +511,7 @@ For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could re
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Kim Calders.</p>
+<p>Developed by Louise Terryn.</p>
 </div>
 
 <div class="pkgdown-footer-right">
