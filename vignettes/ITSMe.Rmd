@@ -118,14 +118,12 @@ but if the second argument *plot* is set TRUE it also plots the circle fitting.
 DBH <- dbh_pc(pc = tree_pc, plot = TRUE)
 
 ```
-<p align="center">
-    <img src="dbh_example.jpeg" height="500" >
-</p>
+![](../man/figures/dbh_example.jpeg)
 
 For some trees (mainly tropical, buttressed trees), `dbh_pc` could result in:
-<p align="center">
-    <img src="dbh_example_buttress.jpeg" height="500" >
-</p>
+
+![](../man/figures/dbh_example_buttress.jpeg)
+
 
 In this case determining the DAB with `dab_pc` is the better option. With 
 `dab_pc`, the diameter (from the optimal circle fitted through a 6mm thick 
@@ -144,9 +142,7 @@ with a *thresholdbuttress* increased with 0.0005.
 DAB <- dab_pc(pc = tree_pc, plot = TRUE)
 
 ```
-<p align="center">
-    <img src="dab_example.jpeg" height="500" >
-</p>
+![](../man/figures/dab_example.jpeg)
 
 Optimise the values of *thresholdbuttress* and or *maxbuttressheight* for your 
 tree if default values do not lead to the desired results:
@@ -178,9 +174,8 @@ the DBH or DAB.
 crown_pc <- classify_crown_pc(pc = tree_pc, plot = TRUE)
 
 ```
-<p align="center">
-    <img src="crown_example.jpeg" height="500" >
-</p>
+
+![](../man/figures/crown_example.jpeg)
 
 Optimise the values of *thresholdbranch* and or *minheight* for your 
 tree if default values do not lead to the desired results:
@@ -202,9 +197,7 @@ crown_pc <- classify_crown_pc(pc = tree_pc, minheight = 4, buttress = TRUE,
                               plot = TRUE)
 
 ```
-<p align="center">
-    <img src="crown_example_tropical.jpeg" height="500" >
-</p>
+![](../man/figures/crown_example_tropical.jpeg)
 
 #### Measure the projected crown area
 
@@ -219,9 +212,7 @@ PCA <- projected_crown_area_pc(pc = tree_pc, minheight = 4, buttress = TRUE,
                               plot = TRUE)
 
 ```
-<p align="center">
-    <img src="pca_example.jpeg" height="500" >
-</p>
+![](../man/figures/pca_example.jpeg)
 
 #### Measure the crown volume
 
@@ -235,9 +226,7 @@ You can however, also specify *alpha* (default=1).
 CV <- volume_crown_pc(pc = tree_pc, minheight = 4, buttress = TRUE, plot = TRUE)
 
 ```
-<p align="center">
-    <img src="cv_example.jpeg" height="500" >
-</p>
+![](../man/figures/cv_example.jpeg)
 
 ### Workflow for multiple trees
 
