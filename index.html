@@ -282,7 +282,13 @@
 <img src="reference/figures/dbh_example.png" height="500"></p>
 <p align="center">
 <img src="reference/figures/dab_example.png" height="500"></p>
-<p>If you want to determine the dbh or dab for several tree point clouds (in the same folder) and visually check the circle fitting, use the plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs function can also be used to optimise the parameters of the dab_pc function when default values do not give the desired results: 1. Run plot_dab_fit_pcs with default values (thresholdbuttress = 0.001, maxbuttressheight = 7). 2. Check the generated figures in your OUT_path. 3. Increase/decrease maxbuttressheight if buttresses on your trees reach higher/lower heights. 4. Increase/decrease thresholdbuttress if the diameter is taken too high/low.</p>
+<p>If you want to determine the dbh or dab for several tree point clouds (in the same folder) and visually check the circle fitting, use the plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs function can also be used to optimise the parameters of the dab_pc function when default values do not give the desired results:</p>
+<ol style="list-style-type: decimal">
+<li>Run plot_dab_fit_pcs with default values (thresholdbuttress = 0.001, maxbuttressheight = 7).</li>
+<li>Check the generated figures in your OUT_path.</li>
+<li>Increase/decrease maxbuttressheight if buttresses on your trees reach higher/lower heights.</li>
+<li>Increase/decrease thresholdbuttress if the diameter is taken too high/low.</li>
+</ol>
 <p>Use plot_crown_classification_pcs to check the crown classification that is used for the projected_crown_area_pc and crown_volume_pc functions. The plot_pca_pcs and plot_cv_pcs can help to determine the desired concavity and alpha values to calculate the projected crown area and crown volume respectively.</p>
 <p>Calculating the stem branch distance of a TreeQSM:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
