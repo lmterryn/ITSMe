@@ -106,7 +106,7 @@ summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
 # also using point cloud info
 summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
                                PCs_path = "path/to/folder/PCs/",
-                               extension = ".txt"
+                               extension = ".txt",
                                OUT_path = "path/to/out/folder/")
 # Calculate the summary with non-default parameter values
 # recommended for buttressed trees
