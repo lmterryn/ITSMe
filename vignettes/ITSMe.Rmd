@@ -451,7 +451,7 @@ sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
                                 thresholdbuttress = 0.002, 
                                 maxbuttressheight = 5)
 ```
-### Workflow for multiple tree
+### Workflow for multiple trees
 
 #### Summarise metrics Terryn et al. (2020)
 

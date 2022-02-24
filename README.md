@@ -21,7 +21,7 @@ You can install the development version of ITSMe from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("lmterryn/ITSMe")
+devtools::install_github("lmterryn/ITSMe", build_vignettes = TRUE)
 ```
 
 ## Input
@@ -92,7 +92,11 @@ buttresses rather than the dbh is used.
 
 ## Examples
 
-For complete workflows, have a look at the ITSMe vignette.
+For complete workflows, have a look at the ITSMe vignette with:
+
+``` r
+vignette("ITSMe")
+```
 
 Calculating the diameter at breast height versus the diameter above
 buttresses of a tree:

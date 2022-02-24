@@ -2,7 +2,7 @@ Package: ITSMe
 Title: Individual Tree Structural Metrics 
 Version: 0.0.0.9000
 Authors@R: 
-    person("Louise", "Terryn", , "terrynlouise@outlook.com",
+    person("Louise", "Terryn", ,"terrynlouise@outlook.com",
      role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8405-2788"))
     person("Kim", "Calders", ,"Kim.Calders@UGent.be", 
      role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4562-2538"))
@@ -30,7 +30,8 @@ Imports:
     sf,
     stats,
     utils
-URL: https://github.com/lmterryn/ITSMe
+URL: https://github.com/lmterryn/ITSMe,
+    https://lmterryn.github.io/ITSMe/
 BugReports: https://github.com/lmterryn/ITSMe/issues 
 Depends: 
     R (>= 2.10)
