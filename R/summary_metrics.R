@@ -37,6 +37,9 @@
 #' @param OUT_path A character with the path to the folder where the summary csv
 #'   file should be saved or logical (default=FALSE) in this case no csv file is
 #'   produced.
+#' @param plot Logical (default=FALSE), indicates if summary figure for each
+#'   tree point cloud is plotted. If an OUT_path is provided, the figures are
+#'   saved in the OUT_path.
 #'
 #'
 #' @return The summary of the basic structural metrics for multiple tree point
@@ -64,7 +67,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              alpha = 1, buttress = FALSE,
                                              thresholdbuttress = 0.001,
                                              maxbuttressheight = 7,
-                                             OUT_path = FALSE) {
+                                             OUT_path = FALSE, plot = FALSE) {
   trees <- data.frame(
     "tree_id" = character(), "X_position" = double(),
     "Y_position" = double(), "tree_height" = double(),
@@ -85,16 +88,26 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     pos <- tree_position_pc(pc)
     h <- tree_height_pc(pc)
     if (buttress){
-      dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+      dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
     } else {
       dab <- NA
     }
-    dbh <- dbh_pc(pc)
-    pca <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
+    dbh_out <- dbh_pc(pc, plot)
+    classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
+                                      thresholdbuttress, maxbuttressheight,
+                                      plot)
+    pca_out <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
                                    buttress, thresholdbuttress,
-                                   maxbuttressheight)
+                                   maxbuttressheight, plot)
     cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight, buttress,
                           thresholdbuttress, maxbuttressheight)
+    if (plot){
+     dbh <- dbh_out$dbh
+     if (buttress){
+       dab <- dab_out$dab
+     }
+     pca <- pca_out$pca
+    }
     tree <- data.frame(
       "tree_id" = filenames[i], "X_position" = pos[1],
       "Y_position" = pos[2], "tree_height" = h,
@@ -105,9 +118,40 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
       tree <- subset(tree, select = -diameter_above_buttresses)
     }
     trees <- rbind(trees, tree)
+    if (plot){
+      if (buttress) {
+        p1 <- ggpubr::ggarrange(dab_out$plot, pca_out$plot, nrow = 2, ncol = 1,
+                                widths = c(1,1))
+      } else {
+        p1 <- ggpubr::ggarrange(dbh_out$plot, pca_out$plot, nrow = 2, ncol = 1,
+                        widths = c(1,1))
+      }
+      p2 <- ggpubr::ggarrange(classify_out$plotXZ, classify_out$plotYZ,
+                              nrow = 1, ncol = 2, heights = c(1,1),
+                              common.legend = TRUE, align = "hv",
+                              legend = "bottom")
+      p2 <- ggpubr::annotate_figure(p2,
+                              top = ggpubr::text_grob(paste("Tree height = ",
+                                                            as.character(
+                                                              round(h,2)),
+                                                            " m", sep = "")))
+      p3 <- ggpubr::ggarrange(p2, p1, nrow = 1, ncol = 2, align = "hv")
+      p3 <- ggpubr::annotate_figure(p3, top = ggpubr::text_grob(paste("Summary ",
+                                                strsplit(filenames[i],
+                                                         extension)[[1]],
+                                                sep = ""), face = "bold"))
+
+    }
     if (is.character(OUT_path)){
       utils::write.csv(trees,paste(OUT_path,"pointcloud_metrics.csv", sep = ""),
                        row.names = FALSE)
+      if (plot) {
+        grDevices::jpeg(file=paste(OUT_path,"summary_figure_",
+                        strsplit(filenames[i], extension)[[1]],".jpeg",
+                        sep = ""), res=600, width=4800, height=3000)
+        print(p3)
+        grDevices::dev.off()
+      }
     }
   }
   return(trees)

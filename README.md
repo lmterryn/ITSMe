@@ -92,9 +92,7 @@ buttresses rather than the dbh is used.
 
 ## Examples
 
-For complete workflows, have a look at the [ITSMe
-website](https://lmterryn.github.io/ITSMe/articles/ITSMe.html) or
-vignette with:
+For complete workflows, have a look at the ITSMe vignette with:
 
 ``` r
 vignette("ITSMe")
@@ -114,25 +112,22 @@ dab <- dab_pc(pc = pc_tree, plot = TRUE)
 ```
 
 <p align="center">
-<img src="man/figures/dbh_example.png" height="500" >
+<img src="man/figures/dbh_example.jpeg" height="500" >
 </p>
 <p align="center">
-<img src="man/figures/dab_example.png" height="500" >
+<img src="man/figures/dab_example.jpeg" height="500" >
 </p>
 
 If you want to determine the dbh or dab for several tree point clouds
 (in the same folder) and visually check the circle fitting, use the
 plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs
 function can also be used to optimise the parameters of the dab_pc
-function when default values do not give the desired results:
-
-1.  Run plot_dab_fit_pcs with default values (thresholdbuttress = 0.001,
-    maxbuttressheight = 7).
-2.  Check the generated figures in your OUT_path.
-3.  Increase/decrease maxbuttressheight if buttresses on your trees
-    reach higher/lower heights.
-4.  Increase/decrease thresholdbuttress if the diameter is taken too
-    high/low.
+function when default values do not give the desired results: 1. Run
+plot_dab_fit_pcs with default values (thresholdbuttress = 0.001,
+maxbuttressheight = 7). 2. Check the generated figures in your OUT_path.
+3. Increase/decrease maxbuttressheight if buttresses on your trees reach
+higher/lower heights. 4. Increase/decrease thresholdbuttress if the
+diameter is taken too high/low.
 
 Use plot_crown_classification_pcs to check the crown classification that
 is used for the projected_crown_area_pc and crown_volume_pc functions.

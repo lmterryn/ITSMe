@@ -44,7 +44,9 @@ fitting is plotted.}
 }
 \value{
 The projected crown area (numeric value) as the area of the concave
-hull computed from the crown points of a tree point cloud.
+hull computed from the crown points of a tree point cloud. Also optionally
+(plot=TRUE) plots the concave hull fitting and in this case returns a list
+with the pca as first element and the plot as the second element.
 }
 \description{
 Returns the projected crown area measured from a tree point cloud.
@@ -61,7 +63,8 @@ hull fitted to the crown points obtained with
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 pca <- projected_crown_area_pc(pc = pc_tree)
 # and plot the concave hull fitting
-pca <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
+output <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
+pca <- output$pca
 # with non-default settings for a buttressed tree
 pca <- projected_crown_area_pc(pc = pc_tree, concavity = 3, minheight = 4,
                                buttress = TRUE)

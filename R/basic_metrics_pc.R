@@ -127,7 +127,9 @@ f <- function(c, x, y) {
 #'   fitting is plotted.
 #'
 #' @return Diameter of the stem at breast height (numeric value). Also
-#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
+#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
+#'   in this case returns a list with the dbh value as first element and the
+#'   plot as the second element.
 #'
 #' @export
 #'
@@ -137,7 +139,8 @@ f <- function(c, x, y) {
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' dbh <- dbh_pc(pc = pc_tree)
 #' # and plot the circle fitting
-#' dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
+#' output <- dbh_pc(pc = pc_tree, plot = TRUE)
+#' dbh <- output$dbh
 #' }
 dbh_pc <- function(pc, plot = FALSE) {
   slice_height <- 1.3
@@ -166,33 +169,42 @@ dbh_pc <- function(pc, plot = FALSE) {
     Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
     R <- mean(Ri) # radius (DBH/2)
     residu <- sum((Ri - R)**2) / length(Ri) # average residual
+    dbh <- 2 * R
     if (plot) {
       X <- Y <- x0 <- y0 <- r <- NULL
       data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
       plotDBH <- ggplot2::ggplot() +
-        ggplot2::geom_point(data = xy_dbh, ggplot2::aes(X, Y), size = 1) +
+        ggplot2::geom_point(data = xy_dbh,
+                            ggplot2::aes(X, Y, color = "points stem slice"),
+                            size = 1) +
         ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::geom_point(
-          data = data_circle,
-          ggplot2::aes(x0, y0, color = "estimated center")
-        ) +
-        ggforce::geom_circle(
-          data = data_circle,
-          ggplot2::aes(
-            x0 = x0, y0 = y0, r = r,
-            color = "fitted circle"
-          ),
-          inherit.aes = FALSE, show.legend = FALSE
-        ) +
-        ggplot2::ggtitle(paste("DBH = ", as.character(round(2 * R, 2)), "m",
-                               sep = ""))
+        ggplot2::geom_point(data = data_circle,
+                            ggplot2::aes(x0, y0, color = "estimated center"),
+                            size = 1) +
+        ggforce::geom_circle(data = data_circle,
+                             ggplot2::aes(x0 = x0, y0 = y0, r = r,
+                                          color = "fitted circle"),
+                             inherit.aes = FALSE, show.legend = TRUE,
+                             size = 1) +
+        ggplot2::ggtitle(paste("DBH = ", as.character(round(dbh, 2)), " m",
+                               sep = "")) +
+        ggplot2::scale_color_manual(name = "",
+                                    values = c("points stem slice" = "black",
+                                                 "estimated center" = "red",
+                                                 "fitted circle" = "blue"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes =
+                                        list(linetype = c(0, 0, 1),
+                                             shape = c(16, 16, NA),
+                                             size = c(2, 2, 1))))
       print(plotDBH)
+      return(list("dbh" = dbh,"plot" = plotDBH))
+    } else {
+      return(dbh)
     }
-    dbh <- 2 * R
   } else {
-    dbh <- NaN
+    return(NaN)
   }
-  return(dbh)
 }
 
 #' Diameter above buttresses point cloud
@@ -232,7 +244,9 @@ dbh_pc <- function(pc, plot = FALSE) {
 #'   fitting is plotted.
 #'
 #' @return Diameter of the stem above buttresses (numeric value). Also
-#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
+#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
+#'   in this case returns a list with the dab value as first element and the
+#'   plot as the second element.
 #'
 #' @export
 #'
@@ -242,10 +256,10 @@ dbh_pc <- function(pc, plot = FALSE) {
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' dab <- dab_pc(pc = pc_tree)
 #' # and plot the circle fitting
-#' dab <- dab_pc(pc = pc_tree, plot = TRUE)
+#' output <- dab_pc(pc = pc_tree, plot = TRUE)
+#' dab <- output$dab
 #' # with non-default settings
-#' dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5,
-#'               plot = TRUE)
+#' dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5)
 #' }
 dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
                    plot = FALSE) {
@@ -274,6 +288,9 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         if (length(remove) != 0) {
           xy_dbh <- xy_dbh[-remove, ]
         }
+        if (lh == 1.27) {
+          dbh_slice <- xy_dbh
+        }
         x_dbh <- xy_dbh$X
         y_dbh <- xy_dbh$Y
         x_m <- mean(x_dbh) # first estimate of the center
@@ -297,7 +314,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         lh <- lh + 0.06
         uh <- uh + 0.06
       } else {
-        dbh <- NaN
+        return(NaN)
       }
     }
     if (uh < maxbuttressheight) {
@@ -316,31 +333,73 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
       R_slices <- c()
     }
   }
+  dab <- 2 * R
   if (plot) {
     X <- Y <- x0 <- y0 <- r <- NULL
     data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
-    plotDAB <- ggplot2::ggplot() +
-      ggplot2::geom_point(data = xy_dbh, ggplot2::aes(X, Y), size = 1) +
-      ggplot2::coord_fixed(ratio = 1) +
-      ggplot2::geom_point(
-        data = data_circle,
-        ggplot2::aes(x0, y0, color = "estimated center")
-      ) +
-      ggforce::geom_circle(
-        data = data_circle,
-        ggplot2::aes(
-          x0 = x0, y0 = y0, r = r,
-          color = "fitted circle"
-        ),
-        inherit.aes = FALSE, show.legend = FALSE
-      ) +
-      ggplot2::ggtitle(paste("DAB = ", as.character(round(2 * R, 2)),
-                             "m at H = ", as.character(round((lh + uh) / 2, 2)),
-                             "m", sep = ""))
+    if (lh != 1.27) {
+      plotDAB <- ggplot2::ggplot() +
+        ggplot2::geom_point(data = dbh_slice,
+                            ggplot2::aes(X, Y, color = "points at breast
+                                         height"), size = 1) +
+        ggplot2::geom_point(data = xy_dbh,
+                            ggplot2::aes(X, Y, color = "points above
+                                         buttresses"), colour = "black",
+                            size = 1) +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_point(data = data_circle,
+                            ggplot2::aes(x0, y0, color = "estimated center")) +
+        ggforce::geom_circle(data = data_circle,
+                             ggplot2::aes(x0 = x0, y0 = y0, r = r,
+                                          color = "fitted circle"),
+                             inherit.aes = FALSE, show.legend = TRUE) +
+        ggplot2::ggtitle(paste("DAB = ", as.character(round(dab, 2)),
+                               " m at H = ",
+                               as.character(round((lh + uh) / 2, 2)),
+                               " m", sep = "")) +
+        ggplot2::scale_color_manual(name = "",
+                                    values = c("points above buttresses" =
+                                                 "black",
+                                               "estimated center" = "red",
+                                               "points at breast height" =
+                                                 "grey",
+                                               "fitted circle" = "blue"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes =
+                                        list(linetype = c(0, 0, 0, 1),
+                                             shape = c(16, 16, 16, NA),
+                                             size = c(2, 2, 2, 1))))
+    } else {
+      plotDAB <- ggplot2::ggplot() +
+        ggplot2::geom_point(data = xy_dbh,
+                            ggplot2::aes(X, Y, color = "points at breast
+                                         height"),
+                            size = 1, colour = "black") +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_point(data = data_circle,
+                            ggplot2::aes(x0, y0, color = "estimated center")) +
+        ggforce::geom_circle(data = data_circle,
+                             ggplot2::aes(x0 = x0, y0 = y0, r = r,
+                                          color = "fitted circle"),
+                             inherit.aes = FALSE, show.legend = TRUE) +
+        ggplot2::ggtitle(paste("DBH = ", as.character(round(dab, 2)),
+                               " m", sep = "")) +
+        ggplot2::scale_color_manual(name = "",
+                                    values = c("points at breast height" =
+                                                 "black",
+                                               "estimated center" = "red",
+                                               "fitted circle" = "blue"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes =
+                                        list(linetype = c(0, 0, 1),
+                                             shape = c(16, 16, NA),
+                                             size = c(2, 2, 1))))
+    }
     print(plotDAB)
+    return(list("dab" = dab,"plot" = plotDAB))
+  } else {
+    return(dab)
   }
-  dbh <- 2 * R
-  return(dbh)
 }
 
 #' Crown classification point cloud
@@ -374,7 +433,8 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #'
 #' @return Data.frame with the crown point cloud (part of the tree above the
 #'   first branch). Also optionally (plot=TRUE) plots the crown vs non-crown
-#'   points.
+#'   points and in this case returns a list with the crown point cloud as first
+#'   element and the plot as the second element.
 #'
 #' @export
 #'
@@ -384,10 +444,10 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' crown_pc <- classify_crown_pc(pc = pc_tree)
 #' # and plot the classification results
-#' crown_pc <- classify_crown_pc(pc = pc_tree, plot = TRUE)
+#' output <- classify_crown_pc(pc = pc_tree, plot = TRUE)
+#' crown_pc <- output$crownpoints
 #' # with non-default settings for a buttressed tree
-#' crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE,
-#'                               plot = TRUE)
+#' crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE)
 #' }
 classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                               buttress = FALSE, thresholdbuttress = 0.001,
@@ -487,12 +547,39 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
     if (nrow(trunk_pc) == 0) {
       tree <- crown
       plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
-        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
-        ggplot2::coord_fixed(ratio = 1)
+        ggplot2::geom_point(size = 0.1, ggplot2::aes(col = class),
+                            shape = ".") +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                       axis.ticks.x = ggplot2::element_blank(),
+                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines")) +
+        ggplot2::scale_color_manual(name = "class",
+                                    values = c("crown" = "green",
+                                               "trunk" = "brown"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes = list(shape = c(16, 16),
+                                                          size = c(2, 2))))
       plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
-        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
-        ggplot2::coord_fixed(ratio = 1)
-      gridExtra::grid.arrange(plotXZ, plotYZ, ncol = 2)
+        ggplot2::geom_point(size = 0.1, ggplot2::aes(col = class),
+                            shape = ".") +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                       axis.title.y = ggplot2::element_blank(),
+                       axis.ticks.y = ggplot2::element_blank(),
+                       axis.text.x = ggplot2::element_blank(),
+                       axis.ticks.x = ggplot2::element_blank(),
+                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines")) +
+        ggplot2::scale_color_manual(name = "class",
+                                    values = c("crown" = "green",
+                                               "trunk" = "brown"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes = list(shape = c(16, 16),
+                                                          size = c(2, 2))))
+      s <- (max(pc$X)-min(pc$X)+max(pc$Y)-min(pc$Y))/(max(pc$Z)-
+                                                        min(pc$Z))*0.5-1.05
+      plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ, nrow = 1, ncol = 3,
+                                     common.legend = TRUE, heights=c(5,5),
+                                     widths = c(1, s ,1))
     } else {
       trunk <- trunk_pc[sample(nrow(trunk_pc),
         size = floor(nrow(trunk_pc) * downsample),
@@ -501,15 +588,46 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       trunk$class <- "trunk"
       tree <- rbind(crown, trunk)
       plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
-        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
-        ggplot2::coord_fixed(ratio = 1)
+        ggplot2::geom_point(size = 0.1, ggplot2::aes(col = class),
+                            shape = ".") +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                       axis.ticks.x = ggplot2::element_blank(),
+                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines")) +
+        ggplot2::scale_color_manual(name = "class",
+                                    values = c("crown" = "green",
+                                               "trunk" = "brown"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes = list(shape = c(16, 16),
+                                                          size = c(2, 2))))
       plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
-        ggplot2::geom_point(size = 1, ggplot2::aes(col = class)) +
-        ggplot2::coord_fixed(ratio = 1)
-      gridExtra::grid.arrange(plotXZ, plotYZ, ncol = 2)
+        ggplot2::geom_point(size = 0.1, ggplot2::aes(col = class),
+                            shape = ".") +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                       axis.title.y = ggplot2::element_blank(),
+                       axis.ticks.y = ggplot2::element_blank(),
+                       axis.text.x = ggplot2::element_blank(),
+                       axis.ticks.x = ggplot2::element_blank(),
+                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines")) +
+        ggplot2::scale_color_manual(name = "class",
+                                    values = c("crown" = "green",
+                                               "trunk" = "brown"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes = list(shape = c(16, 16),
+                                                          size = c(2, 2))))
+      s <- (max(pc$X)-min(pc$X)+max(pc$Y)-min(pc$Y))/(max(pc$Z)-
+                                                        min(pc$Z))*0.5-1.05
+      plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ, nrow = 1, ncol = 3,
+                                     common.legend = TRUE, heights=c(5,5),
+                                     widths = c(1, s ,1))
     }
+    print(plotCrown)
+    return(list("crownpoints" = crown_pc,"plot" = plotCrown, "plotXZ" = plotXZ,
+                "plotYZ" = plotYZ))
+  } else {
+    return(crown_pc)
   }
-  return(crown_pc)
 }
 
 #' Normalize a tree point cloud
@@ -564,7 +682,9 @@ normalize_pc <- function(pc) {
 #'   fitting is plotted.
 #'
 #' @return The projected crown area (numeric value) as the area of the concave
-#'   hull computed from the crown points of a tree point cloud.
+#'   hull computed from the crown points of a tree point cloud. Also optionally
+#'   (plot=TRUE) plots the concave hull fitting and in this case returns a list
+#'   with the pca as first element and the plot as the second element.
 #'
 #' @export
 #'
@@ -574,7 +694,8 @@ normalize_pc <- function(pc) {
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' pca <- projected_crown_area_pc(pc = pc_tree)
 #' # and plot the concave hull fitting
-#' pca <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
+#' output <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
+#' pca <- output$pca
 #' # with non-default settings for a buttressed tree
 #' pca <- projected_crown_area_pc(pc = pc_tree, concavity = 3, minheight = 4,
 #'                                buttress = TRUE)
@@ -589,9 +710,28 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
   hull <- concaveman::concaveman(points, concavity)
   pca <- sf::st_area(hull)
   if (plot) {
-    plot(sf::st_geometry(hull), col = "lightgrey")
+    X <- Y <- NULL
+    plotPCA <- ggplot2::ggplot() +
+      ggplot2::geom_point(data = crown_pc,
+                          ggplot2::aes(X, Y, color = "crown points"),
+                          size = 0.1, stroke = 0, shape = ".") +
+      ggplot2::geom_sf(data = sf::st_geometry(hull),
+                       ggplot2::aes(color = "concave hull"),
+                       col = "red", show.legend = "line", size = 1, fill = NA) +
+      ggplot2::ggtitle(bquote(PCA == .(round(pca,2)) ~ m^2)) +
+      ggplot2::scale_color_manual(name = "",
+                                  values = c("concave hull" = "red",
+                                             "crown points" = "black"),
+                                  guide = ggplot2::guide_legend(
+                                    override.aes =
+                                      list(linetype = c(1, 0),
+                                           shape = c(NA, 16),
+                                           size = c(2, 2))))
+    print(plotPCA)
+    return(list("pca" = pca,"plot" = plotPCA))
+  } else {
+    return(pca)
   }
-  return(pca)
 }
 
 #' Crown volume point cloud
@@ -621,11 +761,15 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #' @param maxbuttressheight Numeric value (default=7). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when buttress == TRUE.
-#' @param plot Logical (default=FALSE), indicates if the optimised circle
-#'   fitting is plotted.
+#' @param plot Logical (default=FALSE), indicates if the alpha-shape is plotted.
 #'
 #' @return The volume of the tree crown (numeric value) as the volume of the 3D
-#'   alpha-shape computed from the crown points of a tree point cloud.
+#'   alpha-shape computed from the crown points of a tree point cloud. Also
+#'   optionally (plot=TRUE) plots the alpha-shape and in this case returns a
+#'   list with the crown point cloud as first element and the alphashape3d
+#'   object as the second element. The 3D plot can be reconstructed using
+#'   plot(output$alphashape3d).
+#'
 #' @export
 #'
 #' @examples
@@ -634,10 +778,10 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' vol_crown <- volume_crown_pc(pc = pc_tree)
 #' # and plot the 3D alpha-shape
-#' vol_crown <- volume_crown_pc(pc = pc_tree, plot = TRUE)
+#' output <- volume_crown_pc(pc = pc_tree, plot = TRUE)
+#' vol_crown <- output$volume
 #' # with non-default settings for a buttressed tree
-#' vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4,
-#'                              buttress = TRUE)
+#' vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4)
 #' }
 volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
                             buttress = FALSE, thresholdbuttress = 0.001,
@@ -647,10 +791,13 @@ volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
   crown_pc_norm <- normalize_pc(crown_pc)
   crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)
+  vol_crown <- alphashape3d::volume_ashape3d(ashape3d.obj)
   if (plot) {
     graphics::par(pty = "s")
+    rgl::bg3d("white")
     plot(ashape3d.obj)
+    return(list("cv" = vol_crown, "ashape3d" = ashape3d.obj))
+  } else {
+    return(vol_crown)
   }
-  vol_crown <- alphashape3d::volume_ashape3d(ashape3d.obj)
-  return(vol_crown)
 }

@@ -15,7 +15,9 @@ fitting is plotted.}
 }
 \value{
 Diameter of the stem at breast height (numeric value). Also
-optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
+optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
+in this case returns a list with the dbh value as first element and the
+plot as the second element.
 }
 \description{
 Returns the diameter at breast height (DBH) of a tree measured from a tree
@@ -33,6 +35,7 @@ optimal fit.
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 dbh <- dbh_pc(pc = pc_tree)
 # and plot the circle fitting
-dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
+output <- dbh_pc(pc = pc_tree, plot = TRUE)
+dbh <- output$dbh
 }
 }

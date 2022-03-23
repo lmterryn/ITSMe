@@ -30,7 +30,9 @@ fitting is plotted.}
 }
 \value{
 Diameter of the stem above buttresses (numeric value). Also
-optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
+optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
+in this case returns a list with the dab value as first element and the
+plot as the second element.
 }
 \description{
 Returns the diameter above buttresses (DAB) of a tree measured from a tree
@@ -56,9 +58,9 @@ iterative process is restarted with a "thresholdbuttress" increased with
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 dab <- dab_pc(pc = pc_tree)
 # and plot the circle fitting
-dab <- dab_pc(pc = pc_tree, plot = TRUE)
+output <- dab_pc(pc = pc_tree, plot = TRUE)
+dab <- output$dab
 # with non-default settings
-dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5,
-              plot = TRUE)
+dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5)
 }
 }

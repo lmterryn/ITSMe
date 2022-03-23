@@ -45,7 +45,8 @@ plotted.}
 \value{
 Data.frame with the crown point cloud (part of the tree above the
 first branch). Also optionally (plot=TRUE) plots the crown vs non-crown
-points.
+points and in this case returns a list with the crown point cloud as first
+element and the plot as the second element.
 }
 \description{
 Returns the crown points from a tree point cloud.
@@ -61,9 +62,9 @@ when the first branch is reached with increasing height.
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 crown_pc <- classify_crown_pc(pc = pc_tree)
 # and plot the classification results
-crown_pc <- classify_crown_pc(pc = pc_tree, plot = TRUE)
+output <- classify_crown_pc(pc = pc_tree, plot = TRUE)
+crown_pc <- output$crownpoints
 # with non-default settings for a buttressed tree
-crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE,
-                              plot = TRUE)
+crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE)
 }
 }

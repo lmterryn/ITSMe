@@ -35,12 +35,12 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    grDevices::jpeg(file = paste(OUT_path, "dbh_",
-                                 strsplit(file_names[i], extension)[[1]],
-                                 ".jpeg", sep = ""))
-    dbh <- dbh_pc(pc, TRUE)
-    grDevices::dev.off()
-    DBHs <- append(DBHs, dbh)
+    out <- dbh_pc(pc, TRUE)
+    filename <- paste(OUT_path, "dbh_",
+                     strsplit(file_names[i], extension)[[1]],
+                     ".jpeg", sep = "")
+    ggplot2::ggsave(filename, plot = out$plot)
+    DBHs <- append(DBHs, out$dbh)
   }
   return(DBHs)
 }
@@ -97,14 +97,12 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    grDevices::jpeg(file = paste(OUT_path, "dab_",
-                                 strsplit(file_names[i], extension)[[1]], "_",
-                                 as.character(thresholdbuttress), "_",
-                                 as.character(maxbuttressheight),
-                                 ".jpeg", sep = ""))
-    dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight, TRUE)
-    grDevices::dev.off()
-    DABs <- append(DABs, dab)
+    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, TRUE)
+    filename = paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
+                     "_", as.character(thresholdbuttress), "_",
+                     as.character(maxbuttressheight), ".jpeg", sep = "")
+    ggplot2::ggsave(filename, plot = out$plot)
+    DABs <- append(DABs, out$dab)
   }
   return(DABs)
 }
@@ -183,14 +181,14 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    grDevices::jpeg(file = paste(OUT_path, "crown_",
-                                 strsplit(file_names[i], extension)[[1]], "_",
-                                 as.character(thresholdbranch), "_",
-                                 as.character(minheight),
-                                 ".jpeg", sep = ""))
-    classify_crown_pc(pc, thresholdbranch, minheight, buttress,
+    out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
                       thresholdbuttress, maxbuttressheight, TRUE)
-    grDevices::dev.off()
+    filename = paste(OUT_path, "crown_",
+                     strsplit(file_names[i], extension)[[1]], "_",
+                     as.character(thresholdbranch), "_",
+                     as.character(minheight),
+                     ".jpeg", sep = "")
+    ggplot2::ggsave(filename, plot = out$plot, bg = "white")
   }
 }
 
@@ -263,14 +261,13 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    grDevices::jpeg(file = paste(OUT_path, "pca_",
-                                 strsplit(file_names[i], extension)[[1]], "_",
-                                 as.character(concavity), ".jpeg", sep = ""))
-    pca <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
+    out <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
                                    buttress, thresholdbuttress,
                                    maxbuttressheight, TRUE)
-    grDevices::dev.off()
-    PCAs <- append(PCAs, pca)
+    filename = paste(OUT_path, "pca_", strsplit(file_names[i], extension)[[1]],
+                     "_", as.character(concavity), ".jpeg", sep = "")
+    ggplot2::ggsave(filename, plot = out$plot, bg = "white")
+    PCAs <- append(PCAs, out$pca)
   }
   return(PCAs)
 }
@@ -346,12 +343,13 @@ plot_cv_pcs <- function(PCs_path, extension = ".txt", OUT_path, alpha = 1,
     pc <- read_tree_pc(file_paths[i])
     fig_name <- paste(OUT_path, "cv_", strsplit(file_names[i], extension)[[1]],
                       "_", as.character(alpha), ".png", sep = "")
-    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight,
+    out <- volume_crown_pc(pc, alpha, thresholdbranch, minheight,
                                    buttress, thresholdbuttress,
                                    maxbuttressheight, TRUE)
     rgl::rgl.snapshot(fig_name, fmt = 'png')
     rgl::rgl.close()
-    CVs <- append(CVs, cv)
+    CVs <- append(CVs, out$cv)
+    gc()
   }
   return(CVs)
 }

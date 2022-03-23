@@ -41,12 +41,15 @@ buttresses. Only relevant when buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height. Only relevant when buttress == TRUE.}
 
-\item{plot}{Logical (default=FALSE), indicates if the optimised circle
-fitting is plotted.}
+\item{plot}{Logical (default=FALSE), indicates if the alpha-shape is plotted.}
 }
 \value{
 The volume of the tree crown (numeric value) as the volume of the 3D
-alpha-shape computed from the crown points of a tree point cloud.
+alpha-shape computed from the crown points of a tree point cloud. Also
+optionally (plot=TRUE) plots the alpha-shape and in this case returns a
+list with the crown point cloud as first element and the alphashape3d
+object as the second element. The 3D plot can be reconstructed using
+plot(output$alphashape3d).
 }
 \description{
 Returns the crown volume measured from a tree point cloud.
@@ -63,9 +66,9 @@ alpha-shape fitted to the crown points obtained with
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 vol_crown <- volume_crown_pc(pc = pc_tree)
 # and plot the 3D alpha-shape
-vol_crown <- volume_crown_pc(pc = pc_tree, plot = TRUE)
+output <- volume_crown_pc(pc = pc_tree, plot = TRUE)
+vol_crown <- output$volume
 # with non-default settings for a buttressed tree
-vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4,
-                             buttress = TRUE)
+vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4)
 }
 }

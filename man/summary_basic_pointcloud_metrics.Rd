@@ -14,7 +14,8 @@ summary_basic_pointcloud_metrics(
   buttress = FALSE,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
-  OUT_path = FALSE
+  OUT_path = FALSE,
+  plot = FALSE
 )
 }
 \arguments{
@@ -53,6 +54,10 @@ buttresses. Only relevant when buttress == TRUE.}
 \item{OUT_path}{A character with the path to the folder where the summary csv
 file should be saved or logical (default=FALSE) in this case no csv file is
 produced.}
+
+\item{plot}{Logical (default=FALSE), indicates if summary figure for each
+tree point cloud is plotted. If an OUT_path is provided, the figures are
+saved in the OUT_path.}
 }
 \value{
 The summary of the basic structural metrics for multiple tree point

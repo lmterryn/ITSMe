@@ -24,6 +24,7 @@ Imports:
     data.table,
     ggforce,
     ggplot2,
+    ggpubr,
     graphics,
     grDevices,
     gridExtra,
