@@ -266,7 +266,7 @@
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
-<p>For complete workflows, have a look at the <a href="https://lmterryn.github.io/ITSMe/articles/ITSMe.html">ITSMe website</a> or vignette with:</p>
+<p>For complete workflows, have a look at the ITSMe vignette with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"ITSMe"</span><span class="op">)</span></code></pre></div>
 <p>Calculating the diameter at breast height versus the diameter above buttresses of a tree:</p>
@@ -279,16 +279,10 @@
 <span class="co"># Use dab_pc function with default parameters and plot the fit</span>
 <span class="va">dab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dab_pc.html">dab_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p align="center">
-<img src="reference/figures/dbh_example.png" height="500"></p>
+<img src="reference/figures/dbh_example.jpeg" height="500"></p>
 <p align="center">
-<img src="reference/figures/dab_example.png" height="500"></p>
-<p>If you want to determine the dbh or dab for several tree point clouds (in the same folder) and visually check the circle fitting, use the plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs function can also be used to optimise the parameters of the dab_pc function when default values do not give the desired results:</p>
-<ol style="list-style-type: decimal">
-<li>Run plot_dab_fit_pcs with default values (thresholdbuttress = 0.001, maxbuttressheight = 7).</li>
-<li>Check the generated figures in your OUT_path.</li>
-<li>Increase/decrease maxbuttressheight if buttresses on your trees reach higher/lower heights.</li>
-<li>Increase/decrease thresholdbuttress if the diameter is taken too high/low.</li>
-</ol>
+<img src="reference/figures/dab_example.jpeg" height="500"></p>
+<p>If you want to determine the dbh or dab for several tree point clouds (in the same folder) and visually check the circle fitting, use the plot_dbh_fit_pcs and plot_dab_fit_pc functions. The plot_dab_fit_pcs function can also be used to optimise the parameters of the dab_pc function when default values do not give the desired results: 1. Run plot_dab_fit_pcs with default values (thresholdbuttress = 0.001, maxbuttressheight = 7). 2. Check the generated figures in your OUT_path. 3. Increase/decrease maxbuttressheight if buttresses on your trees reach higher/lower heights. 4. Increase/decrease thresholdbuttress if the diameter is taken too high/low.</p>
 <p>Use plot_crown_classification_pcs to check the crown classification that is used for the projected_crown_area_pc and crown_volume_pc functions. The plot_pca_pcs and plot_cv_pcs can help to determine the desired concavity and alpha values to calculate the projected crown area and crown volume respectively.</p>
 <p>Calculating the stem branch distance of a TreeQSM:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">

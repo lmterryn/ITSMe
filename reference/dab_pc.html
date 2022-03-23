@@ -84,7 +84,9 @@ fitting is plotted.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Diameter of the stem above buttresses (numeric value). Also
-optionally (plot=TRUE) plots the circle fitting on the horizontal slice.</p>
+optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
+in this case returns a list with the dab value as first element and the
+plot as the second element.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -109,10 +111,10 @@ iterative process is restarted with a "thresholdbuttress" increased with
 <span class="r-in"><span class="va">pc_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>PC_path <span class="op">=</span> <span class="st">"path/to/point_cloud.txt"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">dab</span> <span class="op">&lt;-</span> <span class="fu">dab_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span><span class="op">)</span></span>
 <span class="r-in"><span class="co"># and plot the circle fitting</span></span>
-<span class="r-in"><span class="va">dab</span> <span class="op">&lt;-</span> <span class="fu">dab_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">dab_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dab</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">$</span><span class="va">dab</span></span>
 <span class="r-in"><span class="co"># with non-default settings</span></span>
-<span class="r-in"><span class="va">dab</span> <span class="op">&lt;-</span> <span class="fu">dab_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">5</span>,</span>
-<span class="r-in">              plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dab</span> <span class="op">&lt;-</span> <span class="fu">dab_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
