@@ -546,6 +546,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
     X <- Y <- Z <- NULL
     if (nrow(trunk_pc) == 0) {
       tree <- crown
+      tree$Z <- tree$Z - min(tree$Z)
       plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
         ggplot2::geom_point(size = 0.1, ggplot2::aes(col = class),
                             shape = ".") +
@@ -587,6 +588,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       ), ]
       trunk$class <- "trunk"
       tree <- rbind(crown, trunk)
+      tree$Z <- tree$Z - min(tree$Z)
       plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
         ggplot2::geom_point(size = 0.1, ggplot2::aes(col = class),
                             shape = ".") +
