@@ -119,11 +119,14 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     }
     trees <- rbind(trees, tree)
     if (plot){
+      p0 <- pca_out$plot
+      p0 <- p0 + ggplot2::ggtitle(label = bquote(PCA == .(round(pca,2)) ~ m^2),
+                                  subtitle = bquote(CV == .(round(cv,2)) ~ m^3))
       if (buttress) {
-        p1 <- ggpubr::ggarrange(dab_out$plot, pca_out$plot, nrow = 2, ncol = 1,
+        p1 <- ggpubr::ggarrange(dab_out$plot, p0, nrow = 2, ncol = 1,
                                 widths = c(1,1))
       } else {
-        p1 <- ggpubr::ggarrange(dbh_out$plot, pca_out$plot, nrow = 2, ncol = 1,
+        p1 <- ggpubr::ggarrange(dbh_out$plot, p0, nrow = 2, ncol = 1,
                         widths = c(1,1))
       }
       p2 <- ggpubr::ggarrange(classify_out$plotXZ, classify_out$plotYZ,

@@ -165,6 +165,13 @@ basic_summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/clou
                                                   extension = ".txt")
 ```
 
+If you set the plot parameter TRUE and provide an OUT_path, this
+function save a summary figure for each tree:
+
+<p align="center">
+<img src="man/figures/summary.jpeg" height="500" >
+</p>
+
 Calculating a summary data.frame with the structural metrics defined by
 Terryn et al. (2020) for all TreeQSMs in a specific folder:
 
