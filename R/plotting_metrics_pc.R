@@ -12,10 +12,11 @@
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
 #' @param OUT_path A character with the path to the folder where the figures
-#'   should be saved.
+#'   should be saved (default = current folder).
 #'
-#' @return a numeric containing the dbh values for each tree point cloud.
-#'   Figures are saved in the output folder.
+#' @return A list with in the first element a numeric containing the dbh values
+#'   for each tree point cloud. In the second element there is the list with the
+#'   plots. Figures are also saved in the output folder.
 #'
 #' @export
 #'
@@ -26,12 +27,13 @@
 #'                                extension = ".txt",
 #'                                OUT_path = "path/to/figure/folder/")
 #' }
-plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
+plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./") {
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
   DBHs <- c()
+  Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
@@ -41,8 +43,9 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
                      ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot)
     DBHs <- append(DBHs, out$dbh)
+    Plots <- append(Plots, list(out$plot))
   }
-  return(DBHs)
+  return(list("DBHs"=DBHs, "Plots"=Plots))
 }
 
 #' Calculate and save figures of \code{\link{dab_pc}} function
@@ -61,7 +64,7 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
 #' @param OUT_path A character with the path to the folder where the figures
-#'   should be saved.
+#'   should be saved (default = current folder).
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses.
@@ -69,8 +72,9 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses.
 #'
-#' @return a numeric containing the dbh values for each tree point cloud.
-#'   Figures are saved in the output folder.
+#' @return A list with in the first element a numeric containing the dab values
+#'   for each tree point cloud. In the second element there is the list with the
+#'   plots. Figures are also saved in the output folder.
 #'
 #' @export
 #'
@@ -87,13 +91,14 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path) {
 #'                                thresholdbuttress = 0.002,
 #'                                maxbuttressheight = 5)
 #' }
-plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
+plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                              thresholdbuttress = 0.001, maxbuttressheight = 7) {
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
   DABs <- c()
+  Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
@@ -103,8 +108,9 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
                      as.character(maxbuttressheight), ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot)
     DABs <- append(DABs, out$dab)
+    Plots <- append(Plots, list(out$plot))
   }
-  return(DABs)
+  return(list("DABs"=DABs, "Plots"=Plots))
 }
 
 #' Save figures of \code{\link{classify_crown_pc}} function
@@ -113,7 +119,7 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
 #' the figures with \code{\link{classify_crown_pc}} for multiple tree point
 #' clouds in a folder. Use different values for the thresholdbranch and
 #' minheight parameter to optimise the crown classification for your tree point
-#' clouds. Mainly minheight parameter needs to be optimised, small values (e.g.
+#' clouds. Mainly minheight parameter needs to be optimised, small values (e.g
 #' 1) when the trees don't have buttresses and higher values (e.g 4) for trees
 #' with buttresses. For buttressed trees, first optimise the thresholdbuttress
 #' and maxbuttressheight parameter values using \code{\link{plot_dab_fit_pcs}}
@@ -128,7 +134,7 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
 #' @param OUT_path A character with the path to the folder where the figures
-#'   should be saved.
+#'   should be saved (default = current folder).
 #' @param thresholdbranch Numeric value (default=1.5) from
 #'   \code{\link{classify_crown_pc}}.
 #' @param minheight Numeric value (default=1) from
@@ -145,7 +151,8 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when buttress == TRUE.
 #'
-#' @return Figures are saved in the output folder.
+#' @return Returns a list with the plots and individual plots saved in the
+#'   output folder.
 #'
 #' @export
 #'
@@ -170,7 +177,8 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path,
 #'                               maxbuttressheight = 5)
 #' }
 plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
-                                          OUT_path, thresholdbranch = 1.5,
+                                          OUT_path = "./",
+                                          thresholdbranch = 1.5,
                                           minheight = 1, buttress = FALSE,
                                           thresholdbuttress = 0.001,
                                           maxbuttressheight = 7){
@@ -178,6 +186,7 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
+  Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
@@ -189,7 +198,9 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                      as.character(minheight),
                      ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot, bg = "white")
+    Plots <- append(Plots, list(out$plot))
   }
+  return(Plots)
 }
 
 #' Calculate and save figures of \code{\link{projected_crown_area_pc}} function
@@ -211,7 +222,7 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
 #' @param OUT_path A character with the path to the folder where the figures
-#'   should be saved.
+#'   should be saved (default = current folder).
 #' @param concavity Numeric value (default=2) concavity for the computation of a
 #'   concave hull based on \code{\link[concaveman]{concaveman}} in
 #'   \code{\link{projected_crown_area_pc}}.
@@ -231,8 +242,9 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when buttress == TRUE.
 #'
-#' @return a numeric containing the pca values for each tree point cloud.
-#'   Figures are saved in the output folder.
+#' @return A list with in the first element a numeric containing the pca values
+#'   for each tree point cloud. In the second element there is the list with the
+#'   plots. Figures are also saved in the output folder.
 #'
 #' @export
 #'
@@ -250,14 +262,16 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'                      OUT_path = "path/to/figure/folder/", concavity = 3,
 #'                      minheight = 4, buttress = TRUE)
 #' }
-plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
-                         thresholdbranch = 1.5, minheight = 1, buttress = FALSE,
-                         thresholdbuttress = 0.001, maxbuttressheight = 7){
+plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
+                         concavity = 2, thresholdbranch = 1.5, minheight = 1,
+                         buttress = FALSE, thresholdbuttress = 0.001,
+                         maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
   PCAs <- c()
+  Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
@@ -268,8 +282,9 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
                      "_", as.character(concavity), ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot, bg = "white")
     PCAs <- append(PCAs, out$pca)
+    Plots <- append(Plots, list(out$plot))
   }
-  return(PCAs)
+  return(list("PCAs"=PCAs, "Plots"=Plots))
 }
 
 #' Calculate and save figures of \code{\link{volume_crown_pc}} function
@@ -291,7 +306,7 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
 #' @param OUT_path A character with the path to the folder where the figures
-#'   should be saved.
+#'   should be saved (default = current folder).
 #' @param alpha Numeric value (default=1) alpha for the computation of the 3D
 #'   alpha-shape of the tree crown based on \code{\link[alphashape3d]{ashape3d}}
 #'   in \code{\link{volume_crown_pc}}.
@@ -330,9 +345,10 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path, concavity = 2,
 #'                    OUT_path = "path/to/figure/folder/", alpha = 2,
 #'                    minheight = 4, buttress = TRUE)
 #' }
-plot_cv_pcs <- function(PCs_path, extension = ".txt", OUT_path, alpha = 1,
-                         thresholdbranch = 1.5, minheight = 1, buttress = FALSE,
-                         thresholdbuttress = 0.001, maxbuttressheight = 7){
+plot_cv_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
+                        alpha = 1, thresholdbranch = 1.5, minheight = 1,
+                        buttress = FALSE, thresholdbuttress = 0.001,
+                        maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
