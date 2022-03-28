@@ -7,7 +7,7 @@
 plot_dab_fit_pcs(
   PCs_path,
   extension = ".txt",
-  OUT_path,
+  OUT_path = "./",
   thresholdbuttress = 0.001,
   maxbuttressheight = 7
 )
@@ -20,7 +20,7 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 
 \item{OUT_path}{A character with the path to the folder where the figures
-should be saved.}
+should be saved (default = current folder).}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
@@ -31,8 +31,9 @@ buttresses.}
 buttresses.}
 }
 \value{
-a numeric containing the dbh values for each tree point cloud.
-Figures are saved in the output folder.
+A list with in the first element a numeric containing the dab values
+for each tree point cloud. In the second element there is the list with the
+plots. Figures are also saved in the output folder.
 }
 \description{
 Calculates the dab and saves the figures acquired when running

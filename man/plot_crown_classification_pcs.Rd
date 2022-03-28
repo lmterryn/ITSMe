@@ -7,7 +7,7 @@
 plot_crown_classification_pcs(
   PCs_path,
   extension = ".txt",
-  OUT_path,
+  OUT_path = "./",
   thresholdbranch = 1.5,
   minheight = 1,
   buttress = FALSE,
@@ -23,7 +23,7 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 
 \item{OUT_path}{A character with the path to the folder where the figures
-should be saved.}
+should be saved (default = current folder).}
 
 \item{thresholdbranch}{Numeric value (default=1.5) from
 \code{\link{classify_crown_pc}}.}
@@ -46,14 +46,15 @@ buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 when buttress == TRUE.}
 }
 \value{
-Figures are saved in the output folder.
+Returns a list with the plots and individual plots saved in the
+output folder.
 }
 \description{
 Classifies the tree point clouds into crown and non crown points and saves
 the figures with \code{\link{classify_crown_pc}} for multiple tree point
 clouds in a folder. Use different values for the thresholdbranch and
 minheight parameter to optimise the crown classification for your tree point
-clouds. Mainly minheight parameter needs to be optimised, small values (e.g.
+clouds. Mainly minheight parameter needs to be optimised, small values (e.g
 \enumerate{
 \item when the trees don't have buttresses and higher values (e.g 4) for trees
 with buttresses. For buttressed trees, first optimise the thresholdbuttress

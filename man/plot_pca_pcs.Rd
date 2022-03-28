@@ -7,7 +7,7 @@
 plot_pca_pcs(
   PCs_path,
   extension = ".txt",
-  OUT_path,
+  OUT_path = "./",
   concavity = 2,
   thresholdbranch = 1.5,
   minheight = 1,
@@ -24,7 +24,7 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 
 \item{OUT_path}{A character with the path to the folder where the figures
-should be saved.}
+should be saved (default = current folder).}
 
 \item{concavity}{Numeric value (default=2) concavity for the computation of a
 concave hull based on \code{\link[concaveman]{concaveman}} in
@@ -51,8 +51,9 @@ buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 when buttress == TRUE.}
 }
 \value{
-a numeric containing the pca values for each tree point cloud.
-Figures are saved in the output folder.
+A list with in the first element a numeric containing the pca values
+for each tree point cloud. In the second element there is the list with the
+plots. Figures are also saved in the output folder.
 }
 \description{
 Calculates the projected crown area (pca) and saves the figures acquired when

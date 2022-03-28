@@ -4,7 +4,7 @@
 \alias{plot_dbh_fit_pcs}
 \title{Calculate and save figures of \code{\link{dbh_pc}} function}
 \usage{
-plot_dbh_fit_pcs(PCs_path, extension = ".txt", OUT_path)
+plot_dbh_fit_pcs(PCs_path, extension = ".txt", OUT_path = "./")
 }
 \arguments{
 \item{PCs_path}{A character with the path to the folder that contains the
@@ -14,11 +14,12 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 
 \item{OUT_path}{A character with the path to the folder where the figures
-should be saved.}
+should be saved (default = current folder).}
 }
 \value{
-a numeric containing the dbh values for each tree point cloud.
-Figures are saved in the output folder.
+A list with in the first element a numeric containing the dbh values
+for each tree point cloud. In the second element there is the list with the
+plots. Figures are also saved in the output folder.
 }
 \description{
 Calculates  the dbh and saves the figures acquired when running

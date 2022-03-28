@@ -7,7 +7,7 @@
 plot_cv_pcs(
   PCs_path,
   extension = ".txt",
-  OUT_path,
+  OUT_path = "./",
   alpha = 1,
   thresholdbranch = 1.5,
   minheight = 1,
@@ -24,7 +24,7 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 
 \item{OUT_path}{A character with the path to the folder where the figures
-should be saved.}
+should be saved (default = current folder).}
 
 \item{alpha}{Numeric value (default=1) alpha for the computation of the 3D
 alpha-shape of the tree crown based on \code{\link[alphashape3d]{ashape3d}}
