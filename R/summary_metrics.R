@@ -164,7 +164,9 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #' Summary structural metrics Terryn et al. (2020)
 #'
 #' Returns a summary data.frame containing all the metrics defined by Terryn et
-#' al. (2020).
+#' al. (2020). Also contains: X and Y-position, dbh, tree height, tree volume
+#' and trunk volume. When tree point clouds are provided, dbh and tree height
+#' are based on the point cloud instead of the QSM.
 #'
 #' Metrics Terryn et al. (2020): stem branch angle (sba,
 #' \code{\link{stem_branch_angle_qsm}}), stem branch cluster size (sbcs,
@@ -226,7 +228,12 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   produced.
 #'
 #' @return The summary of all metrics from Terryn et al. (2020) as a data.frame.
-#'   The summary is saved in a csv file if an output folder is provided.
+#'   The summary is saved in a csv file if an output folder is provided. If
+#'   multiple QSMs are provided for all trees the mean values and standard
+#'   deviations for each tree are also calculated and saved in 2 other csv
+#'   files. In this case the function returns a list of the summaries with the
+#'   means and standard deviations in the second and third element of the list
+#'   respectively.
 #'
 #' @references Terryn, L., Calders, K., Disney, M., Origo, N., Malhi, Y.,
 #'   Newnham, G., ... & Verbeeck, H. (2020). Tree species classification using
@@ -270,14 +277,17 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
     }
     tree_ids <- append(tree_ids, id)
   }
-  df <- data.frame(
-    sba = double(), sbcs = double(), sbr = double(), sbl = double(),
-    sbd = double(), dhr = double(), dvr = double(), vb55 = double(),
-    clvr = double(), sr = double(), bar = double(), rvr = double(),
-    csh = double(), ch = double(), ce = double(), cdhr = double(),
-    dmr = double())
+  df <- data.frame(X_position = double(), Y_position = double(), dbh = double(),
+                   tree_height = double(), tree_vol = double(),
+                   trunk_vol = double(), sba = double(), sbcs = double(),
+                   sbr = double(), sbl = double(), sbd = double(),
+                   dhr = double(), dvr = double(), vb55 = double(),
+                   clvr = double(), sr = double(), bar = double(),
+                   rvr = double(), csh = double(), ch = double(), ce = double(),
+                   cdhr = double(), dmr = double())
   results <- df
-  summary <- cbind(tree_id = character(), results)
+  summary <- summary_means <- summary_sds <- cbind(tree_id = character(),
+                                                   results)
   for (i in 1:length(unique_tree_ids)) {
     print(paste("processing ", unique_tree_ids[i]))
     qsms <- filenames[tree_ids == unique_tree_ids[i]]
@@ -292,6 +302,14 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
     for (j in 1:length(qsms)) {
       print(paste("processing ", unique_tree_ids[i], as.character(j)))
       qsm <- read_tree_qsm(paste(QSMs_path, qsms[j], sep = ""), version)
+      position <- tree_position_qsm(qsm$cylinder)
+      X_position <- position[1]
+      Y_position <- position[2]
+      dbh <- dbh(qsm$treedata, pc, buttress, thresholdbuttress,
+                 maxbuttressheight)
+      tree_height <- tree_height(qsm$treedata, pc)
+      tree_vol <- tree_volume_qsm(qsm$treedata)
+      trunk_vol <- trunk_volume_qsm(qsm$treedata)
       sba <- stem_branch_angle_qsm(qsm$branch)
       sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
       sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,
@@ -312,19 +330,41 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
       ce <- crown_evenness_qsm(qsm$cylinder)
       cdhr <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
       dmr <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc, buttress)
-      tree <- data.frame(
-        sba = sba, sbcs = sbcs, sbr = sbr, sbl = sbl, sbd = sbd, dhr = dhr,
-        dvr = dvr, vb55 = vb55, clvr = clvr, sr = sr, bar = bar, rvr = rvr,
-        csh = csh, ch = ch, ce = ce, cdhr = cdhr, dmr = dmr)
+      tree <- data.frame(X_position = X_position, Y_position = Y_position,
+                         dbh = dbh, tree_height = tree_height,
+                         tree_vol = tree_vol, trunk_vol = trunk_vol, sba = sba,
+                         sbcs = sbcs, sbr = sbr, sbl = sbl, sbd = sbd,
+                         dhr = dhr, dvr = dvr, vb55 = vb55, clvr = clvr,
+                         sr = sr, bar = bar, rvr = rvr, csh = csh, ch = ch,
+                         ce = ce, cdhr = cdhr, dmr = dmr)
       trees <- rbind(trees, tree)
     }
-    m <- as.data.frame.list(colMeans(trees))
-    results <- cbind(tree_id = id, m)
+    results <- cbind(tree_id = id, trees)
     summary <- rbind(summary, results)
+    if (length(qsms) > 1){
+    m <- as.data.frame.list(colMeans(trees))
+    s <- as.data.frame.list(sapply(trees, stats::sd, na.rm = TRUE))
+    results_means <- cbind(tree_id = id, m)
+    results_sds <- cbind(tree_id = id, s)
+    summary_means <- rbind(summary_means, results_means)
+    summary_sds <- rbind(summary_means, results_sds)
+    summaries <- list("summary" = summary, "means" = summary_means,
+                      "sds" = summary_sds)
+    } else {
+      summaries <- summary
+    }
     if (is.character(OUT_path)){
-      utils::write.csv(summary,paste(OUT_path,"Terryn_2020_metrics.csv",
-                                     sep = ""), row.names = FALSE)
+      utils::write.csv(summary,paste(OUT_path,
+                                           "Terryn_2020_metrics.csv",
+                                           sep = ""), row.names = FALSE)
+      if (length(qsms) > 1){
+      utils::write.csv(summary_means,paste(OUT_path,
+                                           "Terryn_2020_metrics_means.csv",
+                                           sep = ""), row.names = FALSE)
+      utils::write.csv(summary_sds,paste(OUT_path,"Terryn_2020_metrics_sds.csv",
+                                         sep = ""), row.names = FALSE)
+      }
     }
   }
-  return(summary)
+  return(summaries)
 }
