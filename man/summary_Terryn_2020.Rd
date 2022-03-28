@@ -71,11 +71,18 @@ produced.}
 }
 \value{
 The summary of all metrics from Terryn et al. (2020) as a data.frame.
-The summary is saved in a csv file if an output folder is provided.
+The summary is saved in a csv file if an output folder is provided. If
+multiple QSMs are provided for all trees the mean values and standard
+deviations for each tree are also calculated and saved in 2 other csv
+files. In this case the function returns a list of the summaries with the
+means and standard deviations in the second and third element of the list
+respectively.
 }
 \description{
 Returns a summary data.frame containing all the metrics defined by Terryn et
-al. (2020).
+al. (2020). Also contains: X and Y-position, dbh, tree height, tree volume
+and trunk volume. When tree point clouds are provided, dbh and tree height
+are based on the point cloud instead of the QSM.
 }
 \details{
 Metrics Terryn et al. (2020): stem branch angle (sba,
