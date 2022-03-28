@@ -3,7 +3,7 @@
 the figures with classify_crown_pc for multiple tree point
 clouds in a folder. Use different values for the thresholdbranch and
 minheight parameter to optimise the crown classification for your tree point
-clouds. Mainly minheight parameter needs to be optimised, small values (e.g.
+clouds. Mainly minheight parameter needs to be optimised, small values (e.g
 when the trees don't have buttresses and higher values (e.g 4) for trees
 with buttresses. For buttressed trees, first optimise the thresholdbuttress
 and maxbuttressheight parameter values using plot_dab_fit_pcs
@@ -13,7 +13,7 @@ and use those optimised values in this function.
 the figures with classify_crown_pc for multiple tree point
 clouds in a folder. Use different values for the thresholdbranch and
 minheight parameter to optimise the crown classification for your tree point
-clouds. Mainly minheight parameter needs to be optimised, small values (e.g.
+clouds. Mainly minheight parameter needs to be optimised, small values (e.g
 when the trees don't have buttresses and higher values (e.g 4) for trees
 with buttresses. For buttressed trees, first optimise the thresholdbuttress
 and maxbuttressheight parameter values using plot_dab_fit_pcs
@@ -70,7 +70,7 @@ and use those optimised values in this function.
 the figures with <code><a href="classify_crown_pc.html">classify_crown_pc</a></code> for multiple tree point
 clouds in a folder. Use different values for the thresholdbranch and
 minheight parameter to optimise the crown classification for your tree point
-clouds. Mainly minheight parameter needs to be optimised, small values (e.g.</p><ol><li><p>when the trees don't have buttresses and higher values (e.g 4) for trees
+clouds. Mainly minheight parameter needs to be optimised, small values (e.g</p><ol><li><p>when the trees don't have buttresses and higher values (e.g 4) for trees
 with buttresses. For buttressed trees, first optimise the thresholdbuttress
 and maxbuttressheight parameter values using <code><a href="plot_dab_fit_pcs.html">plot_dab_fit_pcs</a></code>
 and use those optimised values in this function.</p></li>
@@ -81,7 +81,7 @@ and use those optimised values in this function.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span>
   <span class="va">PCs_path</span>,
   extension <span class="op">=</span> <span class="st">".txt"</span>,
-  <span class="va">OUT_path</span>,
+  OUT_path <span class="op">=</span> <span class="st">"./"</span>,
   thresholdbranch <span class="op">=</span> <span class="fl">1.5</span>,
   minheight <span class="op">=</span> <span class="fl">1</span>,
   buttress <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -100,7 +100,7 @@ tree point clouds.</p></dd>
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".</p></dd>
 <dt>OUT_path</dt>
 <dd><p>A character with the path to the folder where the figures
-should be saved.</p></dd>
+should be saved (default = current folder).</p></dd>
 <dt>thresholdbranch</dt>
 <dd><p>Numeric value (default=1.5) from
 <code><a href="classify_crown_pc.html">classify_crown_pc</a></code>.</p></dd>
@@ -124,7 +124,8 @@ when buttress == TRUE.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Figures are saved in the output folder.</p>
+    <p>Returns a list with the plots and individual plots saved in the
+output folder.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
