@@ -226,7 +226,7 @@ You can however, also specify *alpha* (default=1).
 CV <- volume_crown_pc(pc = tree_pc, minheight = 4, buttress = TRUE, plot = TRUE)
 
 ```
-![](../man/figures/cv_example.jpeg)
+![](../man/figures/cv_example.jpg)
 
 ### Workflow for multiple trees
 
@@ -239,7 +239,7 @@ tree point clouds in one folder. For this purpose you can use
 `plot_crown_classification_pcs` (based on `classify_crown_pc`), `plot_pca_pcs` 
 (based on `projected_crown_area_pc`), `plot_cv_pcs` (based on `volume_crown_pc`) 
 which return the DBH, DAB, PCA and CV for each tree in a folder 
-(*PCs_path*) and save the respective figures in the given output path 
+(*PCs_path*) and save the respective figures in the given output path  
 (*OUT_path*). First run these functions with default parameters and check 
 the rendered figures. Optionally change the attributes of the functions: 
 
@@ -458,11 +458,11 @@ output folder (*OUT_path*)
 
 The QSM files have to be of the format xxx_000_qsm.mat (xxx is the plotname, 
 000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for example the 
-n-th QSM that is made for tree 000). When multiple QSMs are present for one tree 
-the mean of the values of the different QSMs is taken for that tree as a final 
-value for a certain feature. When provided, the tree point clouds files have to 
-be of the format xxx_000_pc in order to link the tree point cloud to its' 
-respective treeQSM.
+n-th QSM that is made for tree 000). When multiple QSMs are provided for one 
+tree the mean and the standard deviation of the values of the different QSMs of 
+one tree are also returned in additional data.frames. When provided, the tree 
+point clouds files have to be of the format xxx_000_pc in order to link the tree 
+point cloud to its' respective treeQSM.
 
 ```{r eval = FALSE}
 # Run the summary function with default settings (without point cloud info)
