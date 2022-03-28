@@ -166,7 +166,7 @@ basic_summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/clou
 ```
 
 If you set the plot parameter TRUE and provide an OUT_path, this
-function save a summary figure for each tree:
+function saves a summary figure for each tree:
 
 <p align="center">
 <img src="man/figures/summary.jpeg" height="500" >
