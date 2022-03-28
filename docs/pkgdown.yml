@@ -1,0 +1,10 @@
+pandoc: 2.14.0.3
+pkgdown: 2.0.2
+pkgdown_sha: ~
+articles:
+  ITSMe: ITSMe.html
+last_built: 2022-03-28T13:03Z
+urls:
+  reference: https://lmterryn.github.io/ITSMe/reference
+  article: https://lmterryn.github.io/ITSMe/articles
+
