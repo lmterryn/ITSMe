@@ -797,6 +797,7 @@ volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
   if (plot) {
     graphics::par(pty = "s")
     rgl::bg3d("white")
+    rgl::par3d(windowRect = c(20, 30, 800, 800))
     plot(ashape3d.obj)
     return(list("cv" = vol_crown, "ashape3d" = ashape3d.obj))
   } else {
