@@ -226,7 +226,7 @@ You can however, also specify *alpha* (default=1).
 CV <- volume_crown_pc(pc = tree_pc, minheight = 4, buttress = TRUE, plot = TRUE)
 
 ```
-![](../man/figures/cv_example.jpg)
+![](../man/figures/cv_example.jpeg)
 
 ### Workflow for multiple trees
 
