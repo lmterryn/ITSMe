@@ -1066,7 +1066,7 @@ crown_evenness_qsm <- function(cylinder) {
         minimums <- append(minimums, min(cylinder$start[crownset[ind_bin], 3]))
       }
     }
-    if (length(minimums) == length(bins)) {
+    if (length(minimums) == length(bins)-1) {
       ce <- (min(minimums) - min(cylinder$start[, 3])) /
         (max(minimums) - min(cylinder$start[, 3]))
     } else {
