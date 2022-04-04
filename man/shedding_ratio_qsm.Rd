@@ -4,10 +4,13 @@
 \alias{shedding_ratio_qsm}
 \title{Shedding ratio TreeQSM}
 \usage{
-shedding_ratio_qsm(branch, treedata)
+shedding_ratio_qsm(branch, cylinder, treedata)
 }
 \arguments{
 \item{branch}{Branch field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}.}
+
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
 
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -28,7 +31,8 @@ et al., 2017 & Terryn et al., 2020).
 \dontrun{
 # Read tree qsm and calculate the shedding ratio
 qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-sr <- shedding_ratio_qsm(branch = qsm$branch, treedata = qsm$treedata)
+sr <- shedding_ratio_qsm(branch = qsm$branch, cylinder = qsm$cylinder,
+                         treedata = qsm$treedata)
 }
 }
 \references{

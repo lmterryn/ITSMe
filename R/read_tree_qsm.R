@@ -58,7 +58,7 @@ read_tree_qsm <- function(path, version = "2.4.0", global = FALSE) {
       "NumberBranches" = tree$TreeData[7],
       "MaxBranchOrder" = tree$TreeData[8], "TrunkArea" = NA,
       "BranchArea" = NA, "TotalArea" = tree$TreeData[9],
-      "DBHqsm" = tree$TreeData[10], "DBHcyl" = NA,
+      "DBHqsm" = tree$TreeData[10]/100, "DBHcyl" = NA,
       "CrownDiamAve" = NA, "CrownDiamMax" = NA,
       "CrownAreaConv" = NA, "CrownAreaAlpha" = NA,
       "CrownBaseHeight" = NA, "CrownLength" = NA,

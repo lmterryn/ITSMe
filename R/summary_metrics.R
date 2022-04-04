@@ -90,7 +90,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     if (buttress){
       dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
     } else {
-      dab <- NA
+      dab_out <- NA
     }
     dbh_out <- dbh_pc(pc, plot)
     classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
@@ -102,11 +102,13 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight, buttress,
                           thresholdbuttress, maxbuttressheight)
     if (plot){
-     dbh <- dbh_out$dbh
-     if (buttress){
-       dab <- dab_out$dab
-     }
-     pca <- pca_out$pca
+      dbh <- dbh_out$dbh
+      dab <- dab_out$dab
+      pca <- pca_out$pca
+    } else {
+      dbh <- dbh_out
+      dab <- dab_out
+      pca <- pca_out
     }
     tree <- data.frame(
       "tree_id" = filenames[i], "X_position" = pos[1],
@@ -271,25 +273,25 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
   unique_tree_ids <- c()
   tree_ids <- c()
   for (i in 1:length(filenames)) {
-    id <- strsplit(filenames[i], "_qsm_")[[1]][1]
+    id <- strsplit(filenames[i], "_qsm")[[1]][1]
     if (!(id %in% tree_ids)) {
       unique_tree_ids <- append(unique_tree_ids, id)
     }
     tree_ids <- append(tree_ids, id)
   }
-  df <- data.frame(X_position = double(), Y_position = double(), dbh = double(),
-                   tree_height = double(), tree_vol = double(),
-                   trunk_vol = double(), sba = double(), sbcs = double(),
-                   sbr = double(), sbl = double(), sbd = double(),
-                   dhr = double(), dvr = double(), vb55 = double(),
-                   clvr = double(), sr = double(), bar = double(),
-                   rvr = double(), csh = double(), ch = double(), ce = double(),
-                   cdhr = double(), dmr = double())
-  results <- df
+  df <- results <- data.frame(X_position = double(), Y_position = double(),
+                              dbh = double(), tree_height = double(),
+                              tree_vol = double(), trunk_vol = double(),
+                              sba = double(), sbcs = double(), sbr = double(),
+                              sbl = double(), sbd = double(), dhr = double(),
+                              dvr = double(), vb55 = double(), clvr = double(),
+                              sr = double(), bar = double(), rvr = double(),
+                              csh = double(), ch = double(), ce = double(),
+                              cdhr = double(), dmr = double())
   summary <- summary_means <- summary_sds <- cbind(tree_id = character(),
                                                    results)
   for (i in 1:length(unique_tree_ids)) {
-    print(paste("processing ", unique_tree_ids[i]))
+    #print(paste("processing ", unique_tree_ids[i]))
     qsms <- filenames[tree_ids == unique_tree_ids[i]]
     if (!is.na(PCs_path)) {
       pc <- read_tree_pc(paste(PCs_path, unique_tree_ids[i], "_pc", extension,
@@ -322,7 +324,7 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
       dvr <- dbh_volume_ratio_qsm(qsm$treedata, pc, buttress)
       vb55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
       clvr <- cylinder_length_volume_ratio_qsm(qsm$treedata)
-      sr <- shedding_ratio_qsm(qsm$branch, qsm$treedata)
+      sr <- shedding_ratio_qsm(qsm$branch, qsm$cylinder, qsm$treedata)
       bar <- branch_angle_ratio_qsm(qsm$branch)
       rvr <- relative_volume_ratio_qsm(qsm$cylinder, qsm$treedata)
       csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder, pc)

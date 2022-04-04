@@ -584,7 +584,7 @@ dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
                                  thresholdbuttress = 0.001,
                                  maxbuttressheight = 7) {
   dbh <- dbh(treedata, pc, buttress, thresholdbuttress, maxbuttressheight)
-  volume <- tree_volume_qsm(treedata)
+  volume <- tree_volume_qsm(treedata)/1000
   return(dbh / volume)
 }
 
@@ -622,7 +622,7 @@ dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 #' }
 volume_below_55_qsm <- function(cylinder, treedata) {
   tree_height <- tree_height_qsm(treedata)
-  volume_branches <- total_branch_volume_qsm(treedata)
+  volume_branches <- total_branch_volume_qsm(treedata) / 1000
   height_at_55 <- tree_height * 0.55 + min(cylinder$start[, 3])
   ind_branch_cyl_u55 <- which(cylinder$start[, 3] < height_at_55 &
                                                cylinder$BranchOrder != 0)
@@ -663,7 +663,7 @@ volume_below_55_qsm <- function(cylinder, treedata) {
 #' clvr <- cylinder_length_volume_ratio_qsm(treedata = qsm$treedata)
 #' }
 cylinder_length_volume_ratio_qsm <- function(treedata) {
-  total_branch_volume <- total_branch_volume_qsm(treedata)
+  total_branch_volume <- total_branch_volume_qsm(treedata) / 1000
   total_branch_length <- total_branch_length_qsm(treedata)
   return(total_branch_length / total_branch_volume)
 }
@@ -677,6 +677,8 @@ cylinder_length_volume_ratio_qsm <- function(treedata) {
 #' et al., 2017 & Terryn et al., 2020).
 #'
 #' @param branch Branch field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -698,18 +700,22 @@ cylinder_length_volume_ratio_qsm <- function(treedata) {
 #' \dontrun{
 #' # Read tree qsm and calculate the shedding ratio
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' sr <- shedding_ratio_qsm(branch = qsm$branch, treedata = qsm$treedata)
+#' sr <- shedding_ratio_qsm(branch = qsm$branch, cylinder = qsm$cylinder,
+#'                          treedata = qsm$treedata)
 #' }
-shedding_ratio_qsm <- function(branch, treedata) {
-  ind_stem_branches <- which(branch$order == 1)
-  tree_height <- treedata$TreeHeight[1]
-  if (length(ind_stem_branches) > 0) {
-    ind_stem_branches_u3rd <- which(branch$height < tree_height / 3 &
-                                    branch$order == 1)
-    if (length(ind_stem_branches_u3rd)==0) {
+shedding_ratio_qsm <- function(branch, cylinder, treedata) {
+  ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
+                          cylinder$BranchOrder == 1)
+  height_33 <- treedata$TreeHeight[1] / 3 + min(cylinder$start[,3])
+  if (length(ind_stem_cyl) > 0) {
+    ind_stem_cyl_u3rd <- which(cylinder$PositionInBranch == 1 &
+                                 cylinder$BranchOrder == 1 &
+                                 cylinder$start[,3] < height_33)
+    if (length(ind_stem_cyl_u3rd)==0) {
       sr <- 0
     } else {
-      num_stem_branches_u3rd <- length(ind_stem_branches_u3rd)
+      num_stem_branches_u3rd <- length(ind_stem_cyl_u3rd)
+      ind_stem_branches_u3rd <- cylinder$branch[ind_stem_cyl_u3rd]
       num_without_children <- 0
       for (i in 1:num_stem_branches_u3rd) {
         num_children <- sum(branch$parent == ind_stem_branches_u3rd[i])
