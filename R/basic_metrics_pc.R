@@ -111,6 +111,207 @@ f <- function(c, x, y) {
   return(sum((Ri - mean(Ri))**2))
 }
 
+#' Diameter at certain height point cloud
+#'
+#' Returns the diameter at a certain height of a tree measured from a tree point
+#' cloud.
+#'
+#' The diameter is measured of the optimal circle fitted through a horizontal
+#' slice. A least squares circle fitting algorithm was applied to find the
+#' optimal fit. The height and thickness of the slice can be specified using
+#' slice_height and slice_thickness parameters. This is also a Support function
+#' used to determine the DBH from a tree point cloud with \code{\link{dbh_pc}}.
+#'
+#' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
+#'   \code{\link{read_tree_pc}}.
+#' @param slice_height Numeric value (default = 1.3) that determines the height
+#'   above the lowest point of the point cloud at which the diameter is
+#'   measured.
+#' @param slice_thickness Numeric value (default = 0.6) that determines the
+#'   thickness of the slice which is used to measure the diameter.
+#' @param plot Logical (default=FALSE), indicates if the optimized circle
+#'   fitting is plotted.
+#'
+#' @return A list with the diameter at a specified height (numeric value), the
+#'   residual between circle fit and the points and the center of the circle
+#'   fit. Also optionally (plot=TRUE) plots the circle fitting on the horizontal
+#'   slice.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read tree point cloud and calculate the diameter
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' diameter <- diameter_slice_pc(pc = pc_tree)
+#' # and plot the circle fitting
+#' output <- diameter_slice_pc(pc = pc_tree, plot = TRUE)
+#' diameter <- output$diameter
+#' residual <- output$R2
+#' center <- out$center
+#' }
+diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
+                           plot = FALSE){
+  if (max(pc$Z) - min(pc$Z) > slice_height) {
+    pc_slice <- pc[(pc$Z > min(pc$Z) + slice_height-slice_thickness/2) &
+                     (pc$Z < min(pc$Z) + slice_height+slice_thickness/2), ]
+    xy_slice <- pc_slice[, c("X", "Y")]
+    XY_slice <- data.matrix(xy_slice)
+    k <- 2
+    knn1 <- nabor::knn(XY_slice, XY_slice, k = k, radius = 0)
+    knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
+    knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
+    remove <- which(knn_dist[, k - 1] > 0.05)
+    if (length(remove) != 0) {
+      xy_slice <- xy_slice[-remove, ]
+    }
+    x_slice <- xy_slice$X
+    y_slice <- xy_slice$Y
+    x_m <- mean(x_slice) # first estimate of the center
+    y_m <- mean(y_slice)
+    center_estimate <- stats::optim(par = c(x_m, y_m), fn = f, x = x_slice,
+                                    y = y_slice)
+    x_c <- center_estimate$par[1]
+    y_c <- center_estimate$par[2]
+    Ri <- calc_r(x_slice, y_slice, x_c, y_c)
+    R <- mean(Ri) # radius (DBH/2)
+    residu <- sum((Ri - R)**2) / length(Ri) # average residual
+    diam <- 2 * R
+    if (plot) {
+      X <- Y <- x0 <- y0 <- r <- NULL
+      data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
+      plotDIAM <- ggplot2::ggplot() +
+        ggplot2::geom_point(data = xy_slice,
+                            ggplot2::aes(X, Y, color = "points stem slice"),
+                            size = 1) +
+        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_point(data = data_circle,
+                            ggplot2::aes(x0, y0, color = "estimated center"),
+                            size = 1) +
+        ggforce::geom_circle(data = data_circle,
+                             ggplot2::aes(x0 = x0, y0 = y0, r = r,
+                                          color = "fitted circle"),
+                             inherit.aes = FALSE, show.legend = TRUE,
+                             size = 1) +
+        ggplot2::ggtitle(paste("diameter = ", as.character(round(diam, 2)),
+                               " m at H = ",
+                               as.character(round(slice_height, 2)),
+                               " m", sep = "")) +
+        ggplot2::scale_color_manual(name = "",
+                                    values = c("points stem slice" = "black",
+                                               "estimated center" = "red",
+                                               "fitted circle" = "blue"),
+                                    guide = ggplot2::guide_legend(
+                                      override.aes =
+                                        list(linetype = c(0, 0, 1),
+                                             shape = c(16, 16, NA),
+                                             size = c(2, 2, 1))))
+      print(plotDIAM)
+      return(list("diameter" = diam, "R2" = residu, "center" = center_estimate,
+                  "plot" = plotDIAM))
+    } else {
+      return(list("diameter" = diam, "R2" = residu, "center" = center_estimate))
+    }
+  } else {
+    return(NaN)
+  }
+}
+
+#' Extract lower trunk point cloud
+#'
+#' Returns the trunk points below 1.5 m (above the lowest point of the tree
+#' point cloud).
+#'
+#' This function iteratively adds trunk points to the trunk point cloud starting
+#' from 0.15 m above the lowest point of the tree point cloud (everything below
+#' 0.15 m is assumed to be trunk). For each slice as many crown/branch points
+#' are removed based on kmeans clustering and the distance of the clusters to
+#' the center of the previous slice. Support function used to determine the DBH
+#' from a tree point cloud with \code{\link{dbh_pc}}.
+#'
+#' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
+#'   \code{\link{read_tree_pc}}.
+#'
+#' @return Data.frame with the lower trunk point cloud (part of the trunk below
+#'   1.5 m).
+#'
+#' @examples
+#' \dontrun{
+#' # Read tree point cloud and calculate the DBH
+#' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+#' trunk_pc <- extract_lower_trunk_pc(pc = pc_tree)
+#' }
+extract_lower_trunk_pc <- function(pc){
+  diam <- diameter_slice_pc(pc = pc)
+  d <- diam$diameter
+  minheight <- 0.15
+  dh <- 0.08
+  lh <- minheight - dh/2
+  uh <- minheight + dh/2
+  pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+  center_trunk <- c(diam$center$par[1], diam$center$par[2])
+  trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
+  crown_pc <- pc[FALSE, ]
+  n <- 0
+  while (lh < 1.5) {
+    if (n > 0) {
+      crown_pc <- rbind(crown_pc, pc_slice[
+        pc_slice$C %in% crown,
+        c("X", "Y", "Z")
+      ])
+      trunk_pc <- rbind(trunk_pc, trunk_slice)
+    }
+    n <- n + 1
+    lh <- lh + dh/2
+    uh <- uh + dh/2
+    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh) &
+                     (pc$X > center_trunk[1]-0.75*d) &
+                     (pc$X < center_trunk[1]+0.75*d) &
+                     (pc$Y > center_trunk[2]-0.75*d) &
+                     (pc$Y < center_trunk[2]+0.75*d), ]
+    if (nrow(pc_slice) > 10){
+      k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25, iter.max = 100)
+      pc_slice$C <- k10$cluster
+      distance_to_centers <- c()
+      centers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+      for (i in 1:10) {
+       distance_to_centers <- append(
+          distance_to_centers, ((k10$centers[i, "X"] - center_trunk[1])^2 +
+            (k10$centers[i, "Y"] - center_trunk[2])^2)^(1/2))
+      }
+      crown <- centers[distance_to_centers > 2*d]
+      trunk_slice <- pc_slice[!(pc_slice$C %in% crown), c("X", "Y", "Z")]
+      if (nrow(trunk_slice) > 0){
+        diam <- diameter_slice_pc(pc = rbind(trunk_pc, trunk_slice),
+                             slice_height = lh+dh/2, slice_thickness = dh)
+        if(diam$R2 > 0.001*diam$diameter){
+          R <- sqrt(((trunk_slice$X - diam$center[[1]][1])^2 +
+                       (trunk_slice$Y - diam$center[[1]][2])^2))
+          trunk_slice <- trunk_slice[R < diam$diameter/2*1.1,]
+          diam <- diameter_slice_pc(pc = rbind(trunk_pc, trunk_slice),
+                                    slice_height = lh+dh/2,
+                                    slice_thickness = dh)
+        }
+        d <- diam$diameter
+        center_trunk <- c(diam$center$par[1], diam$center$par[2])
+      }
+    } else {
+      diam <- diameter_slice_pc(pc = pc)
+      d <- diam$diameter
+      minheight <- 0.15
+      dh <- dh + 0.02
+      lh <- minheight - dh/2
+      uh <- minheight + dh/2
+      pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+      center_trunk <- c(diam$center$par[1], diam$center$par[2])
+      trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
+      crown_pc <- pc[FALSE, ]
+      n <- 0
+    }
+  }
+  return(trunk_pc)
+}
+
 #' Diameter at breast height point cloud
 #'
 #' Returns the diameter at breast height (DBH) of a tree measured from a tree
@@ -143,67 +344,47 @@ f <- function(c, x, y) {
 #' dbh <- output$dbh
 #' }
 dbh_pc <- function(pc, plot = FALSE) {
-  slice_height <- 1.3
-  slice_thickness <- 0.06
-  if (max(pc$Z) - min(pc$Z) > slice_height) {
-    pc_dbh <- pc[(pc$Z > min(pc$Z) + slice_height-slice_thickness/2) &
-                   (pc$Z < min(pc$Z) + slice_height+slice_thickness/2), ]
-    xy_dbh <- pc_dbh[, c("X", "Y")]
-    XY_dbh <- data.matrix(xy_dbh)
-    k <- 2
-    knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
-    knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
-    knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
-    remove <- which(knn_dist[, k - 1] > 0.05)
-    if (length(remove) != 0) {
-      xy_dbh <- xy_dbh[-remove, ]
-    }
-    x_dbh <- xy_dbh$X
-    y_dbh <- xy_dbh$Y
-    x_m <- mean(x_dbh) # first estimate of the center
-    y_m <- mean(y_dbh)
-    center_estimate <- stats::optim(par = c(x_m, y_m), fn = f, x = x_dbh,
-                                    y = y_dbh)
-    x_c <- center_estimate$par[1]
-    y_c <- center_estimate$par[2]
-    Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
-    R <- mean(Ri) # radius (DBH/2)
-    residu <- sum((Ri - R)**2) / length(Ri) # average residual
-    dbh <- 2 * R
-    if (plot) {
-      X <- Y <- x0 <- y0 <- r <- NULL
-      data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
-      plotDBH <- ggplot2::ggplot() +
-        ggplot2::geom_point(data = xy_dbh,
-                            ggplot2::aes(X, Y, color = "points stem slice"),
-                            size = 1) +
-        ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::geom_point(data = data_circle,
-                            ggplot2::aes(x0, y0, color = "estimated center"),
-                            size = 1) +
-        ggforce::geom_circle(data = data_circle,
-                             ggplot2::aes(x0 = x0, y0 = y0, r = r,
-                                          color = "fitted circle"),
-                             inherit.aes = FALSE, show.legend = TRUE,
-                             size = 1) +
-        ggplot2::ggtitle(paste("DBH = ", as.character(round(dbh, 2)), " m",
-                               sep = "")) +
-        ggplot2::scale_color_manual(name = "",
-                                    values = c("points stem slice" = "black",
-                                                 "estimated center" = "red",
-                                                 "fitted circle" = "blue"),
-                                    guide = ggplot2::guide_legend(
-                                      override.aes =
-                                        list(linetype = c(0, 0, 1),
-                                             shape = c(16, 16, NA),
-                                             size = c(2, 2, 1))))
-      print(plotDBH)
-      return(list("dbh" = dbh,"plot" = plotDBH))
-    } else {
-      return(dbh)
-    }
+  out <- diameter_slice_pc(pc = pc, slice_height = 1.3, slice_thickness = 0.06)
+  if(out$R2 > 0.001*out$diameter | (out$diameter > 2 & out$R2 > 0.001*2)){
+    trunk_pc <- extract_lower_trunk_pc(pc = pc)
+    out <- diameter_slice_pc(pc = trunk_pc, slice_height = 1.3,
+                             slice_thickness = 0.06)
+  }
+  if (plot){
+    pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.3-0.06/2) &
+                 (pc$Z < min(pc$Z) + 1.3+0.06/2), ]
+    X <- Y <- x0 <- y0 <- r <- NULL
+    data_circle <- data.frame(x0 = out$center[[1]][1], y0 = out$center[[1]][2],
+                              r = out$diameter/2)
+    plotDBH <- ggplot2::ggplot() +
+      ggplot2::geom_point(data = pc_dbh,
+                          ggplot2::aes(X, Y, color = "points stem slice"),
+                          size = 1) +
+      ggplot2::coord_fixed(ratio = 1) +
+      ggplot2::geom_point(data = data_circle,
+                          ggplot2::aes(x0, y0, color = "estimated center"),
+                          size = 1) +
+      ggforce::geom_circle(data = data_circle,
+                           ggplot2::aes(x0 = x0, y0 = y0, r = r,
+                                        color = "fitted circle"),
+                           inherit.aes = FALSE, show.legend = TRUE,
+                           size = 1) +
+      ggplot2::ggtitle(paste("DBH = ",
+                             as.character(round(out$diameter, 2)),
+                             " m", sep = "")) +
+      ggplot2::scale_color_manual(name = "",
+                                  values = c("points stem slice" = "black",
+                                             "estimated center" = "red",
+                                             "fitted circle" = "blue"),
+                                  guide = ggplot2::guide_legend(
+                                    override.aes =
+                                      list(linetype = c(0, 0, 1),
+                                           shape = c(16, 16, NA),
+                                           size = c(2, 2, 1))))
+  print(plotDBH)
+  return(list("dbh" = out$diameter, "plot" = plotDBH))
   } else {
-    return(NaN)
+    return(out$diameter)
   }
 }
 
@@ -462,7 +643,9 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
   lh <- minheight - dh # initiation first slice
   uh <- minheight # initiation first slice
   S_X <- S_Y <- 0
+  n <- 0
   while ((S_X < d) & (S_Y < d)) {
+    n <- n + 1
     lh <- lh + dh
     uh <- uh + dh
     pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
@@ -488,6 +671,34 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       }
     }
   }
+  if (n == 1){
+    while (((S_X > d) | (S_Y > d)) & (lh > dh)){
+      lh <- lh - dh/10
+      uh <- uh - dh/10
+      pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+      if (nrow(pc_slice) == 0) {
+        S_X <- S_Y <- 0
+      } else {
+        xy_dbh <- pc_slice[, c("X", "Y")]
+        XY_dbh <- data.matrix(xy_dbh)
+        k <- 2
+        distance <- dab / 10
+        knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
+        knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
+        knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
+        remove <- which(knn_dist[, k - 1] > distance)
+        if (length(remove) != 0) {
+          pc_slice <- pc_slice[-remove, ]
+        }
+        if (nrow(pc_slice) != 0) {
+          S_X <- max(pc_slice$X) - min(pc_slice$X)
+          S_Y <- max(pc_slice$Y) - min(pc_slice$Y)
+        } else {
+          S_X <- S_Y <- 0
+        }
+      }
+    }
+  }
   lh <- lh - dh
   uh <- uh - dh
   pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
@@ -500,10 +711,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
   S_X <- S_Y <- n <- stop <- 0
   while ((S_X < d) & (S_Y < d) & (stop == 0)) {
     if (n > 0) {
-      crown_pc <- rbind(crown_pc, pc_slice[
-        pc_slice$C %in% crown,
-        c("X", "Y", "Z")
-      ])
+      crown_pc <- rbind(crown_pc,
+                        pc_slice[pc_slice$C %in% crown, c("X", "Y", "Z")])
       trunk_pc <- rbind(trunk_pc, trunk_slice)
     }
     n <- n + 1
@@ -518,10 +727,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       distance_to_centers <- append(
         distance_to_centers,
         ((k10$centers[i, "X"] - k1$centers[1, "X"])^2 +
-          (k10$centers[i, "Y"] - k1$centers[1, "Y"])^2 +
-          (k10$centers[i, "Z"] -
-            k1$centers[1, "Z"])^2)^(1 / 2)
-      )
+          (k10$centers[i, "Y"] - k1$centers[1, "Y"])^2)^(1 / 2))
     }
     crown <- centers[distance_to_centers > d]
     trunk_slice <- pc_slice[!(pc_slice$C %in% crown), c("X", "Y", "Z")]
@@ -625,10 +831,10 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                                      widths = c(1, s ,1))
     }
     print(plotCrown)
-    return(list("crownpoints" = crown_pc,"plot" = plotCrown, "plotXZ" = plotXZ,
-                "plotYZ" = plotYZ))
+    return(list("crownpoints" = crown_pc, "trunkpoints" = trunk_pc,
+                "plot" = plotCrown, "plotXZ" = plotXZ, "plotYZ" = plotYZ))
   } else {
-    return(crown_pc)
+    return(list("crownpoints" = crown_pc, "trunkpoints" = trunk_pc))
   }
 }
 
@@ -708,13 +914,14 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
                                     maxbuttressheight = 7, plot = FALSE) {
   crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
                                 thresholdbuttress, maxbuttressheight, FALSE)
-  points <- sf::st_as_sf(unique(crown_pc[1:2]), coords = c("X", "Y"))
+  points <- sf::st_as_sf(unique(crown_pc$crownpoints[1:2]),
+                         coords = c("X", "Y"))
   hull <- concaveman::concaveman(points, concavity)
   pca <- sf::st_area(hull)
   if (plot) {
     X <- Y <- NULL
     plotPCA <- ggplot2::ggplot() +
-      ggplot2::geom_point(data = crown_pc,
+      ggplot2::geom_point(data = crown_pc$crownpoints,
                           ggplot2::aes(X, Y, color = "crown points"),
                           size = 0.1, stroke = 0, shape = ".") +
       ggplot2::geom_sf(data = sf::st_geometry(hull),
@@ -790,7 +997,7 @@ volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
                             maxbuttressheight = 7, plot = FALSE) {
   crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
                                 thresholdbuttress, maxbuttressheight, FALSE)
-  crown_pc_norm <- normalize_pc(crown_pc)
+  crown_pc_norm <- normalize_pc(crown_pc$crownpoints)
   crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)
   vol_crown <- alphashape3d::volume_ashape3d(ashape3d.obj)

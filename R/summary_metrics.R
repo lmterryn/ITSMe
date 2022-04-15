@@ -90,7 +90,11 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     if (buttress){
       dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
     } else {
-      dab_out <- NA
+      if (plot) {
+        dab_out <- list("dab" = NA)
+      } else {
+        dab_out <- NA
+      }
     }
     dbh_out <- dbh_pc(pc, plot)
     classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
