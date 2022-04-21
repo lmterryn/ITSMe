@@ -235,6 +235,8 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
 #' @return Data.frame with the lower trunk point cloud (part of the trunk below
 #'   1.5 m).
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' # Read tree point cloud and calculate the DBH
@@ -319,11 +321,21 @@ extract_lower_trunk_pc <- function(pc){
 #'
 #' The DBH is measured as the diameter of the optimal circle fitted through a
 #' 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree
-#' point). A least squares circle fitting algorithm was applied to find the
-#' optimal fit.
+#' point) using \code{\link{diameter_slice_pc}}. A least squares circle fitting
+#' algorithm is applied to find the optimal fit. In case there are branches or
+#' foliage at this height, the lower trunk is extracted using
+#' \code{\link{extract_lower_trunk_pc}}. Wether this is the case is determined
+#' using the thresholdR2 parameter.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
+#' @param thresholdR2 Numeric value (default=0.001) that is multiplied with the
+#'   radius to determine if at breast height (1.3 m above the lowest point of
+#'   the point cloud) the circle fit is influenced by branches. If the resulting
+#'   value is exceeded, the lower trunk without branches is extracted using
+#'   \code{\link{extract_lower_trunk_pc}}. Increase the thresholdR2 if your
+#'   point cloud quality is low (for example, errors in co-registration of point
+#'   clouds in multi-scan due to wind-effect).
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -343,9 +355,9 @@ extract_lower_trunk_pc <- function(pc){
 #' output <- dbh_pc(pc = pc_tree, plot = TRUE)
 #' dbh <- output$dbh
 #' }
-dbh_pc <- function(pc, plot = FALSE) {
+dbh_pc <- function(pc, thresholdR2 = 0.001, plot = FALSE) {
   out <- diameter_slice_pc(pc = pc, slice_height = 1.3, slice_thickness = 0.06)
-  if(out$R2 > 0.001*out$diameter | (out$diameter > 2 & out$R2 > 0.001*2)){
+  if(out$R2 > thresholdR2*out$diameter | (out$diameter > 2 & out$R2 > 0.002)){
     trunk_pc <- extract_lower_trunk_pc(pc = pc)
     out <- diameter_slice_pc(pc = trunk_pc, slice_height = 1.3,
                              slice_thickness = 0.06)
@@ -603,6 +615,9 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #'   choose a lower value (such as 1).
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
@@ -631,12 +646,13 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #' crown_pc <- classify_crown_pc(pc = pc_tree, minheight = 4, buttress = TRUE)
 #' }
 classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
-                              buttress = FALSE, thresholdbuttress = 0.001,
-                              maxbuttressheight = 7, plot = FALSE) {
+                              buttress = FALSE, thresholdR2 = 0.001,
+                              thresholdbuttress = 0.001, maxbuttressheight = 7,
+                              plot = FALSE) {
   if (buttress) {
     dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
   } else {
-    dab <- dbh_pc(pc)
+    dab <- dbh_pc(pc, thresholdR2)
   }
   d <- thresholdbranch * dab + 0.1
   dh <- 0.25
@@ -880,6 +896,9 @@ normalize_pc <- function(pc) {
 #'   \code{\link{classify_crown_pc}}.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
@@ -910,10 +929,12 @@ normalize_pc <- function(pc) {
 #' }
 projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
                                     minheight = 1, buttress = FALSE,
+                                    thresholdR2 = 0.001,
                                     thresholdbuttress = 0.001,
                                     maxbuttressheight = 7, plot = FALSE) {
   crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                thresholdbuttress, maxbuttressheight, FALSE)
+                                thresholdR2, thresholdbuttress,
+                                maxbuttressheight, FALSE)
   points <- sf::st_as_sf(unique(crown_pc$crownpoints[1:2]),
                          coords = c("X", "Y"))
   hull <- concaveman::concaveman(points, concavity)
@@ -964,6 +985,9 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height). Only relevant if the tree point
 #'   clouds are available.
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
@@ -993,10 +1017,12 @@ projected_crown_area_pc <- function(pc, concavity = 2, thresholdbranch = 1.5,
 #' vol_crown <- volume_crown_pc(pc = pc_tree, alpha = 2, minheight = 4)
 #' }
 volume_crown_pc <- function(pc, alpha = 1, thresholdbranch = 1.5, minheight = 1,
-                            buttress = FALSE, thresholdbuttress = 0.001,
-                            maxbuttressheight = 7, plot = FALSE) {
-  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                thresholdbuttress, maxbuttressheight, FALSE)
+                            buttress = FALSE, thresholdR2 = 0.001,
+                            thresholdbuttress = 0.001, maxbuttressheight = 7,
+                            plot = FALSE) {
+  crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, thresholdR2,
+                                buttress, thresholdbuttress, maxbuttressheight,
+                                FALSE)
   crown_pc_norm <- normalize_pc(crown_pc$crownpoints)
   crown_xyz <- data.matrix(unique(crown_pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(crown_xyz, alpha = alpha)

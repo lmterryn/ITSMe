@@ -10,6 +10,7 @@ volume_crown_pc(
   thresholdbranch = 1.5,
   minheight = 1,
   buttress = FALSE,
+  thresholdR2 = 0.001,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   plot = FALSE
@@ -32,6 +33,10 @@ alpha-shape of the tree crown based on
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses (higher than breast height). Only relevant if the tree point
 clouds are available.}
+
+\item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above

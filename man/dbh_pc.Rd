@@ -4,11 +4,19 @@
 \alias{dbh_pc}
 \title{Diameter at breast height point cloud}
 \usage{
-dbh_pc(pc, plot = FALSE)
+dbh_pc(pc, thresholdR2 = 0.001, plot = FALSE)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}.}
+
+\item{thresholdR2}{Numeric value (default=0.001) that is multiplied with the
+radius to determine if at breast height (1.3 m above the lowest point of
+the point cloud) the circle fit is influenced by branches. If the resulting
+value is exceeded, the lower trunk without branches is extracted using
+\code{\link{extract_lower_trunk_pc}}. Increase the thresholdR2 if your
+point cloud quality is low (for example, errors in co-registration of point
+clouds in multi-scan due to wind-effect).}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
@@ -26,8 +34,11 @@ point cloud.
 \details{
 The DBH is measured as the diameter of the optimal circle fitted through a
 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree
-point). A least squares circle fitting algorithm was applied to find the
-optimal fit.
+point) using \code{\link{diameter_slice_pc}}. A least squares circle fitting
+algorithm is applied to find the optimal fit. In case there are branches or
+foliage at this height, the lower trunk is extracted using
+\code{\link{extract_lower_trunk_pc}}. Wether this is the case is determined
+using the thresholdR2 parameter.
 }
 \examples{
 \dontrun{

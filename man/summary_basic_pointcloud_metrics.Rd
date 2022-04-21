@@ -12,6 +12,7 @@ summary_basic_pointcloud_metrics(
   concavity = 2,
   alpha = 1,
   buttress = FALSE,
+  thresholdR2 = 0.001,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   OUT_path = FALSE,
@@ -42,6 +43,10 @@ projected crown area.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses (higher than breast height).}
+
+\item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant if buttress == FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above

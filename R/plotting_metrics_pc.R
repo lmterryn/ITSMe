@@ -11,6 +11,9 @@
 #'   tree point clouds.
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height.
 #' @param OUT_path A character with the path to the folder where the figures
 #'   should be saved (default = current folder).
 #'
@@ -27,7 +30,8 @@
 #'                                extension = ".txt",
 #'                                OUT_path = "path/to/figure/folder/")
 #' }
-plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./") {
+plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
+                             OUT_path = "./") {
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -37,10 +41,10 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./") {
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- dbh_pc(pc, TRUE)
+    out <- dbh_pc(pc, thresholdR2, TRUE)
     filename <- paste(OUT_path, "dbh_",
-                     strsplit(file_names[i], extension)[[1]],
-                     ".jpeg", sep = "")
+                     strsplit(file_names[i], extension)[[1]], "_",
+                     as.character(thresholdR2), "_", ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot)
     DBHs <- append(DBHs, out$dbh)
     Plots <- append(Plots, list(out$plot))
@@ -142,6 +146,9 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -180,6 +187,7 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                                           OUT_path = "./",
                                           thresholdbranch = 1.5,
                                           minheight = 1, buttress = FALSE,
+                                          thresholdR2 = 0.001,
                                           thresholdbuttress = 0.001,
                                           maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -191,7 +199,8 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                      thresholdbuttress, maxbuttressheight, TRUE)
+                             thresholdR2, thresholdbuttress, maxbuttressheight,
+                             TRUE)
     filename = paste(OUT_path, "crown_",
                      strsplit(file_names[i], extension)[[1]], "_",
                      as.character(thresholdbranch), "_",
@@ -233,6 +242,9 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -264,7 +276,8 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #' }
 plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                          concavity = 2, thresholdbranch = 1.5, minheight = 1,
-                         buttress = FALSE, thresholdbuttress = 0.001,
+                         buttress = FALSE, thresholdR2 = 0.001,
+                         thresholdbuttress = 0.001,
                          maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
@@ -276,7 +289,7 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
-                                   buttress, thresholdbuttress,
+                                   buttress, thresholdR2, thresholdbuttress,
                                    maxbuttressheight, TRUE)
     filename = paste(OUT_path, "pca_", strsplit(file_names[i], extension)[[1]],
                      "_", as.character(concavity), ".jpeg", sep = "")
@@ -317,6 +330,9 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -347,7 +363,8 @@ plot_pca_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #' }
 plot_cv_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         alpha = 1, thresholdbranch = 1.5, minheight = 1,
-                        buttress = FALSE, thresholdbuttress = 0.001,
+                        buttress = FALSE, thresholdR2 = 0.001,
+                        thresholdbuttress = 0.001,
                         maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
@@ -360,7 +377,7 @@ plot_cv_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     fig_name <- paste(OUT_path, "cv_", strsplit(file_names[i], extension)[[1]],
                       "_", as.character(alpha), ".png", sep = "")
     out <- volume_crown_pc(pc, alpha, thresholdbranch, minheight,
-                                   buttress, thresholdbuttress,
+                                   buttress, thresholdR2, thresholdbuttress,
                                    maxbuttressheight, TRUE)
     rgl::rgl.snapshot(fig_name, fmt = 'png')
     rgl::rgl.close()

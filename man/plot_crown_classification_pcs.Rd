@@ -11,6 +11,7 @@ plot_crown_classification_pcs(
   thresholdbranch = 1.5,
   minheight = 1,
   buttress = FALSE,
+  thresholdR2 = 0.001,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7
 )
@@ -34,6 +35,10 @@ non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses (higher than breast height).}
+
+\item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above

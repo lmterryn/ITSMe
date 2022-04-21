@@ -28,6 +28,9 @@
 #'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
@@ -65,6 +68,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              thresholdbranch = 1.5,
                                              minheight = 1, concavity = 2,
                                              alpha = 1, buttress = FALSE,
+                                             thresholdR2 = 0.001,
                                              thresholdbuttress = 0.001,
                                              maxbuttressheight = 7,
                                              OUT_path = FALSE, plot = FALSE) {
@@ -89,14 +93,15 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     h <- tree_height_pc(pc)
     if (buttress){
       dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
+      dbh_out <- diameter_slice_pc(pc, slice_height = 1.3, plot)
     } else {
+      dbh_out <- dbh_pc(pc, thresholdR2, plot)
       if (plot) {
         dab_out <- list("dab" = NA)
       } else {
         dab_out <- NA
       }
     }
-    dbh_out <- dbh_pc(pc, plot)
     classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
                                       thresholdbuttress, maxbuttressheight,
                                       plot)
@@ -221,6 +226,10 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if the tree point clouds are available. Only
 #'   relevant if the tree point clouds are available.
+#' @param thresholdR2 Numeric value (default=0.001). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress ==
+#'   FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point clouds are available and
@@ -271,7 +280,8 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
                                 sbl_normalisation = "treeheight",
                                 sbd_normalisation = "no",
                                 PCs_path = NA, extension = ".txt",
-                                buttress = FALSE, thresholdbuttress = 0.001,
+                                buttress = FALSE, thresholdR2 = 0.001,
+                                thresholdbuttress = 0.001,
                                 maxbuttressheight = 7, OUT_path = FALSE) {
   filenames <- list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
   unique_tree_ids <- c()
@@ -311,7 +321,7 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
       position <- tree_position_qsm(qsm$cylinder)
       X_position <- position[1]
       Y_position <- position[2]
-      dbh <- dbh(qsm$treedata, pc, buttress, thresholdbuttress,
+      dbh <- dbh(qsm$treedata, pc, buttress, thresholdR2, thresholdbuttress,
                  maxbuttressheight)
       tree_height <- tree_height(qsm$treedata, pc)
       tree_vol <- tree_volume_qsm(qsm$treedata)
@@ -321,11 +331,16 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
       sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,
                                     sbr_normalisation, pc)
       sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, sbl_normalisation,
-                                    pc, buttress)
+                                    pc, buttress, thresholdR2,
+                                    thresholdbuttress, maxbuttressheight)
       sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata,
-                                      sbd_normalisation, pc, buttress)
-      dhr <- dbh_height_ratio_qsm(qsm$treedata, pc, buttress)
-      dvr <- dbh_volume_ratio_qsm(qsm$treedata, pc, buttress)
+                                      sbd_normalisation, pc, buttress,
+                                      thresholdR2, thresholdbuttress,
+                                      maxbuttressheight)
+      dhr <- dbh_height_ratio_qsm(qsm$treedata, pc, buttress, thresholdR2,
+                                  thresholdbuttress, maxbuttressheight)
+      dvr <- dbh_volume_ratio_qsm(qsm$treedata, pc, buttress, thresholdR2,
+                                  thresholdbuttress, maxbuttressheight)
       vb55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
       clvr <- cylinder_length_volume_ratio_qsm(qsm$treedata)
       sr <- shedding_ratio_qsm(qsm$branch, qsm$cylinder, qsm$treedata)
@@ -335,7 +350,9 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
       ch <- crown_height_qsm(qsm$treedata, qsm$cylinder, pc)
       ce <- crown_evenness_qsm(qsm$cylinder)
       cdhr <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
-      dmr <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc, buttress)
+      dmr <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc, buttress,
+                                     thresholdR2, thresholdbuttress,
+                                     maxbuttressheight)
       tree <- data.frame(X_position = X_position, Y_position = Y_position,
                          dbh = dbh, tree_height = tree_height,
                          tree_vol = tree_vol, trunk_vol = trunk_vol, sba = sba,

@@ -4,7 +4,12 @@
 \alias{plot_dbh_fit_pcs}
 \title{Calculate and save figures of \code{\link{dbh_pc}} function}
 \usage{
-plot_dbh_fit_pcs(PCs_path, extension = ".txt", OUT_path = "./")
+plot_dbh_fit_pcs(
+  PCs_path,
+  extension = ".txt",
+  thresholdR2 = 0.001,
+  OUT_path = "./"
+)
 }
 \arguments{
 \item{PCs_path}{A character with the path to the folder that contains the
@@ -12,6 +17,10 @@ tree point clouds.}
 
 \item{extension}{A character refering to the file extension of the point
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
+
+\item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height.}
 
 \item{OUT_path}{A character with the path to the folder where the figures
 should be saved (default = current folder).}

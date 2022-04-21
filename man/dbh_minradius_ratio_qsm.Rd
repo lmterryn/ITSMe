@@ -9,6 +9,7 @@ dbh_minradius_ratio_qsm(
   cylinder,
   pc = NA,
   buttress = FALSE,
+  thresholdR2 = 0.001,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7
 )
@@ -25,7 +26,12 @@ dbh_minradius_ratio_qsm(
 cloud is available.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
-buttresses. Only relevant if pc is}
+buttresses. Only relevant if pc is available.}
+
+\item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant if the tree point cloud is available and buttress ==
+FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
