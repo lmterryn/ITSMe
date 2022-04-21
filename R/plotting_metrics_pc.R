@@ -1,3 +1,64 @@
+#' Calculate and save figures of \code{\link{diameter_slice_pc}} function
+#'
+#' Calculates  the diameter and saves the figures acquired when running
+#' \code{\link{diameter_slice_pc}} on multiple tree point clouds in a folder.
+#'
+#' Uses \code{\link{read_tree_pc}} to read the point clouds and
+#' \code{\link{diameter_slice_pc}} with parameter plot = TRUE to calculate the
+#' diameter and plot the circle fitting.
+#'
+#' @param PCs_path A character with the path to the folder that contains the
+#'   tree point clouds.
+#' @param extension A character refering to the file extension of the point
+#'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".
+#' @param slice_height Numeric value (default = 1.3) that determines the height
+#'   above the lowest point of the point cloud at which the diameter is
+#'   measured. Parameter of the \code{\link{diameter_slice_pc}} function used to
+#'   calculate the diameter of a stem slice.
+#' @param slice_thickness Numeric value (default = 0.6) that determines the
+#'   thickness of the slice which is used to measure the diameter. Parameter of
+#'   the \code{\link{diameter_slice_pc}} function used to calculate the diameter
+#'   of a stem slice.
+#' @param OUT_path A character with the path to the folder where the figures
+#'   should be saved (default = current folder).
+#'
+#' @return A list with in the first element a numeric containing the diameter
+#'   values for each tree point cloud. In the second element there is the list
+#'   with the plots. Figures are also saved in the output folder.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Calculate diameters at a certain height and save circle fitting figures
+#' diam_values <- plot_circle_fit_pcs(PCs_path = "path/to/folder/PCs/",
+#'                                   extension = ".txt",
+#'                                   OUT_path = "path/to/figure/folder/")
+#' }
+plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
+                                slice_height = 1.3, slice_thickness = 0.06,
+                                OUT_path = "./") {
+  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = TRUE)
+  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
+                           full.names = FALSE)
+  Ds <- c()
+  Plots <- list()
+  for (i in 1:length(file_names)) {
+    print(paste("processing ", file_names[i]))
+    pc <- read_tree_pc(file_paths[i])
+    out <- diameter_slice_pc(pc, slice_height, slice_thickness, TRUE)
+    filename <- paste(OUT_path, "circle_",
+                      strsplit(file_names[i], extension)[[1]], "_",
+                      as.character(slice_height), "_",
+                      as.character(slice_thickness), "_", ".jpeg", sep = "")
+    ggplot2::ggsave(filename, plot = out$plot)
+    Ds <- append(Ds, out$diam)
+    Plots <- append(Plots, list(out$plot))
+  }
+  return(list("Diams"=Ds, "Plots"=Plots))
+}
+
 #' Calculate and save figures of \code{\link{dbh_pc}} function
 #'
 #' Calculates  the dbh and saves the figures acquired when running
