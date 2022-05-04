@@ -2,35 +2,44 @@
 #'
 #' Returns a summary data.frame containing the tree position (X,Y-coordinates),
 #' tree height, diameter at breast height, diameter above buttresses, projected
-#' crown area and crown volume.
+#' (crown) area and (crown) volume.
 #'
 #' The tree position, tree height, diameter at breast height, diameter above
-#' buttresses, projected crown area and crown volume are otained with
+#' buttresses, projected (crown) area and (crown) volume are otained with
 #' \code{\link{tree_position_pc}}, \code{\link{tree_height_pc}},
-#' \code{\link{dbh_pc}}, \code{\link{dab_pc}},
-#' \code{\link{projected_crown_area_pc}} and \code{\link{volume_crown_pc}}
-#' respectively.
+#' \code{\link{dbh_pc}}, \code{\link{dab_pc}}, \code{\link{projected_area_pc}}
+#' and \code{\link{alpha_volume_pc}} respectively.
 #'
 #' @param PCs_path A character with the path to the folder that contains the
 #'   tree point clouds.
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 #'   relevant if the tree point clouds are available.
+#' @param dtm The digital terrain model from \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm from \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
+#' @param crown Logical (default=FALSE), indicates if the area and volume is
+#'   calculated based on the full point clouds (crown = FALSE) or only on the
+#'   crown point clouds (crown = TRUE).
 #' @param thresholdbranch Numeric value (default=1.5) from
-#'   \code{\link{classify_crown_pc}}.
+#'   \code{\link{classify_crown_pc}}. Only relevant when crown == TRUE.
 #' @param minheight Numeric value (default=1) from
 #'   \code{\link{classify_crown_pc}}. The default value is based on
 #'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
+#'   Only relevant when crown == TRUE.
 #' @param concavity Numeric value (default=2). Parameter of the
-#'   \code{\link{projected_crown_area_pc}} function used to calculate the
+#'   \code{\link{projected_area_pc}} function used to calculate the
 #'   projected crown area.
 #' @param alpha Numeric value (default=1). Parameter of the
-#'   \code{\link{volume_crown_pc}} function used to calculate the crown volume.
+#'   \code{\link{alpha_volume_pc}} function used to calculate the crown volume.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses (higher than breast height).
 #' @param thresholdR2 Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if buttress == FALSE.
+#' @param slice_thickness Numeric value (default = 0.06). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
@@ -47,28 +56,29 @@
 #'
 #' @return The summary of the basic structural metrics for multiple tree point
 #'   clouds as a data.frame. Includes the tree height, diameter at breast
-#'   height, diameter above buttresses, projected crown area and crown volume.
-#'   The summary is saved in a csv file if an output folder is provided.
+#'   height, diameter above buttresses, projected (crown) area and (crown)
+#'   volume. The summary is saved in a csv file if an output folder is provided.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' # Calculate the summary with default parameters and export to csv
-#' # recommended for non-buttressed trees
 #' summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
 #'                                             OUT_path = "path/to/out/folder/")
 #' # Calculate the summary with non-default parameter values
 #' # recommended for buttressed trees
 #' summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
-#'                                             extension = ".ply",
+#'                                             extension = ".ply", crown = TRUE,
 #'                                             minheight = 4, buttress = TRUE)
 #' }
 summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
+                                             dtm = NA, r = 5, crown = FALSE,
                                              thresholdbranch = 1.5,
                                              minheight = 1, concavity = 2,
                                              alpha = 1, buttress = FALSE,
                                              thresholdR2 = 0.001,
+                                             slice_thickness = 0.06,
                                              thresholdbuttress = 0.001,
                                              maxbuttressheight = 7,
                                              OUT_path = FALSE, plot = FALSE) {
@@ -77,10 +87,12 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     "Y_position" = double(), "tree_height" = double(),
     "diameter_at_breast_height" = double(),
     "diameter_above_buttresses" = double(),
-    "projected_crown_area" = double(), "crown_volume" = double())
-  diameter_above_buttresses <- NULL
+    "projected_area" = double(), "volume" = double())
+  diameter_above_buttresses <- diameter_at_breast_height <- NULL
   if (buttress == FALSE){
     trees <- subset(trees, select = -diameter_above_buttresses)
+  } else {
+    tree <- subset(trees, select = -diameter_at_breast_height)
   }
   filepaths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                           full.names = TRUE)
@@ -90,49 +102,54 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     print(paste("processing ", filenames[i]))
     pc <- read_tree_pc(filepaths[i])
     pos <- tree_position_pc(pc)
-    h <- tree_height_pc(pc)
+    h_out <- tree_height_pc(pc, dtm, r, plot)
     if (buttress){
       dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
-      dbh_out <- diameter_slice_pc(pc, slice_height = 1.3, plot)
+      dbh_out <- NaN
     } else {
-      dbh_out <- dbh_pc(pc, thresholdR2, plot)
-      if (plot) {
-        dab_out <- list("dab" = NA)
-      } else {
-        dab_out <- NA
-      }
+      dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, plot)
+      dab_out <- NaN
     }
-    classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                      thresholdbuttress, maxbuttressheight,
-                                      plot)
-    pca_out <- projected_crown_area_pc(pc, concavity, thresholdbranch, minheight,
-                                   buttress, thresholdbuttress,
-                                   maxbuttressheight, plot)
-    cv <- volume_crown_pc(pc, alpha, thresholdbranch, minheight, buttress,
-                          thresholdbuttress, maxbuttressheight)
+    if (crown){
+      classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
+                                      thresholdR2, thresholdbuttress,
+                                      slice_thickness, maxbuttressheight, plot)
+      pc <- classify_out$crownpoints
+    }
+    pa_out <- projected_area_pc(pc, concavity, plot)
+    av <- alpha_volume_pc(pc, alpha)
     if (plot){
-      dbh <- dbh_out$dbh
-      dab <- dab_out$dab
-      pca <- pca_out$pca
+      h <- h_out$h
+      if (buttress){
+        dab <- dab_out$dab
+        dbh <- dbh_out
+      } else {
+        dbh <- dbh_out$dbh
+        dab <- dab_out
+      }
+      pa <- pa_out$pa
     } else {
+      h <- h_out
       dbh <- dbh_out
       dab <- dab_out
-      pca <- pca_out
+      pa <- pa_out
     }
     tree <- data.frame(
       "tree_id" = filenames[i], "X_position" = pos[1],
       "Y_position" = pos[2], "tree_height" = h,
       "diameter_at_breast_height" = dbh,
       "diameter_above_buttresses" = dab,
-      "projected_crown_area" = pca, "crown_volume" = cv)
+      "projected_area" = pa, "volume" = av)
     if (buttress == FALSE){
       tree <- subset(tree, select = -diameter_above_buttresses)
+    } else {
+      tree <- subset(tree, select = -diameter_at_breast_height)
     }
     trees <- rbind(trees, tree)
     if (plot){
-      p0 <- pca_out$plot
-      p0 <- p0 + ggplot2::ggtitle(label = bquote(PCA == .(round(pca,2)) ~ m^2),
-                                  subtitle = bquote(CV == .(round(cv,2)) ~ m^3))
+      p0 <- pa_out$plot
+      p0 <- p0 + ggplot2::ggtitle(label = bquote(PA == .(round(pa,2)) ~ m^2),
+                                  subtitle = bquote(AV == .(round(av,2)) ~ m^3))
       if (buttress) {
         p1 <- ggpubr::ggarrange(dab_out$plot, p0, nrow = 2, ncol = 1,
                                 widths = c(1,1))
@@ -140,21 +157,25 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
         p1 <- ggpubr::ggarrange(dbh_out$plot, p0, nrow = 2, ncol = 1,
                         widths = c(1,1))
       }
-      p2 <- ggpubr::ggarrange(classify_out$plotXZ, classify_out$plotYZ,
-                              nrow = 1, ncol = 2, heights = c(1,1),
-                              common.legend = TRUE, align = "hv",
-                              legend = "bottom")
-      p2 <- ggpubr::annotate_figure(p2,
-                              top = ggpubr::text_grob(paste("Tree height = ",
-                                                            as.character(
-                                                              round(h,2)),
-                                                            " m", sep = "")))
+      if (crown){
+        p2 <- ggpubr::ggarrange(classify_out$plotXZ, classify_out$plotYZ,
+                                nrow = 1, ncol = 2, heights = c(1,1),
+                                common.legend = TRUE, align = "hv",
+                                legend = "bottom")
+        p2 <- ggpubr::annotate_figure(p2, top = ggpubr::text_grob(
+          paste("Tree height = ", as.character(round(h,2)), " m", sep = "")))
+      } else {
+        p2 <- ggpubr::ggarrange(h_out$plotXZ, h_out$plotYZ,
+                                nrow = 1, ncol = 2, heights = c(1,1),
+                                common.legend = TRUE, align = "hv",
+                                legend = "bottom")
+        p2 <- ggpubr::annotate_figure(p2, top = ggpubr::text_grob(
+          paste("Tree height = ", as.character(round(h,2)), " m", sep = "")))
+      }
       p3 <- ggpubr::ggarrange(p2, p1, nrow = 1, ncol = 2, align = "hv")
-      p3 <- ggpubr::annotate_figure(p3, top = ggpubr::text_grob(paste("Summary ",
-                                                strsplit(filenames[i],
-                                                         extension)[[1]],
-                                                sep = ""), face = "bold"))
-
+      p3 <- ggpubr::annotate_figure(p3, top = ggpubr::text_grob(
+        paste("Summary ", strsplit(filenames[i], extension)[[1]], sep = ""),
+        face = "bold"))
     }
     if (is.character(OUT_path)){
       utils::write.csv(trees,paste(OUT_path,"pointcloud_metrics.csv", sep = ""),
@@ -167,12 +188,13 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
         grDevices::dev.off()
       }
     }
+  gc()
   }
   return(trees)
 }
 
 
-#' Summary structural metrics Terryn et al. (2020)
+#' Summary structural metrics from QSMs
 #'
 #' Returns a summary data.frame containing all the metrics defined by Terryn et
 #' al. (2020). Also contains: X and Y-position, dbh, tree height, tree volume
@@ -230,6 +252,10 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   FALSE.
+#' @param slice_thickness Numeric value (default = 0.06). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant if the tree point cloud is available and buttress ==
+#'   FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point clouds are available and
@@ -261,26 +287,27 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #' \dontrun{
 #' # Calculate the summary with default parameters and export to csv
 #' # recommended for non-buttressed trees
-#' summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
+#' summary <- summary_qsm_metrics(QSMs_path = "path/to/folder/QSMs/",
 #'                                OUT_path = "path/to/out/folder/")
 #' # also using point cloud info
-#' summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
+#' summary <- summary_qsm_metrics(QSMs_path = "path/to/folder/QSMs/",
 #'                                PCs_path = "path/to/folder/PCs/",
 #'                                extension = ".txt",
 #'                                OUT_path = "path/to/out/folder/")
 #' # Calculate the summary with non-default parameter values
 #' # recommended for buttressed trees
-#' summary <- summary_Terryn_2020(QSMs_path = "path/to/folder/QSMs/",
+#' summary <- summary_qsm_metrics(QSMs_path = "path/to/folder/QSMs/",
 #'                                PCs_path = "path/to/folder/PCs/",
 #'                                extension = ".txt", buttress = TRUE,
 #'                                OUT_path = "path/to/out/folder/")
 #' }
-summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
+summary_qsm_metrics <- function(QSMs_path, version = "2.4.0",
                                 sbr_normalisation = "treeheight",
                                 sbl_normalisation = "treeheight",
                                 sbd_normalisation = "no",
                                 PCs_path = NA, extension = ".txt",
                                 buttress = FALSE, thresholdR2 = 0.001,
+                                slice_thickness = 0.06,
                                 thresholdbuttress = 0.001,
                                 maxbuttressheight = 7, OUT_path = FALSE) {
   filenames <- list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
@@ -321,8 +348,8 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
       position <- tree_position_qsm(qsm$cylinder)
       X_position <- position[1]
       Y_position <- position[2]
-      dbh <- dbh(qsm$treedata, pc, buttress, thresholdR2, thresholdbuttress,
-                 maxbuttressheight)
+      dbh <- dbh(qsm$treedata, pc, buttress, thresholdR2, slice_thickness,
+                 thresholdbuttress, maxbuttressheight)
       tree_height <- tree_height(qsm$treedata, pc)
       tree_vol <- tree_volume_qsm(qsm$treedata)
       trunk_vol <- trunk_volume_qsm(qsm$treedata)
@@ -378,13 +405,13 @@ summary_Terryn_2020 <- function(QSMs_path, version = "2.4.0",
     }
     if (is.character(OUT_path)){
       utils::write.csv(summary,paste(OUT_path,
-                                           "Terryn_2020_metrics.csv",
+                                           "qsm_metrics.csv",
                                            sep = ""), row.names = FALSE)
       if (length(qsms) > 1){
       utils::write.csv(summary_means,paste(OUT_path,
-                                           "Terryn_2020_metrics_means.csv",
+                                           "qsm_metrics_means.csv",
                                            sep = ""), row.names = FALSE)
-      utils::write.csv(summary_sds,paste(OUT_path,"Terryn_2020_metrics_sds.csv",
+      utils::write.csv(summary_sds,paste(OUT_path,"qsm_metrics_sds.csv",
                                          sep = ""), row.names = FALSE)
       }
     }

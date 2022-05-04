@@ -4,7 +4,7 @@
 \alias{dbh_pc}
 \title{Diameter at breast height point cloud}
 \usage{
-dbh_pc(pc, thresholdR2 = 0.001, plot = FALSE)
+dbh_pc(pc, thresholdR2 = 0.001, slice_thickness = 0.06, plot = FALSE)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -18,6 +18,9 @@ value is exceeded, the lower trunk without branches is extracted using
 point cloud quality is low (for example, errors in co-registration of point
 clouds in multi-scan due to wind-effect).}
 
+\item{slice_thickness}{Numeric value (default = 0.06) that determines the
+thickness of the slice which is used to measure the diameter.}
+
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
 }
@@ -29,7 +32,7 @@ plot as the second element.
 }
 \description{
 Returns the diameter at breast height (DBH) of a tree measured from a tree
-point cloud.
+point cloud. There should be only one stem at breast height.
 }
 \details{
 The DBH is measured as the diameter of the optimal circle fitted through a

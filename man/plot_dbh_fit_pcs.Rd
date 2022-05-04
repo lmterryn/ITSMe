@@ -8,6 +8,7 @@ plot_dbh_fit_pcs(
   PCs_path,
   extension = ".txt",
   thresholdR2 = 0.001,
+  slice_thickness = 0.06,
   OUT_path = "./"
 )
 }
@@ -22,6 +23,10 @@ cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height.}
 
+\item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height.}
+
 \item{OUT_path}{A character with the path to the folder where the figures
 should be saved (default = current folder).}
 }
@@ -31,7 +36,7 @@ for each tree point cloud. In the second element there is the list with the
 plots. Figures are also saved in the output folder.
 }
 \description{
-Calculates  the dbh and saves the figures acquired when running
+Calculates the dbh and saves the figures acquired when running
 \code{\link{dbh_pc}} on multiple tree point clouds in a folder.
 }
 \details{

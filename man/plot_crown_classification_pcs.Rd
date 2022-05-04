@@ -12,6 +12,7 @@ plot_crown_classification_pcs(
   minheight = 1,
   buttress = FALSE,
   thresholdR2 = 0.001,
+  slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7
 )
@@ -37,6 +38,10 @@ non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.}
 buttresses (higher than breast height).}
 
 \item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.}
+
+\item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height. Only relevant when buttress == FALSE.}
 

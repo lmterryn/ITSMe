@@ -4,11 +4,14 @@
 \alias{extract_lower_trunk_pc}
 \title{Extract lower trunk point cloud}
 \usage{
-extract_lower_trunk_pc(pc)
+extract_lower_trunk_pc(pc, slice_thickness = 0.08)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}.}
+
+\item{slice_thickness}{Numeric value (default = 0.08) that determines the
+thickness of the slice used to determine the lower trunk points.}
 }
 \value{
 Data.frame with the lower trunk point cloud (part of the trunk below

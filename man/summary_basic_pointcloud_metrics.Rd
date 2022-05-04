@@ -7,12 +7,16 @@
 summary_basic_pointcloud_metrics(
   PCs_path,
   extension = ".txt",
+  dtm = NA,
+  r = 5,
+  crown = FALSE,
   thresholdbranch = 1.5,
   minheight = 1,
   concavity = 2,
   alpha = 1,
   buttress = FALSE,
   thresholdR2 = 0.001,
+  slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   OUT_path = FALSE,
@@ -27,19 +31,29 @@ tree point clouds.}
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 relevant if the tree point clouds are available.}
 
+\item{dtm}{The digital terrain model from \code{\link{tree_height_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm from \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
+
+\item{crown}{Logical (default=FALSE), indicates if the area and volume is
+calculated based on the full point clouds (crown = FALSE) or only on the
+crown point clouds (crown = TRUE).}
+
 \item{thresholdbranch}{Numeric value (default=1.5) from
-\code{\link{classify_crown_pc}}.}
+\code{\link{classify_crown_pc}}. Only relevant when crown == TRUE.}
 
 \item{minheight}{Numeric value (default=1) from
 \code{\link{classify_crown_pc}}. The default value is based on
-non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.}
+non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
+Only relevant when crown == TRUE.}
 
 \item{concavity}{Numeric value (default=2). Parameter of the
-\code{\link{projected_crown_area_pc}} function used to calculate the
+\code{\link{projected_area_pc}} function used to calculate the
 projected crown area.}
 
 \item{alpha}{Numeric value (default=1). Parameter of the
-\code{\link{volume_crown_pc}} function used to calculate the crown volume.}
+\code{\link{alpha_volume_pc}} function used to calculate the crown volume.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses (higher than breast height).}
@@ -47,6 +61,10 @@ buttresses (higher than breast height).}
 \item{thresholdR2}{Numeric value (default=0.001). Parameter of the
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height. Only relevant if buttress == FALSE.}
+
+\item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
@@ -67,32 +85,30 @@ saved in the OUT_path.}
 \value{
 The summary of the basic structural metrics for multiple tree point
 clouds as a data.frame. Includes the tree height, diameter at breast
-height, diameter above buttresses, projected crown area and crown volume.
-The summary is saved in a csv file if an output folder is provided.
+height, diameter above buttresses, projected (crown) area and (crown)
+volume. The summary is saved in a csv file if an output folder is provided.
 }
 \description{
 Returns a summary data.frame containing the tree position (X,Y-coordinates),
 tree height, diameter at breast height, diameter above buttresses, projected
-crown area and crown volume.
+(crown) area and (crown) volume.
 }
 \details{
 The tree position, tree height, diameter at breast height, diameter above
-buttresses, projected crown area and crown volume are otained with
+buttresses, projected (crown) area and (crown) volume are otained with
 \code{\link{tree_position_pc}}, \code{\link{tree_height_pc}},
-\code{\link{dbh_pc}}, \code{\link{dab_pc}},
-\code{\link{projected_crown_area_pc}} and \code{\link{volume_crown_pc}}
-respectively.
+\code{\link{dbh_pc}}, \code{\link{dab_pc}}, \code{\link{projected_area_pc}}
+and \code{\link{alpha_volume_pc}} respectively.
 }
 \examples{
 \dontrun{
 # Calculate the summary with default parameters and export to csv
-# recommended for non-buttressed trees
 summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
                                             OUT_path = "path/to/out/folder/")
 # Calculate the summary with non-default parameter values
 # recommended for buttressed trees
 summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
-                                            extension = ".ply",
+                                            extension = ".ply", crown = TRUE,
                                             minheight = 4, buttress = TRUE)
 }
 }

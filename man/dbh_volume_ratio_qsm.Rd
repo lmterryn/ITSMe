@@ -9,6 +9,7 @@ dbh_volume_ratio_qsm(
   pc = NA,
   buttress = FALSE,
   thresholdR2 = 0.001,
+  slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7
 )
@@ -25,6 +26,11 @@ cloud is available.}
 buttresses. Only relevant if pc is available.}
 
 \item{thresholdR2}{Numeric value (default=0.001). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant if the tree point cloud is available and buttress ==
+FALSE.}
+
+\item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.}
