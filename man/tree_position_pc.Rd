@@ -11,12 +11,11 @@ tree_position_pc(pc)
 \code{\link{read_tree_pc}}.}
 }
 \value{
-Numeric with the XY coordinates (location) of the tree stem.
+Numeric with the X, Y, Z coordinates (location) of the tree stem.
 }
 \description{
-Returns the (X,Y)-position of a tree point cloud based on the mean X and Y
-value of the points within a 6mm thick horizontal slice at breast height
-(from 1.27 m to 1.33 m above the lowest tree point).
+Returns the (X,Y,Z)-position of a tree point cloud based on the mean X, Y and
+Z value of the 100 lowest points of the tree point cloud.
 }
 \examples{
 \dontrun{
