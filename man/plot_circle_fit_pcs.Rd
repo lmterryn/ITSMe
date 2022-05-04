@@ -48,9 +48,14 @@ diameter and plot the circle fitting.
 }
 \examples{
 \dontrun{
-# Calculate diameters at a certain height and save circle fitting figures
+# Calculate diameters at breast height (1.3m) and save circle fitting figures
 diam_values <- plot_circle_fit_pcs(PCs_path = "path/to/folder/PCs/",
                                   extension = ".txt",
+                                  OUT_path = "path/to/figure/folder/")
+# Calculate diameters at 2.5 m with a slice of 20 cm and save the figures
+diam_values <- plot_circle_fit_pcs(PCs_path = "path/to/folder/PCs/",
+                                  extension = ".txt", slice_height = 2.5,
+                                  slice_thickness = 0.2,
                                   OUT_path = "path/to/figure/folder/")
 }
 }
