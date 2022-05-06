@@ -10,9 +10,9 @@
 
 ## Goal
 
-The goal of the ITSMe R package is to provide easy to use functions to
+The goal of the ITSMe R-package is to provide easy to use functions to
 quickly obtain structural metrics from individual tree point clouds and
-their respective TreeQSMs.
+their respective quantitative structure models (QSMs).
 
 ## Installation
 
@@ -27,9 +27,8 @@ devtools::install_github("lmterryn/ITSMe", build_vignettes = TRUE)
 ## Input
 
 The functions are developed for tree point clouds obtained with TLS and
-quantitative structure models (QSMs) obtained with
-[TreeQSM](https://github.com/InverseTampere/TreeQSM). The tree point
-cloud based functions can also be used for tree point clouds obtained
+QSMs obtained with [TreeQSM](https://github.com/InverseTampere/TreeQSM).
+The functions can, however, also be used on tree point clouds obtained
 from MLS and UAV-LS if their point densities are high enough
 (e.g. sufficient stem points for dbh/dab estimation).
 
@@ -40,18 +39,18 @@ summarized in the tables below.
 
 ### Basic structural metrics
 
-| structural metric                    |          function name          |            input |
-|--------------------------------------|:-------------------------------:|-----------------:|
-| diameter at breast height (m)        |         dbh_pc, dbh_qsm         | point cloud, QSM |
-| diameter above buttresses (m)        |             dab_pc              |      point cloud |
-| tree height (m)                      | tree_height_pc, tree height_qsm | point cloud, QSM |
-| projected crown area (m<sup>2</sup>) |     projected_crown_area_pc     |      point cloud |
-| crown volume (m<sup>3</sup>)         |         volume_crown_pc         |      point cloud |
-| tree volume (m<sup>3</sup>)          |         tree_volume_qsm         |              QSM |
-| trunk volume (m<sup>3</sup>)         |        trunk_volume_qsm         |              QSM |
-| total branch volume (m<sup>3</sup>)  |     total_branch_volume_qsm     |              QSM |
-| total branch length (m)              |     total_branch_length_qsm     |              QSM |
-| total cylinder length (m)            |      total_cyl_length_qsm       |              QSM |
+| structural metric                   |          function name          |            input |
+|-------------------------------------|:-------------------------------:|-----------------:|
+| diameter at breast height (m)       |         dbh_pc, dbh_qsm         | point cloud, QSM |
+| diameter above buttresses (m)       |             dab_pc              |      point cloud |
+| tree height (m)                     | tree_height_pc, tree height_qsm | point cloud, QSM |
+| projected area (m<sup>2</sup>)      |        projected_area_pc        |      point cloud |
+| alpha volume (m<sup>3</sup>)        |         alpha_volume_pc         |      point cloud |
+| tree volume (m<sup>3</sup>)         |         tree_volume_qsm         |              QSM |
+| trunk volume (m<sup>3</sup>)        |        trunk_volume_qsm         |              QSM |
+| total branch volume (m<sup>3</sup>) |     total_branch_volume_qsm     |              QSM |
+| total branch length (m)             |     total_branch_length_qsm     |              QSM |
+| total cylinder length (m)           |      total_cyl_length_qsm       |              QSM |
 
 ### Structural metrics from Terryn et al. (2020)
 
@@ -68,7 +67,7 @@ of the metrics that were adapted by Terryn et al. (2020). If the tree
 point cloud is provided along with the TreeQSM in the functions, dbh and
 tree height values are based on the point clouds rather than the QSMs.
 When the buttress parameter is indicated “TRUE” the diameter above
-buttresses rather than the dbh is used.
+buttresses instead of the diameter at breast height is used.
 
 | structural metric                             |          function name           |              input |
 |-----------------------------------------------|:--------------------------------:|-------------------:|
@@ -181,7 +180,7 @@ library(ITSMe)
 #If you want dbh/dab and height to be calculated based on tree point clouds:
 #Specify the path to the folder containing the respective tree point cloud files
 #Run summary function with default parameter settings
-Terryn_summary <- summary_Terryn_2020(QSMs_path = "path/to/QSM/folder/", 
+qsm_summary <- summary_qsm_metrics(QSMs_path = "path/to/QSM/folder/", 
                                       version = "2.3.0",
                                       PCs_path = "path/to/point/cloud/folder/", 
                                       extension = ".txt")

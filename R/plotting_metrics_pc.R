@@ -389,6 +389,9 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #' @param thresholdR2 Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when crown == TRUE and buttress == FALSE.
+#' @param slice_thickness Numeric value (default = 0.06). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -420,7 +423,8 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         concavity = 2, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
-                        thresholdbuttress = 0.001, maxbuttressheight = 7){
+                        slice_thickness = 0.06, thresholdbuttress = 0.001,
+                        maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -432,8 +436,8 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     pc <- read_tree_pc(file_paths[i])
     if (crown){
       crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                    thresholdR2, thresholdbuttress,
-                                    maxbuttressheight, FALSE)
+                                    thresholdR2, slice_thickness,
+                                    thresholdbuttress, maxbuttressheight, FALSE)
       out <- projected_area_pc(crown_pc$crownpoints, concavity, TRUE)
       plot_area <- out$plot +
         ggplot2::ggtitle(bquote(PCA == .(round(out$pa,2)) ~ m^2))
@@ -493,6 +497,9 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #' @param thresholdR2 Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when crown == TRUE and buttress == FALSE.
+#' @param slice_thickness Numeric value (default = 0.06). Parameter of the
+#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
+#'   height. Only relevant when buttress == FALSE.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -523,7 +530,8 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         alpha = 1, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
-                        thresholdbuttress = 0.001, maxbuttressheight = 7){
+                        slice_thickness = 0.06, thresholdbuttress = 0.001,
+                        maxbuttressheight = 7){
   file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
@@ -534,9 +542,9 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     pc <- read_tree_pc(file_paths[i])
     if (crown){
       crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                    thresholdR2, thresholdbuttress,
-                                    maxbuttressheight, FALSE)
-      out <- alpha_volume_pc(pc$crownpoints, alpha, TRUE)
+                                    thresholdR2, slice_thickness,
+                                    thresholdbuttress, maxbuttressheight, FALSE)
+      out <- alpha_volume_pc(crown_pc$crownpoints, alpha, TRUE)
       fig_name <- paste(OUT_path, "cv_", strsplit(file_names[i], extension)[[1]],
                       "_", as.character(alpha), ".png", sep = "")
     } else {

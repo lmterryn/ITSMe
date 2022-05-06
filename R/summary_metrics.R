@@ -111,9 +111,10 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
       dab_out <- NaN
     }
     if (crown){
-      classify_out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                      thresholdR2, thresholdbuttress,
-                                      slice_thickness, maxbuttressheight, plot)
+      classify_out <- classify_crown_pc(pc, thresholdbranch, minheight,
+                                        buttress, thresholdR2, slice_thickness,
+                                        thresholdbuttress, maxbuttressheight,
+                                        plot)
       pc <- classify_out$crownpoints
     }
     pa_out <- projected_area_pc(pc, concavity, plot)
@@ -149,14 +150,16 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     if (plot){
       p0 <- pa_out$plot
       p0 <- p0 + ggplot2::ggtitle(label = bquote(PA == .(round(pa,2)) ~ m^2),
-                                  subtitle = bquote(AV == .(round(av,2)) ~ m^3))
+                                  subtitle = bquote(AV == .(round(av,2)) ~ m^3)) +
+        ggplot2::theme(text = ggplot2::element_text(size = 10))
       if (buttress) {
-        p1 <- ggpubr::ggarrange(dab_out$plot, p0, nrow = 2, ncol = 1,
-                                widths = c(1,1))
+        p <- dab_out$plot +
+          ggplot2::theme(text = ggplot2::element_text(size = 10))
       } else {
-        p1 <- ggpubr::ggarrange(dbh_out$plot, p0, nrow = 2, ncol = 1,
-                        widths = c(1,1))
+        p <- dbh_out$plot +
+          ggplot2::theme(text = ggplot2::element_text(size = 10))
       }
+      p1 <- ggpubr::ggarrange(p, p0, nrow = 2, ncol = 1, widths = c(1,1))
       if (crown){
         p2 <- ggpubr::ggarrange(classify_out$plotXZ, classify_out$plotYZ,
                                 nrow = 1, ncol = 2, heights = c(1,1),

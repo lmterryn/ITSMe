@@ -40,15 +40,15 @@ individual tree point cloud with the ITSMe package:
 | diameter at breast height (m) | `dbh_pc`                          |
 | diameter above buttresses (m) | `dab_pc`                          | 
 | tree height (m)               | `tree_height_pc`                  | 
-| projected crown area (m$^{2}$)| `projected_crown_area_pc`         | 
-| crown volume (m$^{3}$)        | `volume_crown_pc`                 | 
+| projected area (m$^{2}$)      | `projected_area_pc`               | 
+| alpha volume (m$^{3}$)        | `alpha_volume_pc`                 | 
 
 ### Tree point cloud requirements
 
 The tree point cloud based functions were developed for point clouds acquired 
 with TLS. But they can also be used for tree point clouds obtained from other 
 LiDAR platforms (e.g. MLS, UAV-LS) if their point densities are high enough 
-(e.g. sufficient stem points for DBH measurement). 
+(e.g. sufficient stem points for DBH measurement).
 
 Make sure outliers are removed. Down sampling of the point cloud is not required 
 but can reduce computation time for very big tree point clouds.
@@ -80,11 +80,11 @@ tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
 #### Measure position of tree point cloud
 
 The position of the tree can be easily determined using `tree_position_pc`, 
-which determines the mean X and Y value of the tree point cloud at breast height 
-(1.27 m - 1.33 m). 
+which determines the mean X, Y and Z value of the 100 lowest points of the tree 
+point cloud.
 ```{r eval = FALSE}
 # Measure tree position from the tree point cloud
-XY_pos <- tree_position_pc(pc = tree_pc)
+XYZ_pos <- tree_position_pc(pc = tree_pc)
 
 ```
 
@@ -92,7 +92,8 @@ XY_pos <- tree_position_pc(pc = tree_pc)
 
 The tree height can be measured using `tree_height_pc` as the difference between 
 the Z-value of the highest and lowest point of the tree point cloud. 
-`tree_height_pc` only needs the tree point cloud as an input.
+`tree_height_pc` only needs the tree point cloud as an input. For UAV-LS, 
+sample lower parts of the stem, tree height can be based on a digital terrain model
 ```{r eval = FALSE}
 # Measure tree height from the tree point cloud
 H <- tree_height_pc(pc = tree_pc)

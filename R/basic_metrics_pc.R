@@ -86,7 +86,8 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
       ggplot2::coord_fixed(ratio = 1) +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                      axis.ticks.x = ggplot2::element_blank(),
-                     plot.margin = ggplot2::unit(c(0,0,0,0), "lines"))
+                     plot.margin = ggplot2::unit(c(0,0,0,0), "lines"),
+                     text = ggplot2::element_text(size = 20))
     if (is.data.frame(dtm)) {
       dtm_under_tree_norm <- dtm_under_tree
       dtm_under_tree_norm$Z <- dtm_under_tree$Z-z_min
@@ -99,7 +100,8 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
                        axis.ticks.y = ggplot2::element_blank(),
                        axis.text.x = ggplot2::element_blank(),
                        axis.ticks.x = ggplot2::element_blank(),
-                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines"))
+                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines"),
+                       text = ggplot2::element_text(size = 20))
       plotXZ <- plotXZ + ggplot2::geom_point(data = dtm_under_tree_norm,
                                              ggplot2::aes(X, Z), col="red",
                                              size = 0.5) +
@@ -125,7 +127,8 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
                        axis.ticks.y = ggplot2::element_blank(),
                        axis.text.x = ggplot2::element_blank(),
                        axis.ticks.x = ggplot2::element_blank(),
-                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines"))
+                       plot.margin = ggplot2::unit(c(0,0,0,0), "lines"),
+                       text = ggplot2::element_text(size = 20))
       s <- (max(pc$X)-min(pc$X)+max(pc$Y)-min(pc$Y))/(max(pc$Z)-
                                                         min(pc$Z))*0.48-1
     }
@@ -133,7 +136,8 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
                                   common.legend = TRUE, heights=c(5,5),
                                   widths = c(1, s ,1))
     plotTree <- ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(
-      paste("Tree height = ", as.character(round(h,2)), " m", sep = "")))
+      paste("Tree height = ", as.character(round(h,2)), " m", sep = ""),
+      size = 20))
     return(list("h"=h,"plot" = plotTree, "plotXZ" = plotXZ, "plotYZ" = plotYZ))
   } else {
     return(h)
@@ -273,7 +277,8 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
         ggplot2::ggtitle(paste("diameter = ", as.character(round(diam, 2)),
                                " m at H = ",
                                as.character(round(slice_height, 2)),
-                               " m", sep = ""))
+                               " m", sep = "")) +
+        ggplot2::theme(text = ggplot2::element_text(size = 20))
       if (!is.nan(R)) {
         data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
         plotDIAM <- plotDIAM +
@@ -293,7 +298,8 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
                                       override.aes =
                                         list(linetype = c(0, 0, 1),
                                              shape = c(16, 16, NA),
-                                             size = c(2, 2, 1))))
+                                             size = c(2, 2, 1)))) +
+        ggplot2::theme(text = ggplot2::element_text(size = 20))
       }
       print(plotDIAM)
       return(list("diameter" = diam, "R2" = residu, "center" = center_estimate,
@@ -519,7 +525,8 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
                                     guide = ggplot2::guide_legend(override.aes =
                                         list(linetype = c(0),
                                              shape = c(16),
-                                             size = c(2))))
+                                             size = c(2)))) +
+        ggplot2::theme(text = ggplot2::element_text(size = 20))
       print(plotDBH)
     } else {
       pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.3-slice_thickness/2) &
@@ -552,7 +559,8 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
                                       override.aes =
                                         list(linetype = c(0, 0, 1),
                                              shape = c(16, 16, NA),
-                                             size = c(2, 2, 1))))
+                                             size = c(2, 2, 1)))) +
+        ggplot2::theme(text = ggplot2::element_text(size = 20))
       print(plotDBH)
     }
     return(list("dbh" = out_130$diameter, "plot" = plotDBH))
@@ -940,7 +948,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                          axis.ticks.x = ggplot2::element_blank(),
-                         plot.margin = ggplot2::unit(c(0,0,0,0), "lines")) +
+                         plot.margin = ggplot2::unit(c(0,0,0,0), "lines"),
+                         text = ggplot2::element_text(size = 20)) +
           ggplot2::scale_color_manual(name = "class",
                                       values = c("crown" = "green",
                                                  "trunk" = "brown"),
@@ -956,7 +965,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                          axis.ticks.y = ggplot2::element_blank(),
                          axis.text.x = ggplot2::element_blank(),
                          axis.ticks.x = ggplot2::element_blank(),
-                         plot.margin = ggplot2::unit(c(0,0,0,0), "lines")) +
+                         plot.margin = ggplot2::unit(c(0,0,0,0), "lines"),
+                         text = ggplot2::element_text(size = 20)) +
           ggplot2::scale_color_manual(name = "class",
                                       values = c("crown" = "green",
                                                  "trunk" = "brown"),
@@ -968,6 +978,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ, nrow = 1, ncol = 3,
                                        common.legend = TRUE, heights=c(5,5),
                                        widths = c(1, s ,1))
+        plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
+          "Crown classification", size = 20))
       } else {
         trunk <- trunk_pc[sample(nrow(trunk_pc),
           size = floor(nrow(trunk_pc) * downsample),
@@ -1010,6 +1022,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ, nrow = 1, ncol = 3,
                                        common.legend = TRUE, heights=c(5,5),
                                        widths = c(1, s ,1))
+        plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
+          "Crown classification", size = 20))
       }
       print(plotCrown)
       return(list("crownpoints" = crown_pc, "trunkpoints" = trunk_pc,
@@ -1057,6 +1071,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ, nrow = 1, ncol = 3,
                                      common.legend = TRUE, heights=c(5,5),
                                      widths = c(1, s ,1))
+      plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
+        "Crown classification", size = 20))
       return(list("crownpoints" = crown_pc, "trunkpoints" = pc,
                   "plot" = plotCrown, "plotXZ" = plotXZ, "plotYZ" = plotYZ))
     } else {
@@ -1145,7 +1161,8 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
                                     override.aes =
                                       list(linetype = c(1, 0),
                                            shape = c(NA, 16),
-                                           size = c(2, 2))))
+                                           size = c(2, 2)))) +
+      ggplot2::theme(text = ggplot2::element_text(size = 20))
     print(plotPA)
     return(list("pa" = pa,"plot" = plotPA))
   } else {
@@ -1202,7 +1219,8 @@ alpha_volume_pc <- function(pc, alpha = 1, plot = FALSE) {
     rgl::par3d(windowRect = c(20, 30, 800, 800))
     rgl::bgplot3d({
       graphics::plot.new()
-      graphics::title(main = bquote(alpha-V == .(round(vol,2)) ~ m^3), line = 2)
+      graphics::title(main = bquote(alpha-V == .(round(vol,2)) ~ m^3), line = 2,
+                      size = 20)
     })
     plot(ashape3d.obj)
     return(list("av" = vol, "ashape3d" = ashape3d.obj))

@@ -14,6 +14,7 @@ plot_av_pcs(
   minheight = 1,
   buttress = FALSE,
   thresholdR2 = 0.001,
+  slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7
 )
@@ -49,6 +50,10 @@ buttresses (higher than breast height). Only relevant when crown == TRUE.}
 \item{thresholdR2}{Numeric value (default=0.001). Parameter of the
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height. Only relevant when crown == TRUE and buttress == FALSE.}
+
+\item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
+\code{\link{dbh_pc}} function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
