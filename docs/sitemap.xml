@@ -22,6 +22,9 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/reference/alpha_volume_pc.html</loc>
+  </url>
+  <url>
     <loc>/reference/branch_angle_ratio_qsm.html</loc>
   </url>
   <url>
@@ -70,6 +73,12 @@
     <loc>/reference/dbh_volume_ratio_qsm.html</loc>
   </url>
   <url>
+    <loc>/reference/diameter_slice_pc.html</loc>
+  </url>
+  <url>
+    <loc>/reference/extract_lower_trunk_pc.html</loc>
+  </url>
+  <url>
     <loc>/reference/f.html</loc>
   </url>
   <url>
@@ -77,6 +86,12 @@
   </url>
   <url>
     <loc>/reference/normalize_pc.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_av_pcs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_circle_fit_pcs.html</loc>
   </url>
   <url>
     <loc>/reference/plot_crown_classification_pcs.html</loc>
@@ -91,7 +106,16 @@
     <loc>/reference/plot_dbh_fit_pcs.html</loc>
   </url>
   <url>
+    <loc>/reference/plot_pa_pcs.html</loc>
+  </url>
+  <url>
     <loc>/reference/plot_pca_pcs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_tree_height_pcs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/projected_area_pc.html</loc>
   </url>
   <url>
     <loc>/reference/projected_crown_area_pc.html</loc>
@@ -125,6 +149,9 @@
   </url>
   <url>
     <loc>/reference/summary_basic_pointcloud_metrics.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary_qsm_metrics.html</loc>
   </url>
   <url>
     <loc>/reference/summary_Terryn_2020.html</loc>

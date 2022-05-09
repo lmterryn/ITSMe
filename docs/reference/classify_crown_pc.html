@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">ITSMe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,6 +56,8 @@
   thresholdbranch <span class="op">=</span> <span class="fl">1.5</span>,
   minheight <span class="op">=</span> <span class="fl">1</span>,
   buttress <span class="op">=</span> <span class="cn">FALSE</span>,
+  thresholdR2 <span class="op">=</span> <span class="fl">0.001</span>,
+  slice_thickness <span class="op">=</span> <span class="fl">0.06</span>,
   thresholdbuttress <span class="op">=</span> <span class="fl">0.001</span>,
   maxbuttressheight <span class="op">=</span> <span class="fl">7</span>,
   plot <span class="op">=</span> <span class="cn">FALSE</span>
@@ -80,6 +82,14 @@ choose a lower value (such as 1).</p></dd>
 <dt>buttress</dt>
 <dd><p>Logical (default=FALSE), indicates if the trees have
 buttresses (higher than breast height).</p></dd>
+<dt>thresholdR2</dt>
+<dd><p>Numeric value (default=0.001). Parameter of the
+<code><a href="dbh_pc.html">dbh_pc</a></code> function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.</p></dd>
+<dt>slice_thickness</dt>
+<dd><p>Numeric value (default = 0.06). Parameter of the
+<code><a href="dbh_pc.html">dbh_pc</a></code> function used to calculate the diameter at breast
+height. Only relevant when buttress == FALSE.</p></dd>
 <dt>thresholdbuttress</dt>
 <dd><p>Numeric value (default=0.001). Parameter of the
 <code><a href="dab_pc.html">dab_pc</a></code> function used to calculate the diameter above
