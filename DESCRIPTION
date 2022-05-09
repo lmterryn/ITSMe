@@ -1,6 +1,6 @@
 Package: ITSMe
 Title: Individual Tree Structural Metrics 
-Version: 0.0.0.9000
+Version: 1.0.0.0
 Authors@R: 
     c(person(given = "Louise", 
              family = "Terryn", 
