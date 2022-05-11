@@ -63,6 +63,7 @@ are based on the point cloud instead of the QSM.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">summary_qsm_metrics</span><span class="op">(</span>
   <span class="va">QSMs_path</span>,
   version <span class="op">=</span> <span class="st">"2.4.0"</span>,
+  multiple <span class="op">=</span> <span class="cn">FALSE</span>,
   sbr_normalisation <span class="op">=</span> <span class="st">"treeheight"</span>,
   sbl_normalisation <span class="op">=</span> <span class="st">"treeheight"</span>,
   sbd_normalisation <span class="op">=</span> <span class="st">"no"</span>,
@@ -90,6 +91,9 @@ for that tree as a final value for a certain feature.</p></dd>
 <dd><p>A character indicating the version of TreeQSM that was used to
 produce the qsms. Default version is 2.4.0. Other possible versions are
 2.2.0.</p></dd>
+<dt>multiple</dt>
+<dd><p>Logical (default = FALSE), indicates if a single .mat file
+for one tree holds multiple QSMs at once.</p></dd>
 <dt>sbr_normalisation</dt>
 <dd><p>Character (default="treeheight"). Normalisation
 parameter of <code><a href="stem_branch_radius_qsm.html">stem_branch_radius_qsm</a></code>.</p></dd>
