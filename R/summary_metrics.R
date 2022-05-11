@@ -335,7 +335,7 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.0",
   summary <- summary_means <- summary_sds <- cbind(tree_id = character(),
                                                    results)
   for (i in 1:length(unique_tree_ids)) {
-    #print(paste("processing ", unique_tree_ids[i]))
+    print(paste("processing ", unique_tree_ids[i]))
     qsms <- filenames[tree_ids == unique_tree_ids[i]]
     if (!is.na(PCs_path)) {
       pc <- read_tree_pc(paste(PCs_path, unique_tree_ids[i], "_pc", extension,
@@ -361,16 +361,18 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.0",
       sbr <- stem_branch_radius_qsm(qsm$cylinder, qsm$treedata,
                                     sbr_normalisation, pc)
       sbl <- stem_branch_length_qsm(qsm$branch, qsm$treedata, sbl_normalisation,
-                                    pc, buttress, thresholdR2,
+                                    pc, buttress, thresholdR2, slice_thickness,
                                     thresholdbuttress, maxbuttressheight)
       sbd <- stem_branch_distance_qsm(qsm$cylinder, qsm$treedata,
                                       sbd_normalisation, pc, buttress,
-                                      thresholdR2, thresholdbuttress,
-                                      maxbuttressheight)
+                                      thresholdR2, slice_thickness,
+                                      thresholdbuttress, maxbuttressheight)
       dhr <- dbh_height_ratio_qsm(qsm$treedata, pc, buttress, thresholdR2,
-                                  thresholdbuttress, maxbuttressheight)
+                                  slice_thickness, thresholdbuttress,
+                                  maxbuttressheight)
       dvr <- dbh_volume_ratio_qsm(qsm$treedata, pc, buttress, thresholdR2,
-                                  thresholdbuttress, maxbuttressheight)
+                                  slice_thickness, thresholdbuttress,
+                                  maxbuttressheight)
       vb55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
       clvr <- cylinder_length_volume_ratio_qsm(qsm$treedata)
       sr <- shedding_ratio_qsm(qsm$branch, qsm$cylinder, qsm$treedata)
@@ -381,8 +383,8 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.0",
       ce <- crown_evenness_qsm(qsm$cylinder)
       cdhr <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
       dmr <- dbh_minradius_ratio_qsm(qsm$treedata, qsm$cylinder, pc, buttress,
-                                     thresholdR2, thresholdbuttress,
-                                     maxbuttressheight)
+                                     thresholdR2, slice_thickness,
+                                     thresholdbuttress, maxbuttressheight)
       tree <- data.frame(X_position = X_position, Y_position = Y_position,
                          dbh = dbh, tree_height = tree_height,
                          tree_vol = tree_vol, trunk_vol = trunk_vol, sba = sba,
