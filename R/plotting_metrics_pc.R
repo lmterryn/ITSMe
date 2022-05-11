@@ -48,7 +48,7 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- tree_height_pc(pc, dtm, r, TRUE)
-    filename <- paste(OUT_path, "tree_height",
+    filename <- paste(OUT_path, "tree_height_",
                       strsplit(file_names[i], extension)[[1]], ".jpeg",
                       sep = "")
     ggplot2::ggsave(filename, plot = out$plot, bg = "white", width = 60,
