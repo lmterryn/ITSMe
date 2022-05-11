@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">ITSMe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,12 +114,12 @@
 <td align="center"><code>tree_height_pc</code></td>
 </tr>
 <tr class="even">
-<td>projected crown area (m<span class="math inline">\(^{2}\)</span>)</td>
-<td align="center"><code>projected_crown_area_pc</code></td>
+<td>projected area (m<span class="math inline">\(^{2}\)</span>)</td>
+<td align="center"><code>projected_area_pc</code></td>
 </tr>
 <tr class="odd">
-<td>crown volume (m<span class="math inline">\(^{3}\)</span>)</td>
-<td align="center"><code>volume_crown_pc</code></td>
+<td>alpha volume (m<span class="math inline">\(^{3}\)</span>)</td>
+<td align="center"><code>alpha_volume_pc</code></td>
 </tr>
 </tbody>
 </table>
@@ -127,8 +127,8 @@
 <div class="section level3">
 <h3 id="tree-point-cloud-requirements">Tree point cloud requirements<a class="anchor" aria-label="anchor" href="#tree-point-cloud-requirements"></a>
 </h3>
-<p>The tree point cloud based functions were developed for point clouds acquired with TLS. But they can also be used for tree point clouds obtained from other LiDAR platforms (e.g. MLS, UAV-LS) if their point densities are high enough (e.g. sufficient stem points for DBH measurement).</p>
-<p>Make sure outliers are removed. Down sampling of the point cloud is not required but can reduce computation time for very big tree point clouds.</p>
+<p>The tree point cloud based functions were developed for point clouds acquired with TLS. But they can also be used for tree point clouds obtained from other LiDAR platforms (e.g. MLS, UAV-LS). Keep in mind that the accuracy of the metric measurements will depend on the quality of the data.</p>
+<p>Make sure outliers and points that don’t belong to the tree (especially near the trunk) are removed. Down sampling of the point cloud is not required but can reduce computation time for very big tree point clouds (down sampling to 2 cm is suggested).</p>
 </div>
 <div class="section level3">
 <h3 id="workflow-for-a-single-tree">Workflow for a single tree<a class="anchor" aria-label="anchor" href="#workflow-for-a-single-tree"></a>
@@ -137,7 +137,7 @@
 <div class="section level4">
 <h4 id="read-the-point-cloud">Read the point cloud<a class="anchor" aria-label="anchor" href="#read-the-point-cloud"></a>
 </h4>
-<p>All of the point cloud based functions (mentioned above) need a tree point cloud in the form of a data.frame with columns X, Y, Z as their fist argument. The ITSME package provides a function <code>read_tree_pc</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;&lt;code&gt;read_tree_pc&lt;/code&gt; can also take a second argument, &lt;em&gt;samplefactor&lt;/em&gt;. This determines the amount of points that are sampled from the point cloud. 1 (default) to sample 100 percent of the points and for example 0.5 to sample 50 percent of the points. This is based on random sampling and is mainly useful to reduce the amount of points to reduce plotting time.&lt;/p&gt;"><sup>1</sup></a> which takes the path to a tree point cloud file (txt, ply or las) as an argument and returns a data.frame with X, Y, Z columns.</p>
+<p>All of the point cloud based functions (mentioned above) need a tree point cloud in the form of a data.frame with columns X, Y, Z as their fist argument. The ITSMe package provides a function <code>read_tree_pc</code> that takes the path to a tree point cloud file (txt, ply or las) as an argument and returns a data.frame with X, Y, Z columns.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Read the point cloud file from its' specified path</span>
 <span class="va">tree_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/point/cloud.txt"</span><span class="op">)</span></code></pre></div>
@@ -145,33 +145,55 @@
 <div class="section level4">
 <h4 id="measure-position-of-tree-point-cloud">Measure position of tree point cloud<a class="anchor" aria-label="anchor" href="#measure-position-of-tree-point-cloud"></a>
 </h4>
-<p>The position of the tree can be easily determined using <code>tree_position_pc</code>, which determines the mean X and Y value of the tree point cloud at breast height (1.27 m - 1.33 m).</p>
+<p>The position of the tree can be easily determined using <code>tree_position_pc</code>, which determines the mean X, Y and Z value of the 100 lowest points of the tree point cloud.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure tree position from the tree point cloud</span>
-<span class="va">XY_pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_position_pc.html">tree_position_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span></code></pre></div>
+<span class="va">XYZ_pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_position_pc.html">tree_position_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="measure-tree-height">Measure tree height<a class="anchor" aria-label="anchor" href="#measure-tree-height"></a>
 </h4>
-<p>The tree height can be measured using <code>tree_height_pc</code> as the difference between the Z-value of the highest and lowest point of the tree point cloud. <code>tree_height_pc</code> only needs the tree point cloud as an input.</p>
+<p>The tree height can be measured using <code>tree_height_pc</code>, which calculates the difference between the Z-value of the highest and lowest point of the tree point cloud. <code>tree_height_pc</code> only requires the tree point cloud as an input. It also optionally plots the tree point cloud in 2D (XZ and YZ plots next to each) when the “plot” parameter equals TRUE.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure tree height from the tree point cloud</span>
-<span class="va">H</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_height_pc.html">tree_height_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span></code></pre></div>
-<p>For tree point clouds that are obtained with airborne LiDAR (ALS, UAV-MLS) and that do not sample the base of the tree sufficiently it is not recommended to use <code>tree_height_pc</code>. In those cases it is better to determine tree height using a digital terrain model.</p>
+<span class="va">H</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_height_pc.html">tree_height_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span>
+<span class="co"># also plot the tree point cloud</span>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_height_pc.html">tree_height_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">H</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">h</span>
+<span class="va">plot_tree</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">plotTree</span></code></pre></div>
+<p><img src="../reference/figures/tree_height_tls_example.jpeg"></p>
+<p>However, for tree point clouds that are obtained with for example UAV-LS and that do not sample the base of the tree sufficiently the tree height would be underestimated. In this case a digital terrain model (DTM) with a certain resolution can be provided to the <code>tree_height_pc</code> function to improve tree height estimation.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Read the DTM</span>
+<span class="va">DTM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/dtm.txt"</span><span class="op">)</span>
+<span class="co"># Measure tree height from the tree point cloud and DTM with resolution r</span>
+<span class="va">H</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_height_pc.html">tree_height_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, dtm <span class="op">=</span> <span class="va">DTM</span>, r <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span>
+<span class="co"># also plot the tree point cloud and estimated lowest point based on DTM</span>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tree_height_pc.html">tree_height_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, dtm <span class="op">=</span> <span class="va">DTM</span>, r <span class="op">=</span> <span class="fl">1.5</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">H</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">h</span>
+<span class="va">plot_tree</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">plot</span></code></pre></div>
+<p><img src="../reference/figures/tree_height_uavls_example.jpeg"> The provided resolution (r) value should be at least the resolution of the provided DTM.</p>
 </div>
 <div class="section level4">
 <h4 id="measure-dbh-andor-dab">Measure DBH and/or DAB<a class="anchor" aria-label="anchor" href="#measure-dbh-andor-dab"></a>
 </h4>
-<p>Depending on if your trees are buttressed or not, you will make a choice between the diameter at breast height (DBH) and the diameter above buttresses (DAB).</p>
-<p>The DBH is measured using <code>dbh_pc</code> as the diameter of the optimal circle fitted through a 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree point). The <code>dbh_pc</code> function only needs the tree point cloud as an input, but if the second argument <em>plot</em> is set TRUE it also plots the circle fitting.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>Depending on if your trees are buttressed or not, you will make a choice between the diameter at breast height (DBH) and the diameter above buttresses (DAB). If you are not sure if this is the case for your tree, you can check the slice (and circle fitting) at 1.3 m with the <code>diameter_slice_pc</code> function.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Measure DBH from the tree point cloud and plot the circle fitting</span>
+<span class="va">slice1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/diameter_slice_pc.html">diameter_slice_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, slice_height <span class="op">=</span> <span class="fl">1.3</span>, 
+                            slice_thickness <span class="op">=</span> <span class="fl">0.06</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="../reference/figures/diameter_slice_example.jpeg"></p>
+<p><img src="../reference/figures/diameter_slice_example_butt.jpeg"></p>
+<p>The DBH is measured using <code>dbh_pc</code> as the diameter of the optimal circle fitted through a default 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree point). If branch or vegetation points are present in the slice, the lower (till 1.5 m above lowest point) trunk is extracted (so without branch/vegetation points) and the fit is done again. The <code>dbh_pc</code> function needs the tree point cloud as an input. If the argument <em>plot</em> is set TRUE it also plots the circle fitting.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure DBH from the tree point cloud and plot the circle fitting</span>
 <span class="va">DBH</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="../reference/figures/dbh_example.jpeg"></p>
-<p>For some trees (mainly tropical, buttressed trees), <code>dbh_pc</code> could result in:</p>
+<p>Generally running the <code>dbh_pc</code> with default values is fine. But there are two other parameters that can be optimised. The <em>thresholdR2</em> parameter (default = 0.001) determines when the trunk extraction is done. For point trees with non-circular stems this value should be increased. Also for smaller trees (DBH &lt; 10 cm) or tree point cloud with a sub-optimal co-registration of scan positions, for example due to wind) a higher value will lead to better results. The <em>slice_thickness</em> parameter determines the thickness of the slice at 1.3 m and is default 6 mm. For tree point clouds with a lower point density at the stem (e.g. UAV-LS) increasing the slice_thickness to for example 20 cm is crucial for DBH measurements.</p>
+<p>For buttressed trees <code>dbh_pc</code> would result in:</p>
 <p><img src="../reference/figures/dbh_example_buttress.jpeg"></p>
 <p>In this case determining the DAB with <code>dab_pc</code> is the better option. With <code>dab_pc</code>, the diameter (from the optimal circle fitted through a 6mm thick horizontal slice) is measured above the buttresses. The height at which the horizontal slice is taken (the height above buttresses), is determined iteratively, starting at breast height. The average residual between the points and the fitted circle is calculated. When the average residual exceeds a value of <em>thresholdbuttress</em> times the radius, indicating a non-circular (irregular) stem shape and presumably buttresses, and the <em>maxbuttressheight</em> is not exceeded, the process is repeated with a new slice 6 mm higher than the previous one. When the <em>maxbuttressheight</em> is exceeded the iterative process is restarted with a <em>thresholdbuttress</em> increased with 0.0005.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure DAB from the tree point cloud with default settings and plot the circle fitting</span>
 <span class="va">DAB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dab_pc.html">dab_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><img src="../reference/figures/dab_example.jpeg"></p>
@@ -180,16 +202,18 @@
 <li>reduce/increase <em>thresholdbuttress</em> if the height above buttresses is consistenly too low/high.</li>
 <li>reduce/increase <em>maxbuttressheight</em> if your buttresses reach lower/higher heights.</li>
 </ul>
-<p>The <code>dbh_pc</code> and <code>dab_pc</code> do not yet take into account (very) slanted trees. Therefore it is advised to always check the plots of the circle fitting.</p>
-<p>For tree point clouds that are obtained with airborne LiDAR (ALS, UAV-MLS) and that do not sample the stem of the tree sufficiently <code>dbh_pc</code> and <code>dab_pc</code> will not work due to a lack of stem points.</p>
+<p>The <code>dbh_pc</code> and <code>dab_pc</code> do not yet work well on very slanted trees. Therefore it is advised to always check the plots of the circle fitting.</p>
+<p>For tree point clouds of which the stem of the tree is not sufficiently sampled <code>dbh_pc</code> and <code>dab_pc</code> will not work due to a lack of stem points.</p>
 </div>
 <div class="section level4">
 <h4 id="classify-crown-points">Classify crown points<a class="anchor" aria-label="anchor" href="#classify-crown-points"></a>
 </h4>
-<p>As a basis for crown metrics (e.g. projected crown area and crown volume) the <code>classify_crown_pc</code> is be used to return the points from the tree point cloud that belong to the crown. The crown is defined here as all points of the tree except for the stem points below the first branch. The height where the first branch emerges is iteratively determined (starting from <em>minheight</em>) as the height where the diameter of the stem exceeds <em>thresholdbranch</em> multiplied with the DBH or DAB.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>As a basis for crown metrics (e.g. projected crown area and 3D alpha crown volume) the <code>classify_crown_pc</code> is used to return the points from the tree point cloud that belong to the crown. The crown is defined here as all points of the tree except for the stem points below the first branch. The height where the first branch emerges is iteratively determined (starting from <em>minheight</em>) as the height where the diameter of the stem exceeds <em>thresholdbranch</em> multiplied with the DBH or DAB.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Classify the tree point cloud with default settings and plot the classification results</span>
-<span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">crownpoints</span>
+<span class="va">plot</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">plot</span></code></pre></div>
 <p><img src="../reference/figures/crown_example.jpeg"></p>
 <p>Optimise the values of <em>thresholdbranch</em> and or <em>minheight</em> for your tree if default values do not lead to the desired results:</p>
 <ul>
@@ -198,30 +222,34 @@
 <li>increase <em>minheight</em> to the height above the widest part of the lower stem (for example above the buttresses).</li>
 </ul>
 <p>For buttressed trees, the attribute <em>buttress</em> has to be set TRUE and previously chosen attributes <em>thresholdbuttress</em> and <em>maxbuttressheight</em> can be specified. It is recommended to increase the <em>minheight</em> for buttressed trees.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Classify the tree point cloud of a buttressed tree and plot the classification results</span>
-<span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
-                              plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
+                              plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">crownpoints</span>
+<span class="va">plot</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">plot</span></code></pre></div>
 <p><img src="../reference/figures/crown_example_tropical.jpeg"></p>
 </div>
 <div class="section level4">
-<h4 id="measure-the-projected-crown-area">Measure the projected crown area<a class="anchor" aria-label="anchor" href="#measure-the-projected-crown-area"></a>
+<h4 id="measure-the-projected-area">Measure the projected area<a class="anchor" aria-label="anchor" href="#measure-the-projected-area"></a>
 </h4>
-<p>The projected crown area (PCA) of a tree point cloud can be measured with <code>projected_crown_area_pc</code> which calculates the area of a concave hull (based on <a href="https://cran.r-project.org/web/packages/concaveman/index.html" class="external-link">concaveman</a>) fitted to the crown points obtained with <code>classify_crown_pc</code>. As <code>projected_crown_area_pc</code> uses <code>classify_crown_pc</code>, it takes the same attributes. You can however, also specify <em>concavity</em> (default=2).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Measure the pca of a tree point cloud of a buttressed tree and plot the result</span>
-<span class="va">PCA</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/projected_crown_area_pc.html">projected_crown_area_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
-                              plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>The projected (crown) area of a tree point cloud can be measured with <code>projected_area_pc</code> which calculates the area of a concave hull (based on <a href="https://cran.r-project.org/web/packages/concaveman/index.html" class="external-link">concaveman</a>) fitted to the (crown) points. The <em>concavity</em> (default=2) can be chosen and a plot is made when parameter <em>plot</em> equals TRUE.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Measure the projected crown area and plot the results</span>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/projected_area_pc.html">projected_area_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">crown_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">pca</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">pa</span>
+<span class="va">plot</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">plot</span></code></pre></div>
 <p><img src="../reference/figures/pca_example.jpeg"></p>
 </div>
 <div class="section level4">
-<h4 id="measure-the-crown-volume">Measure the crown volume<a class="anchor" aria-label="anchor" href="#measure-the-crown-volume"></a>
+<h4 id="measure-the-3d-alpha-volume">Measure the 3D alpha volume<a class="anchor" aria-label="anchor" href="#measure-the-3d-alpha-volume"></a>
 </h4>
-<p>The crown volume (CV) of tree point cloud can be measured with <code>volume_crown_pc</code> which calculates the volume of the 3D alpha-shape (based on <a href="https://cran.r-project.org/web/packages/alphashape3d/index.html" class="external-link">alphashape3d</a>) fitted to the crown points obtained with <code>classify_crown_pc</code>. As <code>volume_crown_pc</code> uses <code>classify_crown_pc</code>, it takes the same attributes. You can however, also specify <em>alpha</em> (default=1).</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Measure the crown volume of a tree point cloud of a buttressed tree and generate 3D plot</span>
-<span class="va">CV</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/volume_crown_pc.html">volume_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p><img src="../reference/figures/cv_example.jpg"></p>
+<p>The 3D alpha (crown) volume of tree point cloud can be measured with <code>alpha_volume_pc</code> which calculates the volume of the 3D alpha-shape (based on <a href="https://cran.r-project.org/web/packages/alphashape3d/index.html" class="external-link">alphashape3d</a>) fitted to the (crown) points. The <em>alpha</em> (default=1) can be chosen and a 3D plot is made when parameter <em>plot</em> equals TRUE.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Measure the crown volume and generate 3D plot</span>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/alpha_volume_pc.html">alpha_volume_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">crown_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">volume</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">av</span></code></pre></div>
+<p><img src="../reference/figures/cv_example.jpeg"></p>
 </div>
 </div>
 <div class="section level3">
@@ -230,9 +258,14 @@
 <div class="section level4">
 <h4 id="optimise-and-plot">Optimise and plot<a class="anchor" aria-label="anchor" href="#optimise-and-plot"></a>
 </h4>
-<p>Often you want to check or optimise the performance of the default attributes used in DBH, DAB, crown classification, PCA, and CV calculation, for multiple tree point clouds in one folder. For this purpose you can use <code>plot_dbh_fit_pcs</code> (based on <code>dbh_pc</code>), <code>plot_dab_fit_pcs</code> (based on <code>dab_pc</code>), <code>plot_crown_classification_pcs</code> (based on <code>classify_crown_pc</code>), <code>plot_pca_pcs</code> (based on <code>projected_crown_area_pc</code>), <code>plot_cv_pcs</code> (based on <code>volume_crown_pc</code>) which return the DBH, DAB, PCA and CV for each tree in a folder (<em>PCs_path</em>) and save the respective figures in the given output path<br>
+<p>Often you want to check or optimise the performance of the (default) attributes used in tree height, DBH, DAB, crown classification, projected area, and 3D alpha volume calculation, for multiple tree point clouds in one folder. For this purpose you can use <code>plot_tree_height_pcs</code> (based on <code>tree_height_pc</code>), <code>plot_circle_fit_pcs</code> (based on <code>diameter_slice_pc</code>), <code>plot_dbh_fit_pcs</code> (based on <code>dbh_pc</code>), <code>plot_dab_fit_pcs</code> (based on <code>dab_pc</code>), <code>plot_crown_classification_pcs</code> (based on <code>classify_crown_pc</code>), <code>plot_pa_pcs</code> (based on <code>projected_area_pc</code>), <code>plot_av_pcs</code> (based on <code>alpha_volume_pc</code>) which return the tree height, diameter, DBH, DAB, PCA and CV for each tree in a folder (<em>PCs_path</em>) and save the respective figures in the given output path<br>
 (<em>OUT_path</em>). First run these functions with default parameters and check the rendered figures. Optionally change the attributes of the functions:</p>
 <ol style="list-style-type: decimal">
+<li>
+<code>plot_tree_height_pcs</code>: <em>r</em> (when DTM is provided)</li>
+<li>
+<code>plot_dbh_fit_pcs</code>: <em>thresholdR2</em>, <em>slice_thickness</em>
+</li>
 <li>
 <code>plot_dab_fit_pcs</code>: <em>thresholdbuttress</em>, <em>maxbuttressheight</em>
 </li>
@@ -243,36 +276,50 @@
 <code>plot_pca_pcs</code> &amp; <code>volume_crown_pc</code>: <em>concavity</em> &amp; <em>alpha</em>
 </li>
 </ol>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Run plot_dbh_fit_pcs to see if buttresses influence dbh calculation and </span>
-<span class="co"># dab calculation is necesarry</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Tree height:</span>
+<span class="co"># Plot the tree point clouds (check for outliers)</span>
+<span class="co"># Specify dtm and r in case lower part of tree is not sampled</span>
+<span class="va">Hs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_tree_height_pcs.html">plot_tree_height_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
+                         extension <span class="op">=</span> <span class="st">".ply"</span>,
+                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
+                         dtm <span class="op">=</span> <span class="va">DTM</span>, r <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+
+<span class="co"># DBH:</span>
+<span class="co"># try out different thresholdR2 and slice_thickness values when default values fail</span>
 <span class="va">DBHs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_dbh_fit_pcs.html">plot_dbh_fit_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
                          extension <span class="op">=</span> <span class="st">".ply"</span>, 
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span><span class="op">)</span>
-<span class="co"># For buttressed trees: </span>
-<span class="co"># try out different values for thresholdbuttress and maxbuttressheight</span>
+                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
+                         thresholdR2 <span class="op">=</span> <span class="fl">0.0025</span>, slice_thickness <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
+<span class="co"># DAB: </span>
+<span class="co"># try out different values for thresholdbuttress and maxbuttressheight when default values fail</span>
 <span class="va">DABs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_dab_fit_pcs.html">plot_dab_fit_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
                          extension <span class="op">=</span> <span class="st">".las"</span>, 
                          OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, 
                          thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+<span class="co"># Crown classification:</span>
+<span class="co"># For non-buttressed trees: (buttress = FALSE,) specify thresholdR2 and slice_thickness chosen in previous step</span>
+<span class="co"># For buttressed trees: buttress = TRUE, specify thresholdbuttress and maxbuttressheight chosen in previous step</span>
 <span class="co"># Try out different values for thresholdbranch and minheight </span>
-<span class="co"># For other attributes: use the values chosen in previous steps</span>
-<span class="co"># For non-buttressed trees: leave out buttress, thresholdbuttress and maxbuttressheight </span>
-<span class="fu"><a href="../reference/plot_crown_classification_pcs.html">plot_crown_classification_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
+<span class="va">crown_pcs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_crown_classification_pcs.html">plot_crown_classification_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>, 
                          extension <span class="op">=</span> <span class="st">".txt"</span>, 
                          OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, 
                          thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
                          thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+<span class="co"># Projected area</span>
 <span class="co"># Try out a different value for concavity </span>
-<span class="co"># For other attributes: use the values chosen in previous steps</span>
-<span class="va">PCAs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pca_pcs.html">plot_pca_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
+<span class="co"># indicate crown = TRUE if you want to calculate projected area on the crown points only</span>
+<span class="co"># In this case: also specify the values for the crown classification chosen in previous step</span>
+<span class="va">PAs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pa_pcs.html">plot_pa_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
                          extension <span class="op">=</span> <span class="st">".ply"</span>, 
                          OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, concavity <span class="op">=</span> <span class="fl">3</span>,
                          thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
                          thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+<span class="co"># 3D alpha volume</span>
 <span class="co"># Try out a different value for alpha</span>
-<span class="co"># For other attributes: use the values chosen in previous steps</span>
-<span class="va">CVs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_cv_pcs.html">plot_cv_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
+<span class="co"># indicate crown = TRUE if you want to calculate projected area on the crown points only</span>
+<span class="co"># In this case: also specify the values for the crown classification chosen in previous step</span>
+<span class="va">AVs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_av_pcs.html">plot_av_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
                          extension <span class="op">=</span> <span class="st">".las"</span>, 
                          OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, alpha <span class="op">=</span> <span class="fl">2</span>,
                          thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -281,13 +328,15 @@
 <div class="section level4">
 <h4 id="summarise">Summarise<a class="anchor" aria-label="anchor" href="#summarise"></a>
 </h4>
-<p>Once you have decided on default/optimised attributes, you can summarise all point cloud structural metrics in one data.frame (and optionally export it to a csv file) for all tree point clouds in a folder with <code>summary_basic_pointcloud_metrics</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Summary with default setting for non-buttressed trees</span>
-<span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span><span class="op">)</span>
+<p>Once you have decided on default/optimised attributes, you can summarise all point cloud structural metrics in one data.frame (and optionally export it to a csv file) for all tree point clouds in a folder with <code>summary_basic_pointcloud_metrics</code>. If the <em>plot</em> parameter is TRUE, a summary figure is rendered for each tree in the folder.</p>
+<p>If you find different optimal attribute values for different trees, split the trees up in groups with the same parameter values (e.g. buttressed and non-buttressed, small and big trees, species1 and species2). Put the groups in different folders and run the summary function on the different folders separately. Afterwards the outputs can be combined.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Summary with default setting for non-buttressed trees and plot the summary</span>
+<span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder_non-buttressed_trees/"</span><span class="op">)</span>
 <span class="co"># Summary with default setting (except minheight and buttress) for buttressed trees </span>
-<span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>, 
+<span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder_buttressed_trees/"</span>, 
                                             minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="../reference/figures/summary.jpeg"></p>
 </div>
 </div>
 </div>
@@ -409,8 +458,8 @@
 <div class="section level4">
 <h4 id="read-the-treeqsm">Read the TreeQSM<a class="anchor" aria-label="anchor" href="#read-the-treeqsm"></a>
 </h4>
-<p>All of the TreeQSM based functions (mentioned above) need one or multiple components (e.g. cylinder, branch, treedata) of a TreeQSM in the form of lists as their fist arguments. The ITSME package provides a function <code>read_tree_qsm</code> which reads a TreeQSM matlab file (.mat) and returns its’ components in a list (and optionally saves the TreeQSM components into the global environment when <em>global</em> = TRUE). It requires the <em>path</em> to the TreeQSM .mat file as a first argument and the TreeQSM <em>version</em> as a second (default = “2.4.0”) argument.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>All of the TreeQSM based functions (mentioned above) need one or multiple components (e.g. cylinder, branch, treedata) of a TreeQSM in the form of lists as their fist arguments. The ITSMe package provides a function <code>read_tree_qsm</code> which reads a TreeQSM matlab file (.mat) and returns its’ components in a list (and optionally saves the TreeQSM components into the global environment when <em>global</em> = TRUE). It requires the <em>path</em> to the TreeQSM .mat file as a first argument and the TreeQSM <em>version</em> as a second (default = “2.4.0”) argument.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Read the TreeQSM file from its' specified path</span>
 <span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/treeqsm.mat"</span><span class="op">)</span>
 <span class="co"># Read the TreeQSM file of version "2.3.0" from its' specified path into the global environment</span>
@@ -418,10 +467,10 @@
                      global <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="exract-metrics-terryn-et-al--2020">Exract metrics Terryn et al. (2020)<a class="anchor" aria-label="anchor" href="#exract-metrics-terryn-et-al--2020"></a>
+<h4 id="extract-metrics-terryn-et-al--2020">Extract metrics Terryn et al. (2020)<a class="anchor" aria-label="anchor" href="#extract-metrics-terryn-et-al--2020"></a>
 </h4>
 <p>After reading in the TreeQSM, the 17 different structural metrics listed in the table above can easily be calculated. Some of these structural metrics rely on only one of the TreeQSM components.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Calculate the stem branch angle and branch angle ratio from the branch component</span>
 <span class="va">sba</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_angle_qsm.html">stem_branch_angle_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span><span class="op">)</span>
 <span class="va">bar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/branch_angle_ratio_qsm.html">branch_angle_ratio_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span><span class="op">)</span>
@@ -431,7 +480,7 @@
 <span class="co"># Calculate the cylinder length volume ratio from the treedata component</span>
 <span class="va">clvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder_length_volume_ratio_qsm.html">cylinder_length_volume_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></code></pre></div>
 <p>Other metrics rely on two of the TreeQSM components.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Calculate the volume below 55 and the relative volume ratio from </span>
 <span class="co"># the cylinder and treedata component</span>
 <span class="va">vol_55</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/volume_below_55_qsm.html">volume_below_55_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span>
@@ -439,14 +488,16 @@
                                           treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span>
 <span class="co"># Calculate the shedding ratio from the branch and treedata component</span>
 <span class="va">shed_ratio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/shedding_ratio_qsm.html">shedding_ratio_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></code></pre></div>
-<p>For some of the metrics which involve the DBH/DAB and/or the tree height, the tree point cloud of the tree can be provided as an input besides the TreeQSM data. This is because (in general) the DBH/DAB and tree height are more accurately measured from the complete tree point cloud. When the DBH is involved the DAB will be used if <em>buttress</em> = TRUE.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<p>For some of the metrics which involve the DBH/DAB and/or the tree height, the tree point cloud of the tree can be provided as an input besides the TreeQSM data. This is because (in general) the DBH/DAB and tree height are more accurately measured from the complete tree point cloud. When the DBH is involved the DAB will be used if <em>buttress</em> = TRUE. Also specify the attribute values determined for the DBH or DAB measurement from a tree point cloud (see previous sections),</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Read the tree point cloud</span>
 <span class="va">tree_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/point/cloud.txt"</span><span class="op">)</span>
 <span class="co"># Calculate the dbh min tree radius and volume ratio using additional point cloud data</span>
 <span class="va">dmrr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_minradius_ratio_qsm.html">dbh_minradius_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, 
-                                cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span>
-<span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_volume_ratio_qsm.html">dbh_volume_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span>
+                                cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>, 
+                                thresholdR2 <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span>
+<span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_volume_ratio_qsm.html">dbh_volume_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>, 
+                            slice_thickness <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
 <span class="co"># Calculate the dbh height ratio of a buttressed tree using additional point cloud data</span>
 <span class="co"># Specify the optimised thresholdbuttress and maxbuttressheight when needed</span>
 <span class="va">dhr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_height_ratio_qsm.html">dbh_height_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>, 
@@ -462,7 +513,7 @@
                                             cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
                                             pc <span class="op">=</span><span class="va">tree_pc</span><span class="op">)</span></code></pre></div>
 <p>Normalisation according to Terryn et al. (2020) as well as Åkerblom et al. (2017) is possible through the normalisation parameter included in the functions of the metrics that were adapted by Terryn et al.  (2020).</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Calculate the stem branch radius according to Åkerblom et al. (2017)</span>
 <span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_radius_qsm.html">stem_branch_radius_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, 
                               normalisation <span class="op">=</span> <span class="st">"parentcylinder"</span><span class="op">)</span>
@@ -484,16 +535,16 @@
 <div class="section level4">
 <h4 id="summarise-metrics-terryn-et-al--2020">Summarise metrics Terryn et al. (2020)<a class="anchor" aria-label="anchor" href="#summarise-metrics-terryn-et-al--2020"></a>
 </h4>
-<p>you can summarise all structural metrics defined by Terryn et al. (2020) in one data.frame (and optionally export it to a csv file) for all TreeQSMs in a folder with <code>summary_Terryn_2020</code>. Choose the normalisation for <code>stem_branch_radius_qsm</code>, <code>stem_branch_length_qsm</code>, and <code>stem_branch_distance_qsm</code>. In case you want to use tree point cloud information, specify the folder (<em>PCs_path</em>) and <em>extension</em> of the tree point cloud files, indicate if the trees have buttresses (<em>buttress</em>) and specify if you want to use non-default argument values (<em>thresholdbuttress</em> and <em>maxbuttressheight</em>) to calculate the DAB (see chapter on point cloud metrics). If you want the data.frame to be exported to a csv file, specify the path to the output folder (<em>OUT_path</em>)</p>
+<p>you can summarise all structural metrics defined by Terryn et al. (2020) in one data.frame (and optionally export it to a csv file) for all TreeQSMs in a folder with <code>summary_Terryn_2020</code>. Choose the normalisation for <code>stem_branch_radius_qsm</code>, <code>stem_branch_length_qsm</code>, and <code>stem_branch_distance_qsm</code>. In case you want to use tree point cloud information, specify the folder (<em>PCs_path</em>) and <em>extension</em> of the tree point cloud files, indicate if the trees have buttresses (<em>buttress</em>) and specify if you want to use non-default argument values (<em>thresholdR2</em>, <em>slice_thickness</em>, <em>thresholdbuttress</em> and <em>maxbuttressheight</em>) to calculate the DAB (see chapter on point cloud metrics). If you want the data.frame to be exported to a csv file, specify the path to the output folder (<em>OUT_path</em>).</p>
 <p>The QSM files have to be of the format xxx_000_qsm.mat (xxx is the plotname, 000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for example the n-th QSM that is made for tree 000). When multiple QSMs are provided for one tree the mean and the standard deviation of the values of the different QSMs of one tree are also returned in additional data.frames. When provided, the tree point clouds files have to be of the format xxx_000_pc in order to link the tree point cloud to its’ respective treeQSM.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Run the summary function with default settings (without point cloud info)</span>
-<span class="fu"><a href="../reference/summary_Terryn_2020.html">summary_Terryn_2020</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsm/folder/"</span><span class="op">)</span>
+<span class="fu">summary_Terryn_2020</span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsm/folder/"</span><span class="op">)</span>
 <span class="co"># Run the summary function with default settings with point cloud info</span>
-<span class="fu"><a href="../reference/summary_Terryn_2020.html">summary_Terryn_2020</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, 
+<span class="fu">summary_Terryn_2020</span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, 
                     PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span><span class="op">)</span>
 <span class="co"># Run the summary function with non-default settings with point cloud info</span>
-<span class="fu"><a href="../reference/summary_Terryn_2020.html">summary_Terryn_2020</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, version <span class="op">=</span> <span class="st">"2.4.0"</span>, 
+<span class="fu">summary_Terryn_2020</span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, version <span class="op">=</span> <span class="st">"2.4.0"</span>, 
                     sbr_normalisation <span class="op">=</span> <span class="st">"parentcylinder"</span>, 
                     sbl_normalisation <span class="op">=</span> <span class="st">"dbh"</span>, sbd_normalisation <span class="op">=</span> <span class="st">"dbh"</span>, 
                     PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>, 
@@ -503,7 +554,6 @@
 </div>
 </div>
 </div>
-
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
 </div>
@@ -517,7 +567,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer>

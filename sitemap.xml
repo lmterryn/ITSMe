@@ -25,6 +25,9 @@
     <loc>https://lmterryn.github.io/ITSMe/reference/DBH_qsm.html</loc>
   </url>
   <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/alpha_volume_pc.html</loc>
+  </url>
+  <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/branch_angle_ratio_qsm.html</loc>
   </url>
   <url>
@@ -70,7 +73,10 @@
     <loc>https://lmterryn.github.io/ITSMe/reference/dbh_volume_ratio_qsm.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/example_qsm.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/diameter_slice_pc.html</loc>
+  </url>
+  <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/extract_lower_trunk_pc.html</loc>
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/f.html</loc>
@@ -82,10 +88,13 @@
     <loc>https://lmterryn.github.io/ITSMe/reference/normalize_pc.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/plot_crown_classification_pcs.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/plot_av_pcs.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/plot_cv_pcs.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/plot_circle_fit_pcs.html</loc>
+  </url>
+  <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/plot_crown_classification_pcs.html</loc>
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/plot_dab_fit_pcs.html</loc>
@@ -94,10 +103,13 @@
     <loc>https://lmterryn.github.io/ITSMe/reference/plot_dbh_fit_pcs.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/plot_pca_pcs.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/plot_pa_pcs.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/projected_crown_area_pc.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/plot_tree_height_pcs.html</loc>
+  </url>
+  <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/projected_area_pc.html</loc>
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/read_tree_pc.html</loc>
@@ -127,10 +139,10 @@
     <loc>https://lmterryn.github.io/ITSMe/reference/stem_branch_radius_qsm.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/summary_Terryn_2020.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics.html</loc>
   </url>
   <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics.html</loc>
+    <loc>https://lmterryn.github.io/ITSMe/reference/summary_qsm_metrics.html</loc>
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/total_branch_length_qsm.html</loc>
@@ -167,8 +179,5 @@
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/volume_below_55_qsm.html</loc>
-  </url>
-  <url>
-    <loc>https://lmterryn.github.io/ITSMe/reference/volume_crown_pc.html</loc>
   </url>
 </urlset>
