@@ -7,6 +7,7 @@
 summary_qsm_metrics(
   QSMs_path,
   version = "2.4.0",
+  multiple = FALSE,
   sbr_normalisation = "treeheight",
   sbl_normalisation = "treeheight",
   sbd_normalisation = "no",
@@ -31,6 +32,9 @@ for that tree as a final value for a certain feature.}
 \item{version}{A character indicating the version of TreeQSM that was used to
 produce the qsms. Default version is 2.4.0. Other possible versions are
 2.2.0.}
+
+\item{multiple}{Logical (default = FALSE), indicates if a single .mat file
+for one tree holds multiple QSMs at once.}
 
 \item{sbr_normalisation}{Character (default="treeheight"). Normalisation
 parameter of \code{\link{stem_branch_radius_qsm}}.}

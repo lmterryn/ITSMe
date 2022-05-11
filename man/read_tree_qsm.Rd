@@ -8,24 +8,27 @@ read_tree_qsm(path, version = "2.4.0", global = FALSE)
 }
 \arguments{
 \item{path}{A character with the path to the TreeQSM mat file. This file
-contains one QSM produced with
+contains one or multiple QSM(s) produced with
 \url{https://github.com/InverseTampere/TreeQSM} in matlab.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
 produce the TreeQSMs. Default version is "2.4.0" Other possible versions
 are "2.0", "2.3.0", "2.3.1" and "2.3.2".}
 
-\item{global}{Logical (default=FALSE), indicates if TreeQSM components should
-be read into the global environment.}
+\item{global}{Logical (default=FALSE), indicates if TreeQSM components (or
+different qsms) should be read into the global environment.}
 }
 \value{
 Returns a list with the TreeQSM components (cylinder, branch,
-treedata and triangulation) and optionally (global=TRUE) saves them into
-the global environment.
+treedata and triangulation) or a list of qsms (qsm_1, qsm_2, etc) wich are
+a list of the components. And optionally (global=TRUE) saves them into the
+global environment.
 }
 \description{
 Reads a TreeQSM matlab file (.mat) and returns its' components in a list and
-optionally saves the TreeQSM components into the global environment.
+optionally saves the TreeQSM components into the global environment. When
+multiple TreeQSMs are in the matlab file they are read into a list of qsms
+(which are a list of components).
 }
 \details{
 Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
@@ -36,9 +39,14 @@ the value of attributes not found in the older version is set NA.
 \dontrun{
 # Read a TreeQSM.mat file with default settings
 qsm <- read_tree_qsm(QSM_path = "path/to/TreeQSM.mat")
+cylinder_data <- qsm$cylinder
 # Read a TreeQSM.mat file of version 2.0
 qsm <- read_tree_qsm(QSM_path = "path/to/TreeQSM.mat", version = "2.0")
 # Read a TreeQSM.mat file with into the global environment
 qsm <- read_tree_qsm(QSM_path = "path/to/TreeQSM.mat", global = TRUE)
+cylinder_data <- cylinder
+# Read a TreeQSM.mat file of multiple qsms
+qsms <- read_tree_qsm(QSM_path = "path/to/TreeQSMs.mat")
+cylinder_data_of_qsm_1 <- qsms$qsm1$cylinder
 }
 }

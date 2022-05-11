@@ -232,6 +232,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #' @param version A character indicating the version of TreeQSM that was used to
 #'   produce the qsms. Default version is 2.4.0. Other possible versions are
 #'   2.2.0.
+#' @param multiple Logical (default = FALSE), indicates if a single .mat file
+#'   for one tree holds multiple QSMs at once.
 #' @param sbr_normalisation Character (default="treeheight"). Normalisation
 #'   parameter of \code{\link{stem_branch_radius_qsm}}.
 #' @param sbl_normalisation Character (default="treeheight"). Normalisation
@@ -304,7 +306,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'                                extension = ".txt", buttress = TRUE,
 #'                                OUT_path = "path/to/out/folder/")
 #' }
-summary_qsm_metrics <- function(QSMs_path, version = "2.4.0",
+summary_qsm_metrics <- function(QSMs_path, version = "2.4.0", multiple = FALSE,
                                 sbr_normalisation = "treeheight",
                                 sbl_normalisation = "treeheight",
                                 sbd_normalisation = "no",
@@ -345,9 +347,17 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.0",
     }
     trees <- df
     id <- unique_tree_ids[i]
+    if (multiple){
+      all_qsms <- read_tree_qsm(paste(QSMs_path,qsms[1], sep = ""), version)
+      qsms <- all_qsms
+    }
     for (j in 1:length(qsms)) {
       print(paste("processing ", unique_tree_ids[i], as.character(j)))
-      qsm <- read_tree_qsm(paste(QSMs_path, qsms[j], sep = ""), version)
+      if (multiple){
+        qsm <- qsms[[j]]
+      } else {
+        qsm <- read_tree_qsm(paste(QSMs_path, qsms[j], sep = ""), version)
+      }
       position <- tree_position_qsm(qsm$cylinder)
       X_position <- position[1]
       Y_position <- position[2]
