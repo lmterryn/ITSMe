@@ -925,7 +925,9 @@ crownset_qsm <- function(cylinder) {
     # STEP 2
     parents <- unique(cylinder$parent[crownset])
     parents <- parents[cylinder$BranchOrder[parents] > 0]
-    while (length(parents) > 0) {
+    init_length <- 0
+    while (length(crownset) > init_length) {
+      init_length <- length(crownset)
       crownset <- unique(append(crownset, parents))
       newparents <- unique(cylinder$parent[parents])
       newparents <- newparents[cylinder$BranchOrder[newparents] > 0]
@@ -941,9 +943,8 @@ crownset_qsm <- function(cylinder) {
     init_length <- 0
     while (length(crownset) > init_length) {
       init_length <- length(crownset)
-      for (i in 1:length(children[crownset])) {
-        crownset <- unique(append(crownset, children[crownset][[i]]))
-      }
+      c <- children[crownset]
+      crownset <- unique(append(crownset,unlist(c, recursive = FALSE)))
     }
   }
   return(crownset)
