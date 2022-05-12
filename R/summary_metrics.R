@@ -407,14 +407,14 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.0", multiple = FALSE,
     results <- cbind(tree_id = id, trees)
     summary <- rbind(summary, results)
     if (length(qsms) > 1){
-    m <- as.data.frame.list(colMeans(trees))
-    s <- as.data.frame.list(sapply(trees, stats::sd, na.rm = TRUE))
-    results_means <- cbind(tree_id = id, m)
-    results_sds <- cbind(tree_id = id, s)
-    summary_means <- rbind(summary_means, results_means)
-    summary_sds <- rbind(summary_means, results_sds)
-    summaries <- list("summary" = summary, "means" = summary_means,
-                      "sds" = summary_sds)
+      m <- as.data.frame.list(colMeans(trees))
+      s <- as.data.frame.list(sapply(trees, stats::sd, na.rm = TRUE))
+      results_means <- cbind(tree_id = id, m)
+      results_sds <- cbind(tree_id = id, s)
+      summary_means <- rbind(summary_means, results_means)
+      summary_sds <- rbind(summary_sds, results_sds)
+      summaries <- list("summary" = summary, "means" = summary_means,
+                        "sds" = summary_sds)
     } else {
       summaries <- summary
     }
