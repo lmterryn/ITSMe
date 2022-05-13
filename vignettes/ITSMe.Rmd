@@ -525,7 +525,7 @@ sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
 
 you can summarise all structural metrics defined by Terryn et al. (2020) in one 
 data.frame (and optionally export it to a csv file) for all TreeQSMs in a folder 
-with `summary_Terryn_2020`. Choose the normalisation for 
+with `summary_qsm_metrics`. Choose the normalisation for 
 `stem_branch_radius_qsm`, `stem_branch_length_qsm`, and 
 `stem_branch_distance_qsm`. In case you want to use tree point cloud 
 information, specify the folder (*PCs_path*) and *extension* of the tree point 
@@ -545,12 +545,14 @@ point cloud to its' respective treeQSM.
 
 ```{r eval = FALSE}
 # Run the summary function with default settings (without point cloud info)
-summary_Terryn_2020(QSMs_path = "path/to/treeqsm/folder/")
+summary_qsm_metrics(QSMs_path = "path/to/treeqsm/folder/")
+# Run the summary function with multiple QSMs per *mat file
+summary_qsm_metrics(QSMs_path = "path/to/treeqsm/folder/", multiple = TRUE)
 # Run the summary function with default settings with point cloud info
-summary_Terryn_2020(QSMs_path = "path/to/treeqsms/folder/", 
+summary_qsm_metrics(QSMs_path = "path/to/treeqsms/folder/", 
                     PCs_path = "path/to/point/clouds/folder/")
 # Run the summary function with non-default settings with point cloud info
-summary_Terryn_2020(QSMs_path = "path/to/treeqsms/folder/", version = "2.4.0", 
+summary_qsm_metrics(QSMs_path = "path/to/treeqsms/folder/", version = "2.4.0", 
                     sbr_normalisation = "parentcylinder", 
                     sbl_normalisation = "dbh", sbd_normalisation = "dbh", 
                     PCs_path = "path/to/point/clouds/folder/", 
