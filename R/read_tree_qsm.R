@@ -6,15 +6,15 @@
 #' (which are a list of components).
 #'
 #' Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
-#' TreeQSM versions older than 2.4.0 are converted to the 2.4.0 structure, where
-#' the value of attributes not found in the older version is set NA.
+#' TreeQSM versions older than 2.4.0 are converted to the 2.4.0/2.4.1 structure,
+#' where the value of attributes not found in the older version is set NA.
 #'
 #' @param path A character with the path to the TreeQSM mat file. This file
 #'   contains one or multiple QSM(s) produced with
 #'   \url{https://github.com/InverseTampere/TreeQSM} in matlab.
 #' @param version A character indicating the version of TreeQSM that was used to
-#'   produce the TreeQSMs. Default version is "2.4.0" Other possible versions
-#'   are "2.0", "2.3.0", "2.3.1" and "2.3.2".
+#'   produce the TreeQSMs. Default version is "2.4.1" Other possible versions
+#'   are "2.4.0", 2.0", "2.3.0", "2.3.1" and "2.3.2".
 #' @param global Logical (default=FALSE), indicates if TreeQSM components (or
 #'   different qsms) should be read into the global environment.
 #'
@@ -39,7 +39,7 @@
 #' qsms <- read_tree_qsm(QSM_path = "path/to/TreeQSMs.mat")
 #' cylinder_data_of_qsm_1 <- qsms$qsm1$cylinder
 #' }
-read_tree_qsm <- function(path, version = "2.4.0", global = FALSE) {
+read_tree_qsm <- function(path, version = "2.4.1", global = FALSE) {
   tree <- R.matlab::readMat(path)
   if (version == "2.0") {
     branch <- list("order" = tree$BOrd, "parent" = tree$BPar, "diameter" = NA,
@@ -98,7 +98,7 @@ read_tree_qsm <- function(path, version = "2.4.0", global = FALSE) {
                           "cylind" = NA)
     out <- list(cylinder = cylinder, branch = branch, treedata = treedata,
                 triangulation = triangulation)
-  } else if (version != "2.4.0") {
+  } else if (version != "2.4.0" & version != "2.4.1") {
     if (length(tree) == 1) {
       names(tree) <- c("qsm")
     }
