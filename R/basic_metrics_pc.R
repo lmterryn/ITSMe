@@ -1219,8 +1219,7 @@ alpha_volume_pc <- function(pc, alpha = 1, plot = FALSE) {
     rgl::par3d(windowRect = c(20, 30, 800, 800))
     rgl::bgplot3d({
       graphics::plot.new()
-      graphics::title(main = bquote(alpha-V == .(round(vol,2)) ~ m^3), line = 2,
-                      size = 20)
+      graphics::title(main = bquote(AV == .(round(vol,2)) ~ m^3), line = 2)
     })
     plot(ashape3d.obj)
     return(list("av" = vol, "ashape3d" = ashape3d.obj))
