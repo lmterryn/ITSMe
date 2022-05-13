@@ -4,7 +4,7 @@
 \alias{read_tree_qsm}
 \title{Read a TreeQSM}
 \usage{
-read_tree_qsm(path, version = "2.4.0", global = FALSE)
+read_tree_qsm(path, version = "2.4.1", global = FALSE)
 }
 \arguments{
 \item{path}{A character with the path to the TreeQSM mat file. This file
@@ -12,8 +12,8 @@ contains one or multiple QSM(s) produced with
 \url{https://github.com/InverseTampere/TreeQSM} in matlab.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
-produce the TreeQSMs. Default version is "2.4.0" Other possible versions
-are "2.0", "2.3.0", "2.3.1" and "2.3.2".}
+produce the TreeQSMs. Default version is "2.4.1" Other possible versions
+are "2.4.0", 2.0", "2.3.0", "2.3.1" and "2.3.2".}
 
 \item{global}{Logical (default=FALSE), indicates if TreeQSM components (or
 different qsms) should be read into the global environment.}
@@ -32,8 +32,8 @@ multiple TreeQSMs are in the matlab file they are read into a list of qsms
 }
 \details{
 Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
-TreeQSM versions older than 2.4.0 are converted to the 2.4.0 structure, where
-the value of attributes not found in the older version is set NA.
+TreeQSM versions older than 2.4.0 are converted to the 2.4.0/2.4.1 structure,
+where the value of attributes not found in the older version is set NA.
 }
 \examples{
 \dontrun{
