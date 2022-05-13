@@ -136,7 +136,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
                                   common.legend = TRUE, heights=c(5,5),
                                   widths = c(1, s ,1))
     plotTree <- ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(
-      paste("Tree height = ", as.character(round(h,2)), " m", sep = ""),
+      paste("H = ", as.character(round(h,2)), " m", sep = ""),
       size = 20))
     return(list("h"=h,"plot" = plotTree, "plotXZ" = plotXZ, "plotYZ" = plotYZ))
   } else {

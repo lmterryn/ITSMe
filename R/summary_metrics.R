@@ -87,7 +87,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     "Y_position" = double(), "tree_height" = double(),
     "diameter_at_breast_height" = double(),
     "diameter_above_buttresses" = double(),
-    "projected_area" = double(), "volume" = double())
+    "projected_area" = double(), "alpha_volume" = double())
   diameter_above_buttresses <- diameter_at_breast_height <- NULL
   if (buttress == FALSE){
     trees <- subset(trees, select = -diameter_above_buttresses)
@@ -140,7 +140,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
       "Y_position" = pos[2], "tree_height" = h,
       "diameter_at_breast_height" = dbh,
       "diameter_above_buttresses" = dab,
-      "projected_area" = pa, "volume" = av)
+      "projected_area" = pa, "alpha_volume" = av)
     if (buttress == FALSE){
       tree <- subset(tree, select = -diameter_above_buttresses)
     } else {
@@ -166,14 +166,14 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                 common.legend = TRUE, align = "hv",
                                 legend = "bottom")
         p2 <- ggpubr::annotate_figure(p2, top = ggpubr::text_grob(
-          paste("Tree height = ", as.character(round(h,2)), " m", sep = "")))
+          paste("H = ", as.character(round(h,2)), " m", sep = "")))
       } else {
         p2 <- ggpubr::ggarrange(h_out$plotXZ, h_out$plotYZ,
                                 nrow = 1, ncol = 2, heights = c(1,1),
                                 common.legend = TRUE, align = "hv",
                                 legend = "bottom")
         p2 <- ggpubr::annotate_figure(p2, top = ggpubr::text_grob(
-          paste("Tree height = ", as.character(round(h,2)), " m", sep = "")))
+          paste("H = ", as.character(round(h,2)), " m", sep = "")))
       }
       p3 <- ggpubr::ggarrange(p2, p1, nrow = 1, ncol = 2, align = "hv")
       p3 <- ggpubr::annotate_figure(p3, top = ggpubr::text_grob(
