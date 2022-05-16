@@ -181,8 +181,14 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
         face = "bold"))
     }
     if (is.character(OUT_path)){
-      utils::write.csv(trees,paste(OUT_path,"pointcloud_metrics.csv", sep = ""),
-                       row.names = FALSE)
+      file <- paste(OUT_path,"pointcloud_metrics_0.csv", sep = "")
+      n <- 0
+      while (file.exists(file)) {
+        n <- n + 1
+        file <- paste(OUT_path, "pointcloud_metrics_", as.character(n),".csv",
+                      sep = "")
+      }
+      utils::write.csv(trees,file,row.names = FALSE)
       if (plot) {
         grDevices::jpeg(file=paste(OUT_path,"summary_figure_",
                         strsplit(filenames[i], extension)[[1]],".jpeg",
@@ -224,13 +230,14 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #' \code{\link{dbh_minradius_ratio_qsm}}).
 #'
 #' @param QSMs_path A character with the path to the folder that contains the
-#'   treeQSMs. These files have to be of the format xxx_000_qsm.mat (xxx is the
-#'   plotname, 000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for
-#'   example the n-th QSM that is made for tree 000). When multiple QSMs are
-#'   present for one tree the mean of the values of the different QSMs is taken
-#'   for that tree as a final value for a certain feature.
+#'   treeQSMs. These files have to be of the format xxx_qsm.mat (xxx is the
+#'   unique tree id) or xxx_qsm_0.mat (0 at the end is for example the n-th QSM
+#'   that is made for tree xxx). Multiple QSMs can be present in one QSM file, in
+#'   this case set parameter multiple TRUE. When multiple QSMs are present for
+#'   one tree the mean of the values of the different QSMs is taken for that
+#'   tree as a final value for a certain feature.
 #' @param version A character indicating the version of TreeQSM that was used to
-#'   produce the qsms (Default = "2.4.1"). Other possible versions are "2.4.0",
+#'   produce the QSMs (Default = "2.4.1"). Other possible versions are "2.4.0",
 #'   "2.0", "2.3.0", "2.3.1" and "2.3.2".
 #' @param multiple Logical (default = FALSE), indicates if a single .mat file
 #'   for one tree holds multiple QSMs at once.
@@ -245,8 +252,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   The point clouds are used to determine the DBH, tree height, projected
 #'   crown area and crown volume. The DBH and tree height obtained from the tree
 #'   point clouds are then used for the normalisation of the other features. The
-#'   point cloud files have to be of the format xxx_000_pc in order to link the
-#'   tree point cloud to its' respective treeQSM.
+#'   point cloud files have to be of the format xxx_pc in order to link the tree
+#'   point cloud to its' respective treeQSM.
 #' @param extension A character refering to the file extension of the point
 #'   cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 #'   relevant if the tree point clouds are available.
@@ -419,15 +426,21 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
       summaries <- summary
     }
     if (is.character(OUT_path)){
-      utils::write.csv(summary,paste(OUT_path,
-                                           "qsm_metrics.csv",
-                                           sep = ""), row.names = FALSE)
+      file <- paste(OUT_path, "qsm_metrics_0.csv", sep = "")
+      n <- 0
+      while (file.exists(file)) {
+        n <- n + 1
+        file <- paste(OUT_path, "qsm_metrics_", as.character(n),".csv",
+                      sep = "")
+      }
+      utils::write.csv(summary, file, row.names = FALSE)
       if (length(qsms) > 1){
-      utils::write.csv(summary_means,paste(OUT_path,
-                                           "qsm_metrics_means.csv",
-                                           sep = ""), row.names = FALSE)
-      utils::write.csv(summary_sds,paste(OUT_path,"qsm_metrics_sds.csv",
-                                         sep = ""), row.names = FALSE)
+        file_means <- paste(strsplit(file, ".csv")[[1]], "_means_",
+                            as.character(n), ".csv", sep = "")
+        file_sds <- paste(strsplit(file, ".csv")[[1]], "_sds_", as.character(n),
+                          ".csv", sep = "")
+        utils::write.csv(summary_means, file_means, row.names = FALSE)
+        utils::write.csv(summary_sds, file_sds, row.names = FALSE)
       }
     }
   }
