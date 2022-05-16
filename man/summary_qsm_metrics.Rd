@@ -23,14 +23,15 @@ summary_qsm_metrics(
 }
 \arguments{
 \item{QSMs_path}{A character with the path to the folder that contains the
-treeQSMs. These files have to be of the format xxx_000_qsm.mat (xxx is the
-plotname, 000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for
-example the n-th QSM that is made for tree 000). When multiple QSMs are
-present for one tree the mean of the values of the different QSMs is taken
-for that tree as a final value for a certain feature.}
+treeQSMs. These files have to be of the format xxx_qsm.mat (xxx is the
+unique tree id) or xxx_qsm_0.mat (0 at the end is for example the n-th QSM
+that is made for tree xxx). Multiple QSMs can be present in one QSM file, in
+this case set parameter multiple TRUE. When multiple QSMs are present for
+one tree the mean of the values of the different QSMs is taken for that
+tree as a final value for a certain feature.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
-produce the qsms (Default = "2.4.1"). Other possible versions are "2.4.0",
+produce the QSMs (Default = "2.4.1"). Other possible versions are "2.4.0",
 "2.0", "2.3.0", "2.3.1" and "2.3.2".}
 
 \item{multiple}{Logical (default = FALSE), indicates if a single .mat file
@@ -50,8 +51,8 @@ tree point clouds. Default is NA when the point clouds are not available.
 The point clouds are used to determine the DBH, tree height, projected
 crown area and crown volume. The DBH and tree height obtained from the tree
 point clouds are then used for the normalisation of the other features. The
-point cloud files have to be of the format xxx_000_pc in order to link the
-tree point cloud to its' respective treeQSM.}
+point cloud files have to be of the format xxx_pc in order to link the tree
+point cloud to its' respective treeQSM.}
 
 \item{extension}{A character refering to the file extension of the point
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
