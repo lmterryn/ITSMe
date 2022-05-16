@@ -535,13 +535,14 @@ you want to use non-default argument values (*thresholdR2*, *slice_thickness*,
 on point cloud metrics). If you want the data.frame to be exported to a csv 
 file, specify the path to the output folder (*OUT_path*).
 
-The QSM files have to be of the format xxx_000_qsm.mat (xxx is the plotname, 
-000 is the tree number) or xxx_000_qsm_0.mat (0 at the end is for example the 
-n-th QSM that is made for tree 000). When multiple QSMs are provided for one 
-tree the mean and the standard deviation of the values of the different QSMs of 
-one tree are also returned in additional data.frames. When provided, the tree 
-point clouds files have to be of the format xxx_000_pc in order to link the tree 
-point cloud to its' respective treeQSM.
+The QSM files have to be of the format xxx_qsm.mat (xxx is tree id and can 
+consist of multiple parts e.g. plot name, tree number) or xxx_qsm_0.mat (0 at 
+the end is for example the n-th QSM that is made for tree 000). The qsm file can 
+also contain multiple QSMs, in this case set parameter *multiple* = TRUE. When 
+multiple QSMs are provided for one tree the mean and the standard deviation of 
+the values of the different QSMs of one tree are also returned in additional 
+data.frames. When provided, the tree point clouds files have to be of the format 
+xxx_pc in order to link the tree point cloud to its' respective treeQSM.
 
 ```{r eval = FALSE}
 # Run the summary function with default settings (without point cloud info)
