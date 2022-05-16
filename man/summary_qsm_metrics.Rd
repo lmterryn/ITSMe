@@ -6,7 +6,7 @@
 \usage{
 summary_qsm_metrics(
   QSMs_path,
-  version = "2.4.0",
+  version = "2.4.1",
   multiple = FALSE,
   sbr_normalisation = "treeheight",
   sbl_normalisation = "treeheight",
@@ -30,8 +30,8 @@ present for one tree the mean of the values of the different QSMs is taken
 for that tree as a final value for a certain feature.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
-produce the qsms. Default version is 2.4.0. Other possible versions are
-2.2.0.}
+produce the qsms (Default = "2.4.1"). Other possible versions are "2.4.0",
+"2.0", "2.3.0", "2.3.1" and "2.3.2".}
 
 \item{multiple}{Logical (default = FALSE), indicates if a single .mat file
 for one tree holds multiple QSMs at once.}

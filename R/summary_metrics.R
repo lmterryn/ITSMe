@@ -230,8 +230,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   present for one tree the mean of the values of the different QSMs is taken
 #'   for that tree as a final value for a certain feature.
 #' @param version A character indicating the version of TreeQSM that was used to
-#'   produce the qsms. Default version is 2.4.0. Other possible versions are
-#'   2.2.0.
+#'   produce the qsms (Default = "2.4.1"). Other possible versions are "2.4.0",
+#'   "2.0", "2.3.0", "2.3.1" and "2.3.2".
 #' @param multiple Logical (default = FALSE), indicates if a single .mat file
 #'   for one tree holds multiple QSMs at once.
 #' @param sbr_normalisation Character (default="treeheight"). Normalisation
@@ -306,7 +306,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'                                extension = ".txt", buttress = TRUE,
 #'                                OUT_path = "path/to/out/folder/")
 #' }
-summary_qsm_metrics <- function(QSMs_path, version = "2.4.0", multiple = FALSE,
+summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
                                 sbr_normalisation = "treeheight",
                                 sbl_normalisation = "treeheight",
                                 sbd_normalisation = "no",
