@@ -6,15 +6,15 @@
 #' (which are a list of components).
 #'
 #' Initial reading of the .mat file uses \code{\link[R.matlab]{readMat}}.
-#' TreeQSM versions older than 2.4.0 are converted to the 2.4.0/2.4.1 structure,
-#' where the value of attributes not found in the older version is set NA.
+#' TreeQSM versions older than 2.4.0 are converted to the 2.4.x structure, where
+#' the value of attributes not found in the older version is set NA.
 #'
 #' @param path A character with the path to the TreeQSM mat file. This file
 #'   contains one or multiple QSM(s) produced with
 #'   \url{https://github.com/InverseTampere/TreeQSM} in matlab.
 #' @param version A character indicating the version of TreeQSM that was used to
-#'   produce the TreeQSMs. Default version is "2.4.1" Other possible versions
-#'   are "2.4.0", 2.0", "2.3.0", "2.3.1" and "2.3.2".
+#'   produce the TreeQSMs (Default = "2.4.1"). Other possible versions are
+#'   "2.4.0", "2.0", "2.3.0", "2.3.1" and "2.3.2".
 #' @param global Logical (default=FALSE), indicates if TreeQSM components (or
 #'   different qsms) should be read into the global environment.
 #'
