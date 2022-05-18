@@ -1124,6 +1124,8 @@ crown_evenness_qsm <- function(cylinder) {
     } else {
       ce <- 0
     }
+  } else {
+    ce <- 0
   }
   return(ce)
 }
