@@ -184,9 +184,10 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
       file <- paste(OUT_path,".csv", sep = "")
       utils::write.csv(trees,file,row.names = FALSE)
       if (plot) {
-        grDevices::jpeg(file=paste(OUT_path,"summary_figure_",
-                        strsplit(filenames[i], extension)[[1]],".jpeg",
-                        sep = ""), res=600, width=4800, height=3000)
+        file_plot <- paste(OUT_path,"_fig_",
+                           strsplit(filenames[i], extension)[[1]],".jpeg",
+                           sep = "")
+        grDevices::jpeg(file= file_plot, res=600, width=4800, height=3000)
         print(p3)
         grDevices::dev.off()
       }
