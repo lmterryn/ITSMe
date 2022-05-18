@@ -6,6 +6,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/lmterryn/ITSMe/workflows/R-CMD-check/badge.svg)](https://github.com/lmterryn/ITSMe/actions)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6560321.svg)](https://doi.org/10.5281/zenodo.6560321)
 <!-- badges: end -->
 
 ## Goal
