@@ -74,9 +74,9 @@ buttresses. Only relevant when buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses. Only relevant when buttress == TRUE.}
 
-\item{OUT_path}{A character with the path to the folder where the summary csv
-file should be saved or logical (default=FALSE) in this case no csv file is
-produced.}
+\item{OUT_path}{A character with name of the output file (including the path
+to the folder), where the summary csv file should be saved or logical
+(default=FALSE) in this case no csv file is produced.}
 
 \item{plot}{Logical (default=FALSE), indicates if summary figure for each
 tree point cloud is plotted. If an OUT_path is provided, the figures are

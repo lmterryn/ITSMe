@@ -25,9 +25,9 @@ summary_qsm_metrics(
 \item{QSMs_path}{A character with the path to the folder that contains the
 treeQSMs. These files have to be of the format xxx_qsm.mat (xxx is the
 unique tree id) or xxx_qsm_0.mat (0 at the end is for example the n-th QSM
-that is made for tree xxx). Multiple QSMs can be present in one QSM file, in
-this case set parameter multiple TRUE. When multiple QSMs are present for
-one tree the mean of the values of the different QSMs is taken for that
+that is made for tree xxx). Multiple QSMs can be present in one QSM file,
+in this case set parameter multiple TRUE. When multiple QSMs are present
+for one tree the mean of the values of the different QSMs is taken for that
 tree as a final value for a certain feature.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
@@ -82,9 +82,9 @@ buttress == TRUE.}
 buttresses. Only relevant if the tree point clouds are available and
 buttress == TRUE.}
 
-\item{OUT_path}{A character with the path to the folder where the summary csv
-file should be saved or logical (default=FALSE) in this case no csv file is
-produced.}
+\item{OUT_path}{A character with name of the output file (including the path
+to the folder), where the summary csv file should be saved or logical
+(default=FALSE) in this case no csv file is produced.}
 }
 \value{
 The summary of all metrics from Terryn et al. (2020) as a data.frame.
