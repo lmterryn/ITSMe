@@ -16,7 +16,7 @@ multiple TreeQSMs are in the matlab file they are read into a list of qsms
     
     <a class="navbar-brand me-2" href="../index.html">ITSMe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@ multiple TreeQSMs are in the matlab file they are read into a list of qsms
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">read_tree_qsm</span><span class="op">(</span><span class="va">path</span>, version <span class="op">=</span> <span class="st">"2.4.0"</span>, global <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">read_tree_qsm</span><span class="op">(</span><span class="va">path</span>, version <span class="op">=</span> <span class="st">"2.4.1"</span>, global <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,8 +71,8 @@ contains one or multiple QSM(s) produced with
 <a href="https://github.com/InverseTampere/TreeQSM" class="external-link">https://github.com/InverseTampere/TreeQSM</a> in matlab.</p></dd>
 <dt>version</dt>
 <dd><p>A character indicating the version of TreeQSM that was used to
-produce the TreeQSMs. Default version is "2.4.0" Other possible versions
-are "2.0", "2.3.0", "2.3.1" and "2.3.2".</p></dd>
+produce the TreeQSMs (Default = "2.4.1"). Other possible versions are
+"2.4.0", "2.0", "2.3.0", "2.3.1" and "2.3.2".</p></dd>
 <dt>global</dt>
 <dd><p>Logical (default=FALSE), indicates if TreeQSM components (or
 different qsms) should be read into the global environment.</p></dd>
@@ -87,7 +87,7 @@ global environment.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Initial reading of the .mat file uses <code><a href="https://rdrr.io/pkg/R.matlab/man/readMat.html" class="external-link">readMat</a></code>.
-TreeQSM versions older than 2.4.0 are converted to the 2.4.0 structure, where
+TreeQSM versions older than 2.4.0 are converted to the 2.4.x structure, where
 the value of attributes not found in the older version is set NA.</p>
     </div>
 

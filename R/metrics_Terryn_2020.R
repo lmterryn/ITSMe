@@ -49,9 +49,11 @@ dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdR2 = 0.001,
     return(dbh_qsm(treedata))
   } else {
     if (buttress) {
-      return(dab_pc(pc, thresholdbuttress, maxbuttressheight))
+      out <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+      return(out$dab)
     } else {
-      return(dbh_pc(pc, thresholdR2, slice_thickness))
+      out <- dbh_pc(pc, thresholdR2, slice_thickness)
+      return(out$dbh)
     }
   }
 }

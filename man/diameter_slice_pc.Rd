@@ -22,9 +22,9 @@ fitting is plotted.}
 }
 \value{
 A list with the diameter at a specified height (numeric value), the
-residual between circle fit and the points and the center of the circle
-fit. Also optionally (plot=TRUE) plots the circle fitting on the horizontal
-slice.
+residual between circle fit and the points, the center of the circle fit,
+and the functional diameter calculated from the concave hull fitting. Also
+optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
 }
 \description{
 Returns the diameter at a certain height of a tree measured from a tree point
@@ -34,8 +34,12 @@ cloud.
 The diameter is measured of the optimal circle fitted through a horizontal
 slice. A least squares circle fitting algorithm was applied to find the
 optimal fit. The height and thickness of the slice can be specified using
-slice_height and slice_thickness parameters. This is also a Support function
-used to determine the DBH from a tree point cloud with \code{\link{dbh_pc}}.
+slice_height and slice_thickness parameters. Additionally, the functional
+diameter is calculated. For this the area of the concave hull with (concavity
+4) is determined on the slice. From this area the diameter is determined as
+the diameter of a circle with this area. This function is also a Support
+function used to determine the DBH from a tree point cloud with
+\code{\link{dbh_pc}}.
 }
 \examples{
 \dontrun{

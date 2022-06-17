@@ -134,6 +134,7 @@ you are not sure if this is the case for your tree, you can check the slice
 # Measure DBH from the tree point cloud and plot the circle fitting
 slice1 <- diameter_slice_pc(pc = tree_pc, slice_height = 1.3, 
                             slice_thickness = 0.06, plot = TRUE)
+diameter <- slice1$diameter
 
 ```
 
@@ -151,7 +152,8 @@ plots the circle fitting.
 
 ```{r eval = FALSE}
 # Measure DBH from the tree point cloud and plot the circle fitting
-DBH <- dbh_pc(pc = tree_pc, plot = TRUE)
+DBH_out <- dbh_pc(pc = tree_pc, plot = TRUE)
+DBH <- DBH_out$dbh
 
 ```
 ![](../man/figures/dbh_example.jpeg)
@@ -186,7 +188,8 @@ with a *thresholdbuttress* increased with 0.0005.
 
 ```{r eval = FALSE}
 # Measure DAB from the tree point cloud with default settings and plot the circle fitting
-DAB <- dab_pc(pc = tree_pc, plot = TRUE)
+DAB_out <- dab_pc(pc = tree_pc, plot = TRUE)
+DAB <- DAB_out$dab
 
 ```
 ![](../man/figures/dab_example.jpeg)

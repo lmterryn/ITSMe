@@ -35,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="index.html">ITSMe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -275,9 +275,17 @@
 <span class="co"># Read the point cloud file from the Specified path to the tree point cloud file</span>
 <span class="va">pc_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/point/cloud.txt"</span><span class="op">)</span>
 <span class="co"># Use dbh_pc function with default parameters and plot the fit</span>
-<span class="va">dbh</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">out_dbh</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="co"># Access the dbh, residual and fdbh values from the output list</span>
+<span class="va">dbh</span> <span class="op">&lt;-</span> <span class="va">out_dbh</span><span class="op">$</span><span class="va">dbh</span>
+<span class="va">residual_dbh</span> <span class="op">&lt;-</span> <span class="va">out_dbh</span><span class="op">$</span><span class="va">R2</span>
+<span class="va">fdbh</span> <span class="op">&lt;-</span> <span class="va">out_dbh</span><span class="op">$</span><span class="va">fdbh</span>
 <span class="co"># Use dab_pc function with default parameters and plot the fit</span>
-<span class="va">dab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dab_pc.html">dab_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">out_dab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dab_pc.html">dab_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="co"># Access the dab, residual and fdab values from the output list</span>
+<span class="va">ddab</span> <span class="op">&lt;-</span> <span class="va">out_dab</span><span class="op">$</span><span class="va">dab</span>
+<span class="va">residual_dab</span> <span class="op">&lt;-</span> <span class="va">out_dab</span><span class="op">$</span><span class="va">R2</span>
+<span class="va">fdab</span> <span class="op">&lt;-</span> <span class="va">out_dab</span><span class="op">$</span><span class="va">fdab</span></code></pre></div>
 <p align="center">
 <img src="reference/figures/dbh_example.jpeg" height="500"></p>
 <p align="center">
@@ -350,7 +358,6 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/lmterryn/ITSMe/actions" class="external-link"><img src="https://github.com/lmterryn/ITSMe/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://zenodo.org/badge/latestdoi/447157090" class="external-link"><img src="https://zenodo.org/badge/447157090.svg" alt="DOI"></a></li>
 </ul>
 </div>
 

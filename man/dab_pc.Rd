@@ -29,28 +29,30 @@ again at 1.3 m.}
 fitting is plotted.}
 }
 \value{
-Diameter of the stem above buttresses (numeric value). Also
-optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
-in this case returns a list with the dab value as first element and the
-plot as the second element.
+List with the diameter of the stem above buttresses, the residuals on
+the fitting, and the functional diameter at breast height. Also optionally
+(plot=TRUE) plots the circle fitting on the horizontal slice which is then
+included in the list output.
 }
 \description{
-Returns the diameter above buttresses (DAB) of a tree measured from a tree
-point cloud.
+Returns the diameter above buttresses (DAB) and the functional diameter above
+buttresses (fDAB) of a tree measured from a tree point cloud.
 }
 \details{
 The DAB is measured as the diameter of the optimal circle fitted through a
-6mm thick horizontal slice taken above the buttresses. A least squares circle
-fitting algorithm was applied to find the optimal fit. The height at which
-the horizontal slice is taken, is determined iteratively. Starting at 1.27 m
-to 1.33 m from the lowest point of the tree point cloud. The average residual
-between the points and the fitted circle is calculated. When the average
-residual exceeds a value of "thresholdbuttress" times the radius, indicating
-a non-circular (irregular) stem shape and presumably buttresses, the process
-is repeated with a new slice 6 mm higher than the previous one until a slice
-above the buttresses is reached. When the "maxbuttressheight" is exceeded the
-iterative process is restarted with a "thresholdbuttress" increased with
-0.0005.
+6mm thick horizontal slice taken above the buttresses using using
+\code{\link{diameter_slice_pc}}. A least squares circle fitting algorithm was
+applied to find the optimal fit. The height at which the horizontal slice is
+taken, is determined iteratively. Starting at 1.27 m to 1.33 m from the
+lowest point of the tree point cloud. The average residual between the points
+and the fitted circle is calculated. When the average residual exceeds a
+value of "thresholdbuttress" times the radius, indicating a non-circular
+(irregular) stem shape and presumably buttresses, the process is repeated
+with a new slice 6 mm higher than the previous one until a slice above the
+buttresses is reached. When the "maxbuttressheight" is exceeded the iterative
+process is restarted with a "thresholdbuttress" increased with 0.0005. At the
+determined height above buttresses also the functional diameter is calculated
+using \code{\link{diameter_slice_pc}}.
 }
 \examples{
 \dontrun{

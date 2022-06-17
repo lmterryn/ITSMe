@@ -1,11 +1,13 @@
 #' Summary basic structural metrics tree point cloud
 #'
 #' Returns a summary data.frame containing the tree position (X,Y-coordinates),
-#' tree height, diameter at breast height, diameter above buttresses, projected
+#' tree height, diameter at breast height, functional diameter at breast height,
+#' diameter above buttresses, functional diameter above buttresses, projected
 #' (crown) area and (crown) volume.
 #'
-#' The tree position, tree height, diameter at breast height, diameter above
-#' buttresses, projected (crown) area and (crown) volume are otained with
+#' The tree position, tree height, diameter at breast height, functional
+#' diameter at breast height, diameter above buttresses, functional diameter
+#' above buttresses, projected (crown) area and (crown) volume are otained with
 #' \code{\link{tree_position_pc}}, \code{\link{tree_height_pc}},
 #' \code{\link{dbh_pc}}, \code{\link{dab_pc}}, \code{\link{projected_area_pc}}
 #' and \code{\link{alpha_volume_pc}} respectively.
@@ -28,8 +30,8 @@
 #'   non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
 #'   Only relevant when crown == TRUE.
 #' @param concavity Numeric value (default=2). Parameter of the
-#'   \code{\link{projected_area_pc}} function used to calculate the
-#'   projected crown area.
+#'   \code{\link{projected_area_pc}} function used to calculate the projected
+#'   crown area.
 #' @param alpha Numeric value (default=1). Parameter of the
 #'   \code{\link{alpha_volume_pc}} function used to calculate the crown volume.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
@@ -86,13 +88,19 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     "tree_id" = character(), "X_position" = double(),
     "Y_position" = double(), "tree_height" = double(),
     "diameter_at_breast_height" = double(),
+    "functional_diameter_at_breast_height" = double(),
     "diameter_above_buttresses" = double(),
+    "functional_diameter_above_buttresses" = double(),
     "projected_area" = double(), "alpha_volume" = double())
   diameter_above_buttresses <- diameter_at_breast_height <- NULL
+  functional_diameter_above_buttresses <-
+    functional_diameter_at_breast_height <- NULL
   if (buttress == FALSE){
-    trees <- subset(trees, select = -diameter_above_buttresses)
+    trees <- subset(trees, select = -c(diameter_above_buttresses,
+                                       functional_diameter_above_buttresses))
   } else {
-    tree <- subset(trees, select = -diameter_at_breast_height)
+    trees <- subset(trees, select = -c(diameter_at_breast_height,
+                                      functional_diameter_at_breast_height))
   }
   filepaths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                           full.names = TRUE)
@@ -105,10 +113,14 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     h_out <- tree_height_pc(pc, dtm, r, plot)
     if (buttress){
       dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
-      dbh_out <- NaN
+      dab <- dab_out$dab
+      fdab <- dab_out$fdab
+      dbh <- fdbh <- NaN
     } else {
       dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, plot)
-      dab_out <- NaN
+      dbh <- dbh_out$dbh
+      fdbh <- dbh_out$fdbh
+      dab <- fdab <- NaN
     }
     if (crown){
       classify_out <- classify_crown_pc(pc, thresholdbranch, minheight,
@@ -121,37 +133,40 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     av <- alpha_volume_pc(pc, alpha)
     if (plot){
       h <- h_out$h
-      if (buttress){
-        dab <- dab_out$dab
-        dbh <- dbh_out
-      } else {
-        dbh <- dbh_out$dbh
-        dab <- dab_out
-      }
       pa <- pa_out$pa
     } else {
       h <- h_out
-      dbh <- dbh_out
-      dab <- dab_out
       pa <- pa_out
     }
     tree <- data.frame(
       "tree_id" = filenames[i], "X_position" = pos[1],
       "Y_position" = pos[2], "tree_height" = h,
       "diameter_at_breast_height" = dbh,
+      "functional_diameter_at_breast_height" = fdbh,
       "diameter_above_buttresses" = dab,
+      "functional_diameter_above_buttresses" = fdab,
       "projected_area" = pa, "alpha_volume" = av)
     if (buttress == FALSE){
-      tree <- subset(tree, select = -diameter_above_buttresses)
+      tree <- subset(tree, select = -c(diameter_above_buttresses,
+                                       functional_diameter_above_buttresses))
     } else {
-      tree <- subset(tree, select = -diameter_at_breast_height)
+      tree <- subset(tree, select = -c(diameter_at_breast_height,
+                                       functional_diameter_at_breast_height))
     }
     trees <- rbind(trees, tree)
     if (plot){
       p0 <- pa_out$plot
-      p0 <- p0 + ggplot2::ggtitle(label = bquote(PA == .(round(pa,2)) ~ m^2),
-                                  subtitle = bquote(AV == .(round(av,2)) ~ m^3)) +
-        ggplot2::theme(text = ggplot2::element_text(size = 10))
+      if(crown){
+        p0 <- p0 + ggplot2::ggtitle(label = bquote(PCA == .(round(pa,2)) ~ m^2),
+                                  subtitle = bquote(ACV == .(round(av,2))
+                                                    ~ m^3)) +
+          ggplot2::theme(text = ggplot2::element_text(size = 10))
+      } else {
+        p0 <- p0 + ggplot2::ggtitle(label = bquote(PA == .(round(pa,2)) ~ m^2),
+                                    subtitle = bquote(AV == .(round(av,2))
+                                                      ~ m^3)) +
+          ggplot2::theme(text = ggplot2::element_text(size = 10))
+      }
       if (buttress) {
         p <- dab_out$plot +
           ggplot2::theme(text = ggplot2::element_text(size = 10))

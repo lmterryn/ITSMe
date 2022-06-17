@@ -6,7 +6,6 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/lmterryn/ITSMe/workflows/R-CMD-check/badge.svg)](https://github.com/lmterryn/ITSMe/actions)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6560321.svg)](https://doi.org/10.5281/zenodo.6560321)
 <!-- badges: end -->
 
 ## Goal
@@ -107,9 +106,17 @@ library(ITSMe)
 # Read the point cloud file from the Specified path to the tree point cloud file
 pc_tree <- read_tree_pc(path = "path/to/point/cloud.txt")
 # Use dbh_pc function with default parameters and plot the fit
-dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
+out_dbh <- dbh_pc(pc = pc_tree, plot = TRUE)
+# Access the dbh, residual and fdbh values from the output list
+dbh <- out_dbh$dbh
+residual_dbh <- out_dbh$R2
+fdbh <- out_dbh$fdbh
 # Use dab_pc function with default parameters and plot the fit
-dab <- dab_pc(pc = pc_tree, plot = TRUE)
+out_dab <- dab_pc(pc = pc_tree, plot = TRUE)
+# Access the dab, residual and fdab values from the output list
+ddab <- out_dab$dab
+residual_dab <- out_dab$R2
+fdab <- out_dab$fdab
 ```
 
 <p align="center">

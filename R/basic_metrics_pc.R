@@ -200,8 +200,12 @@ f <- function(c, x, y) {
 #' The diameter is measured of the optimal circle fitted through a horizontal
 #' slice. A least squares circle fitting algorithm was applied to find the
 #' optimal fit. The height and thickness of the slice can be specified using
-#' slice_height and slice_thickness parameters. This is also a Support function
-#' used to determine the DBH from a tree point cloud with \code{\link{dbh_pc}}.
+#' slice_height and slice_thickness parameters. Additionally, the functional
+#' diameter is calculated. For this the area of the concave hull with (concavity
+#' 4) is determined on the slice. From this area the diameter is determined as
+#' the diameter of a circle with this area. This function is also a Support
+#' function used to determine the DBH from a tree point cloud with
+#' \code{\link{dbh_pc}}.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -214,9 +218,9 @@ f <- function(c, x, y) {
 #'   fitting is plotted.
 #'
 #' @return A list with the diameter at a specified height (numeric value), the
-#'   residual between circle fit and the points and the center of the circle
-#'   fit. Also optionally (plot=TRUE) plots the circle fitting on the horizontal
-#'   slice.
+#'   residual between circle fit and the points, the center of the circle fit,
+#'   and the functional diameter calculated from the concave hull fitting. Also
+#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
 #'
 #' @export
 #'
@@ -259,8 +263,12 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
       R <- mean(Ri) # radius (DBH/2)
       residu <- sum((Ri - R)**2) / length(Ri) # average residual
       diam <- 2 * R
+      points <- sf::st_as_sf(unique(xy_slice), coords = c("X", "Y"))
+      hull <- concaveman::concaveman(points, 4)
+      pa <- sf::st_area(hull)
+      fdiam <- sqrt(pa/pi)*2
     } else {
-      R <- diam <- residu <- center_estimate <- NaN
+      R <- diam <- residu <- center_estimate <- fdiam <- NaN
     }
     if (!is.nan(R)){
       if (R > 3){
@@ -273,11 +281,20 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
         ggplot2::geom_point(data = xy_slice,
                             ggplot2::aes(X, Y, color = "points stem slice"),
                             size = 1) +
-        ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::ggtitle(paste("diameter = ", as.character(round(diam, 2)),
-                               " m at H = ",
+        #ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_sf(data = sf::st_geometry(hull),
+                         ggplot2::aes(color = "concave hull"),
+                         col = "green", size = 1,
+                         fill = NA) +
+        ggplot2::ggtitle(paste("diameter at ",
                                as.character(round(slice_height, 2)),
                                " m", sep = "")) +
+        ggplot2::labs(caption = paste("diameter = ",
+                                      as.character(round(diam, 2))," m \n",
+                                      "R2 = ", as.character(round(residu*100,2)),
+                                      " cm", "\n", "fdiameter =",
+                                      as.character(round(fdiam,2)), " m",
+                                      sep ="")) +
         ggplot2::theme(text = ggplot2::element_text(size = 20))
       if (!is.nan(R)) {
         data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
@@ -292,23 +309,26 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
                              size = 1)  +
         ggplot2::scale_color_manual(name = "",
                                     values = c("points stem slice" = "black",
+                                               "concave hull" = "green",
                                                "estimated center" = "red",
                                                "fitted circle" = "blue"),
                                     guide = ggplot2::guide_legend(
                                       override.aes =
-                                        list(linetype = c(0, 0, 1),
-                                             shape = c(16, 16, NA),
-                                             size = c(2, 2, 1)))) +
+                                        list(linetype = c(0, 1, 0, 1),
+                                             shape = c(16, NA, 16, NA),
+                                             size = c(2, 1, 2, 1)))) +
         ggplot2::theme(text = ggplot2::element_text(size = 20))
       }
       print(plotDIAM)
       return(list("diameter" = diam, "R2" = residu, "center" = center_estimate,
-                  "plot" = plotDIAM))
+                  "fdiameter" = fdiam, "hull" = hull, "plot" = plotDIAM))
     } else {
-      return(list("diameter" = diam, "R2" = residu, "center" = center_estimate))
+      return(list("diameter" = diam, "R2" = residu, "center" = center_estimate,
+                  "fdiameter" = fdiam, "hull" = hull))
     }
   } else {
-    return(list("diameter" = NaN, "R2" = NaN, "center" = NaN))
+    return(list("diameter" = NaN, "R2" = NaN, "center" = NaN,
+                "fdiameter" = NaN, "hull" = NaN))
   }
 }
 
@@ -435,16 +455,18 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08){
 
 #' Diameter at breast height point cloud
 #'
-#' Returns the diameter at breast height (DBH) of a tree measured from a tree
-#' point cloud. There should be only one stem at breast height.
+#' Returns the diameter at breast height (DBH) and functional diameter at breast
+#' height of a tree measured from a tree point cloud. There should be only one
+#' stem at breast height.
 #'
 #' The DBH is measured as the diameter of the optimal circle fitted through a
 #' 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree
 #' point) using \code{\link{diameter_slice_pc}}. A least squares circle fitting
-#' algorithm is applied to find the optimal fit. In case there are branches or
-#' foliage at this height, the lower trunk is extracted using
-#' \code{\link{extract_lower_trunk_pc}}. Wether this is the case is determined
-#' using the thresholdR2 parameter.
+#' algorithm is applied to find the optimal fit. Also the functional diameter at
+#' breast height (fDBH) is determined using \code{\link{diameter_slice_pc}}. In
+#' case there are branches or foliage at this height, the lower trunk is
+#' extracted using \code{\link{extract_lower_trunk_pc}}. Wether this is the case
+#' is determined using the thresholdR2 parameter.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -460,10 +482,10 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08){
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
-#' @return Diameter of the stem at breast height (numeric value). Also
-#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
-#'   in this case returns a list with the dbh value as first element and the
-#'   plot as the second element.
+#' @return List with the diameter of the stem at breast height, the residuals on
+#'   the fitting, and the functional diameter at breast height. Also optionally
+#'   (plot=TRUE) plots the circle fitting on the horizontal slice which is then
+#'   included in the list output.
 #'
 #' @export
 #'
@@ -519,7 +541,9 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
                             ggplot2::aes(X, Y, color = "points stem slice"),
                             size = 1) +
         ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::ggtitle("DBH = NaN") +
+        ggplot2::ggtitle("DBH") +
+        ggplot2::labs(caption = paste("DBH = NaN", "\n", "R2 = NaN", "\n",
+                                      "fDBH = NaN", sep ="")) +
         ggplot2::scale_color_manual(name = "",
                                     values = c("points stem slice" = "black"),
                                     guide = ggplot2::guide_legend(override.aes =
@@ -539,7 +563,10 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
         ggplot2::geom_point(data = pc_dbh,
                             ggplot2::aes(X, Y, color = "points stem slice"),
                             size = 1) +
-        ggplot2::coord_fixed(ratio = 1) +
+        #ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_sf(data = sf::st_geometry(out_130$hull),
+                         ggplot2::aes(color = "concave hull"),
+                         col = "green", size = 1, fill = NA) +
         ggplot2::geom_point(data = data_circle,
                             ggplot2::aes(x0, y0, color = "estimated center"),
                             size = 1) +
@@ -548,44 +575,55 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
                                           color = "fitted circle"),
                              inherit.aes = FALSE, show.legend = TRUE,
                              size = 1) +
-        ggplot2::ggtitle(paste("DBH = ",
-                               as.character(round(out_130$diameter, 2)),
-                               " m", sep = "")) +
+        ggplot2::ggtitle("DBH") +
+        ggplot2::labs(caption = paste("DBH = ",
+                                      as.character(round(out_130$diameter, 2)),
+                                      " m \n",
+                                      "R2 = ",
+                                      as.character(round(out_130$R2*100, 2)),
+                                      " cm", "\n", "fDBH =",
+                                      as.character(round(out_130$fdiameter, 2)),
+                                      " m", sep ="")) +
         ggplot2::scale_color_manual(name = "",
                                     values = c("points stem slice" = "black",
+                                               "concave hull" = "green",
                                                "estimated center" = "red",
                                                "fitted circle" = "blue"),
                                     guide = ggplot2::guide_legend(
                                       override.aes =
-                                        list(linetype = c(0, 0, 1),
-                                             shape = c(16, 16, NA),
-                                             size = c(2, 2, 1)))) +
+                                        list(linetype = c(0, 1, 0, 1),
+                                             shape = c(16, NA, 16, NA),
+                                             size = c(2, 1, 2, 1)))) +
         ggplot2::theme(text = ggplot2::element_text(size = 20))
       print(plotDBH)
     }
-    return(list("dbh" = out_130$diameter, "plot" = plotDBH))
+    return(list("dbh" = out_130$diameter, "R2" = out_130$R2,
+                "fdbh" = out_130$fdiameter, "plot" = plotDBH))
   } else {
-    return(out_130$diameter)
+    return(list("dbh" = out_130$diameter, "R2" = out_130$R2,
+                "fdbh" = out_130$fdiameter))
   }
 }
 
 #' Diameter above buttresses point cloud
 #'
-#' Returns the diameter above buttresses (DAB) of a tree measured from a tree
-#' point cloud.
+#' Returns the diameter above buttresses (DAB) and the functional diameter above
+#' buttresses (fDAB) of a tree measured from a tree point cloud.
 #'
 #' The DAB is measured as the diameter of the optimal circle fitted through a
-#' 6mm thick horizontal slice taken above the buttresses. A least squares circle
-#' fitting algorithm was applied to find the optimal fit. The height at which
-#' the horizontal slice is taken, is determined iteratively. Starting at 1.27 m
-#' to 1.33 m from the lowest point of the tree point cloud. The average residual
-#' between the points and the fitted circle is calculated. When the average
-#' residual exceeds a value of "thresholdbuttress" times the radius, indicating
-#' a non-circular (irregular) stem shape and presumably buttresses, the process
-#' is repeated with a new slice 6 mm higher than the previous one until a slice
-#' above the buttresses is reached. When the "maxbuttressheight" is exceeded the
-#' iterative process is restarted with a "thresholdbuttress" increased with
-#' 0.0005.
+#' 6mm thick horizontal slice taken above the buttresses using using
+#' \code{\link{diameter_slice_pc}}. A least squares circle fitting algorithm was
+#' applied to find the optimal fit. The height at which the horizontal slice is
+#' taken, is determined iteratively. Starting at 1.27 m to 1.33 m from the
+#' lowest point of the tree point cloud. The average residual between the points
+#' and the fitted circle is calculated. When the average residual exceeds a
+#' value of "thresholdbuttress" times the radius, indicating a non-circular
+#' (irregular) stem shape and presumably buttresses, the process is repeated
+#' with a new slice 6 mm higher than the previous one until a slice above the
+#' buttresses is reached. When the "maxbuttressheight" is exceeded the iterative
+#' process is restarted with a "thresholdbuttress" increased with 0.0005. At the
+#' determined height above buttresses also the functional diameter is calculated
+#' using \code{\link{diameter_slice_pc}}.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -605,10 +643,10 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
-#' @return Diameter of the stem above buttresses (numeric value). Also
-#'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
-#'   in this case returns a list with the dab value as first element and the
-#'   plot as the second element.
+#' @return List with the diameter of the stem above buttresses, the residuals on
+#'   the fitting, and the functional diameter at breast height. Also optionally
+#'   (plot=TRUE) plots the circle fitting on the horizontal slice which is then
+#'   included in the list output.
 #'
 #' @export
 #'
@@ -625,142 +663,143 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #' }
 dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
                    plot = FALSE) {
-  lh <- 1.27
-  uh <- 1.33
+  slice_height <- 1.30
+  slice_thickness <- 0.06
   residu <- 1
   R <- 0.5
   r_diff <- 1
-  RES <- c()
-  THRESH <- c()
-  DBH_HEIGHT <- c()
   R_slices <- c()
   loop <- 1
   while (loop == 1) {
-    while ((residu > thresholdbuttress * R) & (uh < maxbuttressheight) |
+    while ((residu > thresholdbuttress * R) &
+           (slice_height + slice_thickness/2 < maxbuttressheight) |
            (R > 2) | (r_diff > 2)) {
-      if (max(pc$Z) - min(pc$Z) > (lh + uh) / 2) {
-        pc_dbh <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
-        xy_dbh <- pc_dbh[, c("X", "Y")]
-        XY_dbh <- data.matrix(xy_dbh)
-        k <- 2
-        knn1 <- nabor::knn(XY_dbh, XY_dbh, k = k, radius = 0)
-        knn_ind <- data.frame(knn = knn1[[1]][, 2:k])
-        knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
-        remove <- which(knn_dist[, k - 1] > 0.05)
-        if (length(remove) != 0) {
-          xy_dbh <- xy_dbh[-remove, ]
-        }
-        if (lh == 1.27) {
-          dbh_slice <- xy_dbh
-        }
-        x_dbh <- xy_dbh$X
-        y_dbh <- xy_dbh$Y
-        x_m <- mean(x_dbh) # first estimate of the center
-        y_m <- mean(y_dbh)
-        center_estimate <- stats::optim(par = c(x_m, y_m), fn = f, x = x_dbh,
-                                        y = y_dbh)
-        x_c <- center_estimate$par[1]
-        y_c <- center_estimate$par[2]
-        Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
-        R <- mean(Ri) # radius (DBH/2)
-        residu <- sum((Ri - R)**2) / length(Ri) # average residual between
-        if (lh == 1.27) {
+      out <- diameter_slice_pc(pc = pc, slice_height = slice_height,
+                               slice_thickness = slice_thickness, plot = FALSE)
+      if (is.nan(out$diameter)){
+        loop <- 0
+        dab <- R <- residu <- NaN
+        fdab <- out$fdiameter
+      } else {
+        dab <- out$diameter
+        R <- dab/2
+        residu <- out$R2
+        fdab <- out$fdiameter
+        if (slice_height == 1.3) {
           r_diff <- 1
         } else {
           r_diff <- utils::tail(R_slices, n = 1) / R
         }
         R_slices <- append(R_slices, R)
-        RES <- append(RES, residu)
-        THRESH <- append(THRESH, thresholdbuttress * R)
-        DBH_HEIGHT <- append(DBH_HEIGHT, (lh + uh) / 2)
-        lh <- lh + 0.06
-        uh <- uh + 0.06
-      } else {
-        return(NaN)
+        slice_height <- slice_height + slice_thickness
       }
     }
-    if (uh < maxbuttressheight) {
-      lh <- lh - 0.06
-      uh <- uh - 0.06
+    if (slice_height + slice_thickness/2 < maxbuttressheight) {
+      slice_height <- slice_height - slice_thickness
       loop <- 0
     } else {
       thresholdbuttress <- thresholdbuttress + 0.0005
-      lh <- 1.27
-      uh <- 1.33
+      slice_height <- 1.30
       residu <- 1
       R <- 0.5
-      RES <- c()
-      THRESH <- c()
-      DBH_HEIGHT <- c()
       R_slices <- c()
     }
   }
-  dab <- 2 * R
   if (plot) {
     X <- Y <- x0 <- y0 <- r <- NULL
+    x_c <- out$center[[1]][1]
+    y_c <- out$center[[1]][2]
     data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
-    if (lh != 1.27) {
+    dbh_slice <- pc[(pc$Z > min(pc$Z) + 1.3-slice_thickness/2) &
+                      (pc$Z < min(pc$Z) + 1.3+slice_thickness/2), ]
+    xy_dbh <- pc[(pc$Z > min(pc$Z) + slice_height-slice_thickness/2) &
+                   (pc$Z < min(pc$Z) + slice_height+slice_thickness/2), ]
+    if (slice_height != 1.30) {
       plotDAB <- ggplot2::ggplot() +
-        ggplot2::geom_point(data = dbh_slice,
-                            ggplot2::aes(X, Y, color = "points at breast
-                                         height"), size = 1) +
         ggplot2::geom_point(data = xy_dbh,
-                            ggplot2::aes(X, Y, color = "points above
-                                         buttresses"), colour = "black",
+                            ggplot2::aes(X, Y, color = "points above buttresses"),
                             size = 1) +
-        ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_point(data = dbh_slice,
+                            ggplot2::aes(X, Y, color = "points at breast height"),
+                            size = 1) +
+        #ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_sf(data = sf::st_geometry(out$hull),
+                         ggplot2::aes(color = "concave hull"),
+                         col = "green", size = 1, fill = NA) +
         ggplot2::geom_point(data = data_circle,
-                            ggplot2::aes(x0, y0, color = "estimated center")) +
+                            ggplot2::aes(x0, y0, color = "estimated center"),
+                            size = 1) +
         ggforce::geom_circle(data = data_circle,
                              ggplot2::aes(x0 = x0, y0 = y0, r = r,
                                           color = "fitted circle"),
-                             inherit.aes = FALSE, show.legend = TRUE) +
-        ggplot2::ggtitle(paste("DAB = ", as.character(round(dab, 2)),
-                               " m at H = ",
-                               as.character(round((lh + uh) / 2, 2)),
-                               " m", sep = "")) +
+                             inherit.aes = FALSE, show.legend = TRUE,
+                             size = 1) +
+        ggplot2::ggtitle(paste("DAB at ",
+                               as.character(round(slice_height,2)), " m",
+                               sep = "")) +
+        ggplot2::labs(caption = paste("DAB = ",
+                                      as.character(round(out$diameter, 2)),
+                                      " m \n",
+                                      "R2 = ",
+                                      as.character(round(out$R2*100, 2)),
+                                      " cm", "\n", "fDAB =",
+                                      as.character(round(out$fdiameter, 2)),
+                                      " m", sep ="")) +
         ggplot2::scale_color_manual(name = "",
-                                    values = c("points above buttresses" =
-                                                 "black",
+                                    values = c("points above buttresses" = "black",
+                                               "points at breast height" = "grey",
+                                               "concave hull" = "green",
                                                "estimated center" = "red",
-                                               "points at breast height" =
-                                                 "grey",
                                                "fitted circle" = "blue"),
                                     guide = ggplot2::guide_legend(
                                       override.aes =
-                                        list(linetype = c(0, 0, 0, 1),
-                                             shape = c(16, 16, 16, NA),
-                                             size = c(2, 2, 2, 1))))
+                                        list(linetype = c(0, 0, 1, 0, 1),
+                                             shape = c(16, 16, NA, 16, NA),
+                                             size = c(2, 2, 1, 2, 1)))) +
+        ggplot2::theme(text = ggplot2::element_text(size = 20))
     } else {
       plotDAB <- ggplot2::ggplot() +
         ggplot2::geom_point(data = xy_dbh,
-                            ggplot2::aes(X, Y, color = "points at breast
-                                         height"),
-                            size = 1, colour = "black") +
-        ggplot2::coord_fixed(ratio = 1) +
+                            ggplot2::aes(X, Y, color = "points at breast height"),
+                            size = 1) +
+        #ggplot2::coord_fixed(ratio = 1) +
+        ggplot2::geom_sf(data = sf::st_geometry(out$hull),
+                         ggplot2::aes(color = "concave hull"),
+                         col = "green", size = 1, fill = NA) +
         ggplot2::geom_point(data = data_circle,
-                            ggplot2::aes(x0, y0, color = "estimated center")) +
+                            ggplot2::aes(x0, y0, color = "estimated center"),
+                            size = 1) +
         ggforce::geom_circle(data = data_circle,
                              ggplot2::aes(x0 = x0, y0 = y0, r = r,
                                           color = "fitted circle"),
-                             inherit.aes = FALSE, show.legend = TRUE) +
-        ggplot2::ggtitle(paste("DBH = ", as.character(round(dab, 2)),
-                               " m", sep = "")) +
+                             inherit.aes = FALSE, show.legend = TRUE,
+                             size = 1) +
+        ggplot2::ggtitle("DBH") +
+        ggplot2::labs(caption = paste("DBH = ",
+                                      as.character(round(out$diameter, 2)),
+                                      " m \n",
+                                      "R2 = ",
+                                      as.character(round(out$R2*100, 2)),
+                                      " cm", "\n", "fDBH =",
+                                      as.character(round(out$fdiameter, 2)),
+                                      " m", sep ="")) +
         ggplot2::scale_color_manual(name = "",
-                                    values = c("points at breast height" =
-                                                 "black",
+                                    values = c("points at breast height" = "black",
+                                               "concave hull" = "green",
                                                "estimated center" = "red",
                                                "fitted circle" = "blue"),
                                     guide = ggplot2::guide_legend(
                                       override.aes =
-                                        list(linetype = c(0, 0, 1),
-                                             shape = c(16, 16, NA),
-                                             size = c(2, 2, 1))))
+                                        list(linetype = c(0, 1, 0, 1),
+                                             shape = c(16, NA, 16, NA),
+                                             size = c(2, 1, 2, 1)))) +
+        ggplot2::theme(text = ggplot2::element_text(size = 20))
     }
     print(plotDAB)
-    return(list("dab" = dab,"plot" = plotDAB))
+    return(list("dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter,
+                "plot" = plotDAB))
   } else {
-    return(dab)
+    return(list("dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter))
   }
 }
 
@@ -822,9 +861,11 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                               slice_thickness = 0.06, thresholdbuttress = 0.001,
                               maxbuttressheight = 7, plot = FALSE) {
   if (buttress) {
-    dab <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+    dab <- out$dab
   } else {
-    dab <- dbh_pc(pc, thresholdR2, slice_thickness)
+    out <- dbh_pc(pc, thresholdR2, slice_thickness)
+    dab <- out$dbh
   }
   if (!is.nan(dab)){
     d <- thresholdbranch * dab + 0.1

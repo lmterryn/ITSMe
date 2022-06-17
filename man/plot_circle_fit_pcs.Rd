@@ -34,8 +34,10 @@ should be saved (default = current folder).}
 }
 \value{
 A list with in the first element a numeric containing the diameter
-values for each tree point cloud. In the second element there is the list
-with the plots. Figures are also saved in the output folder.
+values for each tree point cloud, the second element the residuals on the
+circle fittings, the third element the functional diameters. In the fourth
+element there is the list with the plots. Figures are also saved in the
+output folder.
 }
 \description{
 Calculates  the diameter and saves the figures acquired when running

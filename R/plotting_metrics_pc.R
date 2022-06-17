@@ -84,8 +84,10 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
 #'   should be saved (default = current folder).
 #'
 #' @return A list with in the first element a numeric containing the diameter
-#'   values for each tree point cloud. In the second element there is the list
-#'   with the plots. Figures are also saved in the output folder.
+#'   values for each tree point cloud, the second element the residuals on the
+#'   circle fittings, the third element the functional diameters. In the fourth
+#'   element there is the list with the plots. Figures are also saved in the
+#'   output folder.
 #'
 #' @export
 #'
@@ -109,6 +111,8 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
   Ds <- c()
+  Rs <- c()
+  fDs <- c()
   Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
@@ -119,10 +123,12 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
                       as.character(slice_height), "_",
                       as.character(slice_thickness), "_", ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot)
-    Ds <- append(Ds, out$diam)
+    Ds <- append(Ds, out$diameter)
+    Rs <- append(Rs, out$R2)
+    fDs <- append(fDs, out$fdiameter)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("Diams"=Ds, "Plots"=Plots))
+  return(list("Diams"=Ds, "R2s"=Rs, "fDiams"=fDs, "Plots"=Plots))
 }
 
 #' Calculate and save figures of \code{\link{dbh_pc}} function
@@ -148,8 +154,10 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #'   should be saved (default = current folder).
 #'
 #' @return A list with in the first element a numeric containing the dbh values
-#'   for each tree point cloud. In the second element there is the list with the
-#'   plots. Figures are also saved in the output folder.
+#'   for each tree point cloud, the second element the residuals on the circle
+#'   fittings, the third element the functional diameters. In the fourth element
+#'   there is the list with the plots. Figures are also saved in the output
+#'   folder.
 #'
 #' @export
 #'
@@ -167,6 +175,8 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
   DBHs <- c()
+  Rs <- c()
+  fDBHs <- c()
   Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
@@ -178,9 +188,11 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
                      as.character(slice_thickness), ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot)
     DBHs <- append(DBHs, out$dbh)
+    Rs <- append(Rs, out$R2)
+    fDBHs <- append(fDBHs, out$fdbh)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DBHs"=DBHs, "Plots"=Plots))
+  return(list("DBHs"=DBHs, "R2s"=Rs, "fDBHs"=fDBHs, "Plots"=Plots))
 }
 
 #' Calculate and save figures of \code{\link{dab_pc}} function
@@ -208,8 +220,10 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #'   buttresses.
 #'
 #' @return A list with in the first element a numeric containing the dab values
-#'   for each tree point cloud. In the second element there is the list with the
-#'   plots. Figures are also saved in the output folder.
+#'   for each tree point cloud, the second element the residuals on the circle
+#'   fittings, the third element the functional diameters. In the fourth element
+#'   there is the list with the plots. Figures are also saved in the output
+#'   folder.
 #'
 #' @export
 #'
@@ -233,6 +247,8 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
   file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
                            full.names = FALSE)
   DABs <- c()
+  Rs <- c()
+  fDABs <- c()
   Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
@@ -243,9 +259,11 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                      as.character(maxbuttressheight), ".jpeg", sep = "")
     ggplot2::ggsave(filename, plot = out$plot)
     DABs <- append(DABs, out$dab)
+    Rs <- append(Rs, out$R2)
+    fDABs <- append(fDABs, out$fdab)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DABs"=DABs, "Plots"=Plots))
+  return(list("DABs"=DABs, "R2s"=Rs, "fDABs"=fDABs, "Plots"=Plots))
 }
 
 #' Save figures of \code{\link{classify_crown_pc}} function

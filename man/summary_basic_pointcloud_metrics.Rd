@@ -49,8 +49,8 @@ non-buttressed trees. Choose a higher value (e.g. 4) for buttressed trees.
 Only relevant when crown == TRUE.}
 
 \item{concavity}{Numeric value (default=2). Parameter of the
-\code{\link{projected_area_pc}} function used to calculate the
-projected crown area.}
+\code{\link{projected_area_pc}} function used to calculate the projected
+crown area.}
 
 \item{alpha}{Numeric value (default=1). Parameter of the
 \code{\link{alpha_volume_pc}} function used to calculate the crown volume.}
@@ -90,12 +90,14 @@ volume. The summary is saved in a csv file if an output folder is provided.
 }
 \description{
 Returns a summary data.frame containing the tree position (X,Y-coordinates),
-tree height, diameter at breast height, diameter above buttresses, projected
+tree height, diameter at breast height, functional diameter at breast height,
+diameter above buttresses, functional diameter above buttresses, projected
 (crown) area and (crown) volume.
 }
 \details{
-The tree position, tree height, diameter at breast height, diameter above
-buttresses, projected (crown) area and (crown) volume are otained with
+The tree position, tree height, diameter at breast height, functional
+diameter at breast height, diameter above buttresses, functional diameter
+above buttresses, projected (crown) area and (crown) volume are otained with
 \code{\link{tree_position_pc}}, \code{\link{tree_height_pc}},
 \code{\link{dbh_pc}}, \code{\link{dab_pc}}, \code{\link{projected_area_pc}}
 and \code{\link{alpha_volume_pc}} respectively.

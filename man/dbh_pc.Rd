@@ -25,23 +25,25 @@ thickness of the slice which is used to measure the diameter.}
 fitting is plotted.}
 }
 \value{
-Diameter of the stem at breast height (numeric value). Also
-optionally (plot=TRUE) plots the circle fitting on the horizontal slice and
-in this case returns a list with the dbh value as first element and the
-plot as the second element.
+List with the diameter of the stem at breast height, the residuals on
+the fitting, and the functional diameter at breast height. Also optionally
+(plot=TRUE) plots the circle fitting on the horizontal slice which is then
+included in the list output.
 }
 \description{
-Returns the diameter at breast height (DBH) of a tree measured from a tree
-point cloud. There should be only one stem at breast height.
+Returns the diameter at breast height (DBH) and functional diameter at breast
+height of a tree measured from a tree point cloud. There should be only one
+stem at breast height.
 }
 \details{
 The DBH is measured as the diameter of the optimal circle fitted through a
 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree
 point) using \code{\link{diameter_slice_pc}}. A least squares circle fitting
-algorithm is applied to find the optimal fit. In case there are branches or
-foliage at this height, the lower trunk is extracted using
-\code{\link{extract_lower_trunk_pc}}. Wether this is the case is determined
-using the thresholdR2 parameter.
+algorithm is applied to find the optimal fit. Also the functional diameter at
+breast height (fDBH) is determined using \code{\link{diameter_slice_pc}}. In
+case there are branches or foliage at this height, the lower trunk is
+extracted using \code{\link{extract_lower_trunk_pc}}. Wether this is the case
+is determined using the thresholdR2 parameter.
 }
 \examples{
 \dontrun{
