@@ -67,37 +67,52 @@
     <dl><dt>treedata</dt>
 <dd><p>Treedata field of a TreeQSM that is returned by
 <code><a href="read_tree_qsm.html">read_tree_qsm</a></code>.</p></dd>
+
+
 <dt>pc</dt>
 <dd><p>The tree point cloud as a data.frame with columns X,Y,Z. Output of
 <code><a href="read_tree_pc.html">read_tree_pc</a></code>. Default is NA and indicates no tree point
 cloud is available.</p></dd>
+
+
 <dt>buttress</dt>
 <dd><p>Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available.</p></dd>
+
+
 <dt>thresholdR2</dt>
 <dd><p>Numeric value (default=0.001). Parameter of the
 <code><a href="dbh_pc.html">dbh_pc</a></code> function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.</p></dd>
+
+
 <dt>slice_thickness</dt>
 <dd><p>Numeric value (default = 0.06). Parameter of the
 <code><a href="dbh_pc.html">dbh_pc</a></code> function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.</p></dd>
+
+
 <dt>thresholdbuttress</dt>
 <dd><p>Numeric value (default=0.001). Parameter of the
 <code><a href="dab_pc.html">dab_pc</a></code> function used to calculate the diameter above
 buttresses. Only relevant if the tree point cloud is available and
 buttress == TRUE.</p></dd>
+
+
 <dt>maxbuttressheight</dt>
 <dd><p>Numeric value (default=7). Parameter of the
 <code><a href="dab_pc.html">dab_pc</a></code> function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress
 == TRUE.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>DBH divided by the tree height.</p>
+    
+
+<p>DBH divided by the tree height.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -139,7 +154,7 @@ Photogrammetry and Remote Sensing, 168, 170-181.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

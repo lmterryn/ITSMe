@@ -88,22 +88,34 @@ that is made for tree xxx). Multiple QSMs can be present in one QSM file,
 in this case set parameter multiple TRUE. When multiple QSMs are present
 for one tree the mean of the values of the different QSMs is taken for that
 tree as a final value for a certain feature.</p></dd>
+
+
 <dt>version</dt>
 <dd><p>A character indicating the version of TreeQSM that was used to
 produce the QSMs (Default = "2.4.1"). Other possible versions are "2.4.0",
 "2.0", "2.3.0", "2.3.1" and "2.3.2".</p></dd>
+
+
 <dt>multiple</dt>
 <dd><p>Logical (default = FALSE), indicates if a single .mat file
 for one tree holds multiple QSMs at once.</p></dd>
+
+
 <dt>sbr_normalisation</dt>
 <dd><p>Character (default="treeheight"). Normalisation
 parameter of <code><a href="stem_branch_radius_qsm.html">stem_branch_radius_qsm</a></code>.</p></dd>
+
+
 <dt>sbl_normalisation</dt>
 <dd><p>Character (default="treeheight"). Normalisation
 parameter of <code><a href="stem_branch_length_qsm.html">stem_branch_length_qsm</a></code>.</p></dd>
+
+
 <dt>sbd_normalisation</dt>
 <dd><p>Character (default="no"). Normalisation parameter of
 <code><a href="stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></code>.</p></dd>
+
+
 <dt>PCs_path</dt>
 <dd><p>A character with the path to the folder that contains the
 tree point clouds. Default is NA when the point clouds are not available.
@@ -112,42 +124,59 @@ crown area and crown volume. The DBH and tree height obtained from the tree
 point clouds are then used for the normalisation of the other features. The
 point cloud files have to be of the format xxx_pc in order to link the tree
 point cloud to its' respective treeQSM.</p></dd>
+
+
 <dt>extension</dt>
 <dd><p>A character refering to the file extension of the point
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
 relevant if the tree point clouds are available.</p></dd>
+
+
 <dt>buttress</dt>
 <dd><p>Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if the tree point clouds are available. Only
 relevant if the tree point clouds are available.</p></dd>
+
+
 <dt>thresholdR2</dt>
 <dd><p>Numeric value (default=0.001). Parameter of the
 <code><a href="dbh_pc.html">dbh_pc</a></code> function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.</p></dd>
+
+
 <dt>slice_thickness</dt>
 <dd><p>Numeric value (default = 0.06). Parameter of the
 <code><a href="dbh_pc.html">dbh_pc</a></code> function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.</p></dd>
+
+
 <dt>thresholdbuttress</dt>
 <dd><p>Numeric value (default=0.001). Parameter of the
 <code><a href="dab_pc.html">dab_pc</a></code> function used to calculate the diameter above
 buttresses. Only relevant if the tree point clouds are available and
 buttress == TRUE.</p></dd>
+
+
 <dt>maxbuttressheight</dt>
 <dd><p>Numeric value (default=7). Parameter of the
 <code><a href="dab_pc.html">dab_pc</a></code> function used to calculate the diameter above
 buttresses. Only relevant if the tree point clouds are available and
 buttress == TRUE.</p></dd>
+
+
 <dt>OUT_path</dt>
 <dd><p>A character with name of the output file (including the path
 to the folder), where the summary csv file should be saved or logical
 (default=FALSE) in this case no csv file is produced.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The summary of all metrics from Terryn et al. (2020) as a data.frame.
+    
+
+<p>The summary of all metrics from Terryn et al. (2020) as a data.frame.
 The summary is saved in a csv file if an output folder is provided. If
 multiple QSMs are provided for all trees the mean values and standard
 deviations for each tree are also calculated and saved in 2 other csv
@@ -214,7 +243,7 @@ of Photogrammetry and Remote Sensing, 168, 170-181.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

@@ -69,17 +69,24 @@ multiple TreeQSMs are in the matlab file they are read into a list of qsms
 <dd><p>A character with the path to the TreeQSM mat file. This file
 contains one or multiple QSM(s) produced with
 <a href="https://github.com/InverseTampere/TreeQSM" class="external-link">https://github.com/InverseTampere/TreeQSM</a> in matlab.</p></dd>
+
+
 <dt>version</dt>
 <dd><p>A character indicating the version of TreeQSM that was used to
 produce the TreeQSMs (Default = "2.4.1"). Other possible versions are
 "2.4.0", "2.0", "2.3.0", "2.3.1" and "2.3.2".</p></dd>
+
+
 <dt>global</dt>
 <dd><p>Logical (default=FALSE), indicates if TreeQSM components (or
 different qsms) should be read into the global environment.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns a list with the TreeQSM components (cylinder, branch,
+    
+
+<p>Returns a list with the TreeQSM components (cylinder, branch,
 treedata and triangulation) or a list of qsms (qsm_1, qsm_2, etc) wich are
 a list of the components. And optionally (global=TRUE) saves them into the
 global environment.</p>
@@ -117,7 +124,7 @@ the value of attributes not found in the older version is set NA.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
