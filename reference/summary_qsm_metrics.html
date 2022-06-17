@@ -218,19 +218,25 @@ of Photogrammetry and Remote Sensing, 168, 170-181.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># Calculate the summary with default parameters and export to csv</span></span>
 <span class="r-in"><span class="co"># recommended for non-buttressed trees</span></span>
-<span class="r-in"><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summary_qsm_metrics</span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/folder/QSMs/"</span>,</span>
-<span class="r-in">                               OUT_path <span class="op">=</span> <span class="st">"path/to/out/folder/"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summary_qsm_metrics</span><span class="op">(</span></span>
+<span class="r-in">  QSMs_path <span class="op">=</span> <span class="st">"path/to/folder/QSMs/"</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/out/folder/"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># also using point cloud info</span></span>
-<span class="r-in"><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summary_qsm_metrics</span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/folder/QSMs/"</span>,</span>
-<span class="r-in">                               PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                               extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
-<span class="r-in">                               OUT_path <span class="op">=</span> <span class="st">"path/to/out/folder/"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summary_qsm_metrics</span><span class="op">(</span></span>
+<span class="r-in">  QSMs_path <span class="op">=</span> <span class="st">"path/to/folder/QSMs/"</span>,</span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/out/folder/"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># Calculate the summary with non-default parameter values</span></span>
 <span class="r-in"><span class="co"># recommended for buttressed trees</span></span>
-<span class="r-in"><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summary_qsm_metrics</span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/folder/QSMs/"</span>,</span>
-<span class="r-in">                               PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                               extension <span class="op">=</span> <span class="st">".txt"</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                               OUT_path <span class="op">=</span> <span class="st">"path/to/out/folder/"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summary_qsm_metrics</span><span class="op">(</span></span>
+<span class="r-in">  QSMs_path <span class="op">=</span> <span class="st">"path/to/folder/QSMs/"</span>,</span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/out/folder/"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>

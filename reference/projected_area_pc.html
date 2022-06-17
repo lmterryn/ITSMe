@@ -97,9 +97,11 @@ hull fitted to the provided point clouds.</p>
 <span class="r-in"><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu">projected_crown_area_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">pca</span> <span class="op">&lt;-</span> <span class="va">output</span><span class="op">$</span><span class="va">pca</span></span>
 <span class="r-in"><span class="co"># classify the tree point cloud and calculate the projected crown area</span></span>
-<span class="r-in"><span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span><span class="va">pc</span>, <span class="va">thresholdbranch</span>, <span class="va">minheight</span>, <span class="va">buttress</span>,</span>
-<span class="r-in">                              <span class="va">thresholdR2</span>, <span class="va">thresholdbuttress</span>,</span>
-<span class="r-in">                              <span class="va">maxbuttressheight</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span></span>
+<span class="r-in">  <span class="va">pc</span>, <span class="va">thresholdbranch</span>, <span class="va">minheight</span>, <span class="va">buttress</span>,</span>
+<span class="r-in">  <span class="va">thresholdR2</span>, <span class="va">thresholdbuttress</span>,</span>
+<span class="r-in">  <span class="va">maxbuttressheight</span>, <span class="cn">FALSE</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu">projected_crown_area_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">crown_pc</span><span class="op">$</span><span class="va">crownpoints</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>

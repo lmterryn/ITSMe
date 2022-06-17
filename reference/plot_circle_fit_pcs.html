@@ -115,14 +115,18 @@ diameter and plot the circle fitting.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># Calculate diameters at breast height (1.3m) and save circle fitting figures</span></span>
-<span class="r-in"><span class="va">diam_values</span> <span class="op">&lt;-</span> <span class="fu">plot_circle_fit_pcs</span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                                  extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
-<span class="r-in">                                  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">diam_values</span> <span class="op">&lt;-</span> <span class="fu">plot_circle_fit_pcs</span><span class="op">(</span></span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># Calculate diameters at 2.5 m with a slice of 20 cm and save the figures</span></span>
-<span class="r-in"><span class="va">diam_values</span> <span class="op">&lt;-</span> <span class="fu">plot_circle_fit_pcs</span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                                  extension <span class="op">=</span> <span class="st">".txt"</span>, slice_height <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span class="r-in">                                  slice_thickness <span class="op">=</span> <span class="fl">0.2</span>,</span>
-<span class="r-in">                                  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">diam_values</span> <span class="op">&lt;-</span> <span class="fu">plot_circle_fit_pcs</span><span class="op">(</span></span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>, slice_height <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span class="r-in">  slice_thickness <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>

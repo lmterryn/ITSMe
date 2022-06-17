@@ -180,8 +180,10 @@
 <p>Depending on if your trees are buttressed or not, you will make a choice between the diameter at breast height (DBH) and the diameter above buttresses (DAB). If you are not sure if this is the case for your tree, you can check the slice (and circle fitting) at 1.3 m with the <code>diameter_slice_pc</code> function.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Measure DBH from the tree point cloud and plot the circle fitting</span>
-<span class="va">slice1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/diameter_slice_pc.html">diameter_slice_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, slice_height <span class="op">=</span> <span class="fl">1.3</span>, 
-                            slice_thickness <span class="op">=</span> <span class="fl">0.06</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">slice1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/diameter_slice_pc.html">diameter_slice_pc</a></span><span class="op">(</span>
+  pc <span class="op">=</span> <span class="va">tree_pc</span>, slice_height <span class="op">=</span> <span class="fl">1.3</span>,
+  slice_thickness <span class="op">=</span> <span class="fl">0.06</span>, plot <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
 <span class="va">diameter</span> <span class="op">&lt;-</span> <span class="va">slice1</span><span class="op">$</span><span class="va">diameter</span></code></pre></div>
 <p><img src="../reference/figures/diameter_slice_example.jpeg"></p>
 <p><img src="../reference/figures/diameter_slice_example_butt.jpeg"></p>
@@ -227,8 +229,10 @@
 <p>For buttressed trees, the attribute <em>buttress</em> has to be set TRUE and previously chosen attributes <em>thresholdbuttress</em> and <em>maxbuttressheight</em> can be specified. It is recommended to increase the <em>minheight</em> for buttressed trees.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Classify the tree point cloud of a buttressed tree and plot the classification results</span>
-<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
-                              plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>
+  pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
+  plot <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
 <span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">crownpoints</span>
 <span class="va">plot</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">plot</span></code></pre></div>
 <p><img src="../reference/figures/crown_example_tropical.jpeg"></p>
@@ -283,50 +287,62 @@
 <code class="sourceCode R"><span class="co"># Tree height:</span>
 <span class="co"># Plot the tree point clouds (check for outliers)</span>
 <span class="co"># Specify dtm and r in case lower part of tree is not sampled</span>
-<span class="va">Hs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_tree_height_pcs.html">plot_tree_height_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
-                         extension <span class="op">=</span> <span class="st">".ply"</span>,
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
-                         dtm <span class="op">=</span> <span class="va">DTM</span>, r <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="va">Hs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_tree_height_pcs.html">plot_tree_height_pcs</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".ply"</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
+  dtm <span class="op">=</span> <span class="va">DTM</span>, r <span class="op">=</span> <span class="fl">2</span>
+<span class="op">)</span>
 
 <span class="co"># DBH:</span>
 <span class="co"># try out different thresholdR2 and slice_thickness values when default values fail</span>
-<span class="va">DBHs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_dbh_fit_pcs.html">plot_dbh_fit_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
-                         extension <span class="op">=</span> <span class="st">".ply"</span>, 
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
-                         thresholdR2 <span class="op">=</span> <span class="fl">0.0025</span>, slice_thickness <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>
-<span class="co"># DAB: </span>
+<span class="va">DBHs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_dbh_fit_pcs.html">plot_dbh_fit_pcs</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".ply"</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
+  thresholdR2 <span class="op">=</span> <span class="fl">0.0025</span>, slice_thickness <span class="op">=</span> <span class="fl">0.2</span>
+<span class="op">)</span>
+<span class="co"># DAB:</span>
 <span class="co"># try out different values for thresholdbuttress and maxbuttressheight when default values fail</span>
-<span class="va">DABs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_dab_fit_pcs.html">plot_dab_fit_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
-                         extension <span class="op">=</span> <span class="st">".las"</span>, 
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, 
-                         thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+<span class="va">DABs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_dab_fit_pcs.html">plot_dab_fit_pcs</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".las"</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
+  thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span>
+<span class="op">)</span>
 <span class="co"># Crown classification:</span>
 <span class="co"># For non-buttressed trees: (buttress = FALSE,) specify thresholdR2 and slice_thickness chosen in previous step</span>
 <span class="co"># For buttressed trees: buttress = TRUE, specify thresholdbuttress and maxbuttressheight chosen in previous step</span>
-<span class="co"># Try out different values for thresholdbranch and minheight </span>
-<span class="va">crown_pcs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_crown_classification_pcs.html">plot_crown_classification_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>, 
-                         extension <span class="op">=</span> <span class="st">".txt"</span>, 
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, 
-                         thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
-                         thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+<span class="co"># Try out different values for thresholdbranch and minheight</span>
+<span class="va">crown_pcs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_crown_classification_pcs.html">plot_crown_classification_pcs</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".txt"</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>,
+  thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
+  thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span>
+<span class="op">)</span>
 <span class="co"># Projected area</span>
-<span class="co"># Try out a different value for concavity </span>
+<span class="co"># Try out a different value for concavity</span>
 <span class="co"># indicate crown = TRUE if you want to calculate projected area on the crown points only</span>
 <span class="co"># In this case: also specify the values for the crown classification chosen in previous step</span>
-<span class="va">PAs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pa_pcs.html">plot_pa_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
-                         extension <span class="op">=</span> <span class="st">".ply"</span>, 
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, concavity <span class="op">=</span> <span class="fl">3</span>,
-                         thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
-                         thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span>
+<span class="va">PAs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_pa_pcs.html">plot_pa_pcs</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".ply"</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, concavity <span class="op">=</span> <span class="fl">3</span>,
+  thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
+  thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span>
+<span class="op">)</span>
 <span class="co"># 3D alpha volume</span>
 <span class="co"># Try out a different value for alpha</span>
 <span class="co"># indicate crown = TRUE if you want to calculate projected area on the crown points only</span>
 <span class="co"># In this case: also specify the values for the crown classification chosen in previous step</span>
-<span class="va">AVs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_av_pcs.html">plot_av_pcs</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span> , 
-                         extension <span class="op">=</span> <span class="st">".las"</span>, 
-                         OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, alpha <span class="op">=</span> <span class="fl">2</span>,
-                         thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
-                         thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></code></pre></div>
+<span class="va">AVs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_av_pcs.html">plot_av_pcs</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".las"</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>, alpha <span class="op">=</span> <span class="fl">2</span>,
+  thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">3</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
+  thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">9</span>
+<span class="op">)</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="summarise">Summarise<a class="anchor" aria-label="anchor" href="#summarise"></a>
@@ -336,9 +352,11 @@
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Summary with default setting for non-buttressed trees and plot the summary</span>
 <span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder_non-buttressed_trees/"</span><span class="op">)</span>
-<span class="co"># Summary with default setting (except minheight and buttress) for buttressed trees </span>
-<span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder_buttressed_trees/"</span>, 
-                                            minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="co"># Summary with default setting (except minheight and buttress) for buttressed trees</span>
+<span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder_buttressed_trees/"</span>,
+  minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 <p><img src="../reference/figures/summary.jpeg"></p>
 </div>
 </div>
@@ -466,8 +484,10 @@
 <code class="sourceCode R"><span class="co"># Read the TreeQSM file from its' specified path</span>
 <span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/treeqsm.mat"</span><span class="op">)</span>
 <span class="co"># Read the TreeQSM file of version "2.3.0" from its' specified path into the global environment</span>
-<span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/treeqsm.mat"</span>, version <span class="op">=</span> <span class="st">"2.3.0"</span>, 
-                     global <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>
+  path <span class="op">=</span> <span class="st">"path/to/treeqsm.mat"</span>, version <span class="op">=</span> <span class="st">"2.3.0"</span>,
+  global <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="extract-metrics-terryn-et-al--2020">Extract metrics Terryn et al. (2020)<a class="anchor" aria-label="anchor" href="#extract-metrics-terryn-et-al--2020"></a>
@@ -477,18 +497,20 @@
 <code class="sourceCode R"><span class="co"># Calculate the stem branch angle and branch angle ratio from the branch component</span>
 <span class="va">sba</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_angle_qsm.html">stem_branch_angle_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span><span class="op">)</span>
 <span class="va">bar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/branch_angle_ratio_qsm.html">branch_angle_ratio_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span><span class="op">)</span>
-<span class="co"># Calculate stem branch cluster size and crown evenness from the cylinder component </span>
+<span class="co"># Calculate stem branch cluster size and crown evenness from the cylinder component</span>
 <span class="va">sbcs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_cluster_size_qsm.html">stem_branch_cluster_size_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span><span class="op">)</span>
 <span class="va">ce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_evenness_qsm.html">crown_evenness_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span><span class="op">)</span>
 <span class="co"># Calculate the cylinder length volume ratio from the treedata component</span>
 <span class="va">clvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder_length_volume_ratio_qsm.html">cylinder_length_volume_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></code></pre></div>
 <p>Other metrics rely on two of the TreeQSM components.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Calculate the volume below 55 and the relative volume ratio from </span>
+<code class="sourceCode R"><span class="co"># Calculate the volume below 55 and the relative volume ratio from</span>
 <span class="co"># the cylinder and treedata component</span>
 <span class="va">vol_55</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/volume_below_55_qsm.html">volume_below_55_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span>
-<span class="va">relvol_ratio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_volume_ratio_qsm.html">relative_volume_ratio_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                                          treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span>
+<span class="va">relvol_ratio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/relative_volume_ratio_qsm.html">relative_volume_ratio_qsm</a></span><span class="op">(</span>
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>
+<span class="op">)</span>
 <span class="co"># Calculate the shedding ratio from the branch and treedata component</span>
 <span class="va">shed_ratio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/shedding_ratio_qsm.html">shedding_ratio_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></code></pre></div>
 <p>For some of the metrics which involve the DBH/DAB and/or the tree height, the tree point cloud of the tree can be provided as an input besides the TreeQSM data. This is because (in general) the DBH/DAB and tree height are more accurately measured from the complete tree point cloud. When the DBH is involved the DAB will be used if <em>buttress</em> = TRUE. Also specify the attribute values determined for the DBH or DAB measurement from a tree point cloud (see previous sections),</p>
@@ -496,40 +518,58 @@
 <code class="sourceCode R"><span class="co"># Read the tree point cloud</span>
 <span class="va">tree_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/point/cloud.txt"</span><span class="op">)</span>
 <span class="co"># Calculate the dbh min tree radius and volume ratio using additional point cloud data</span>
-<span class="va">dmrr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_minradius_ratio_qsm.html">dbh_minradius_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, 
-                                cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>, 
-                                thresholdR2 <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span>
-<span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_volume_ratio_qsm.html">dbh_volume_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>, 
-                            slice_thickness <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
+<span class="va">dmrr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_minradius_ratio_qsm.html">dbh_minradius_ratio_qsm</a></span><span class="op">(</span>
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>,
+  thresholdR2 <span class="op">=</span> <span class="fl">0.0025</span>
+<span class="op">)</span>
+<span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_volume_ratio_qsm.html">dbh_volume_ratio_qsm</a></span><span class="op">(</span>
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>,
+  slice_thickness <span class="op">=</span> <span class="fl">0.1</span>
+<span class="op">)</span>
 <span class="co"># Calculate the dbh height ratio of a buttressed tree using additional point cloud data</span>
 <span class="co"># Specify the optimised thresholdbuttress and maxbuttressheight when needed</span>
-<span class="va">dhr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_height_ratio_qsm.html">dbh_height_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>, 
-                            buttress <span class="op">=</span> <span class="cn">TRUE</span>, thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, 
-                            maxbuttressheight <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
+<span class="va">dhr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_height_ratio_qsm.html">dbh_height_ratio_qsm</a></span><span class="op">(</span>
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">tree_pc</span>,
+  buttress <span class="op">=</span> <span class="cn">TRUE</span>, thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>,
+  maxbuttressheight <span class="op">=</span> <span class="fl">5</span>
+<span class="op">)</span>
 <span class="co"># Calculate the crown start height, crown height and crown diameter height ratio</span>
 <span class="co"># using additional point cloud data</span>
-<span class="va">csh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_start_height_qsm.html">crown_start_height_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                              pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span>
-<span class="va">ch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_height_qsm.html">crown_height_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                         pc <span class="op">=</span> <span class="va">tree_pc</span><span class="op">)</span>
-<span class="va">cdhr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_diameterheight_ratio_qsm.html">crown_diameterheight_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, 
-                                            cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                                            pc <span class="op">=</span><span class="va">tree_pc</span><span class="op">)</span></code></pre></div>
+<span class="va">csh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_start_height_qsm.html">crown_start_height_qsm</a></span><span class="op">(</span>
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  pc <span class="op">=</span> <span class="va">tree_pc</span>
+<span class="op">)</span>
+<span class="va">ch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_height_qsm.html">crown_height_qsm</a></span><span class="op">(</span>
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  pc <span class="op">=</span> <span class="va">tree_pc</span>
+<span class="op">)</span>
+<span class="va">cdhr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crown_diameterheight_ratio_qsm.html">crown_diameterheight_ratio_qsm</a></span><span class="op">(</span>
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  pc <span class="op">=</span> <span class="va">tree_pc</span>
+<span class="op">)</span></code></pre></div>
 <p>Normalisation according to Terryn et al. (2020) as well as Åkerblom et al. (2017) is possible through the normalisation parameter included in the functions of the metrics that were adapted by Terryn et al.  (2020).</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Calculate the stem branch radius according to Åkerblom et al. (2017)</span>
-<span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_radius_qsm.html">stem_branch_radius_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, 
-                              normalisation <span class="op">=</span> <span class="st">"parentcylinder"</span><span class="op">)</span>
-<span class="co"># Calculate the stem branch length according to Terryn et al. (2020) </span>
-<span class="va">sbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_length_qsm.html">stem_branch_length_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, 
-                              normalisation <span class="op">=</span> <span class="st">"treeheight"</span><span class="op">)</span>
+<span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_radius_qsm.html">stem_branch_radius_qsm</a></span><span class="op">(</span>
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,
+  normalisation <span class="op">=</span> <span class="st">"parentcylinder"</span>
+<span class="op">)</span>
+<span class="co"># Calculate the stem branch length according to Terryn et al. (2020)</span>
+<span class="va">sbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_length_qsm.html">stem_branch_length_qsm</a></span><span class="op">(</span>
+  branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,
+  normalisation <span class="op">=</span> <span class="st">"treeheight"</span>
+<span class="op">)</span>
 <span class="co"># Calculate the stem branch distance according to Åkerblom et al. (2017) and</span>
-<span class="co"># using point cloud information </span>
-<span class="va">sbd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                                treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, normalisation <span class="op">=</span> <span class="st">"dbh"</span>, 
-                                pc <span class="op">=</span>  <span class="va">tree_pc</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
-                                thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, 
-                                maxbuttressheight <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+<span class="co"># using point cloud information</span>
+<span class="va">sbd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></span><span class="op">(</span>
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, normalisation <span class="op">=</span> <span class="st">"dbh"</span>,
+  pc <span class="op">=</span> <span class="va">tree_pc</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
+  thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>,
+  maxbuttressheight <span class="op">=</span> <span class="fl">5</span>
+<span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -546,16 +586,20 @@
 <span class="co"># Run the summary function with multiple QSMs per *mat file</span>
 <span class="fu"><a href="../reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsm/folder/"</span>, multiple <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co"># Run the summary function with default settings with point cloud info</span>
-<span class="fu"><a href="../reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, 
-                    PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>
+  QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>,
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>
+<span class="op">)</span>
 <span class="co"># Run the summary function with non-default settings with point cloud info</span>
-<span class="fu"><a href="../reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, version <span class="op">=</span> <span class="st">"2.4.0"</span>, 
-                    sbr_normalisation <span class="op">=</span> <span class="st">"parentcylinder"</span>, 
-                    sbl_normalisation <span class="op">=</span> <span class="st">"dbh"</span>, sbd_normalisation <span class="op">=</span> <span class="st">"dbh"</span>, 
-                    PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>, 
-                    extension <span class="op">=</span> <span class="st">".ply"</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>, 
-                    thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">5</span>, 
-                    OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>
+  QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsms/folder/"</span>, version <span class="op">=</span> <span class="st">"2.4.0"</span>,
+  sbr_normalisation <span class="op">=</span> <span class="st">"parentcylinder"</span>,
+  sbl_normalisation <span class="op">=</span> <span class="st">"dbh"</span>, sbd_normalisation <span class="op">=</span> <span class="st">"dbh"</span>,
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".ply"</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,
+  thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>, maxbuttressheight <span class="op">=</span> <span class="fl">5</span>,
+  OUT_path <span class="op">=</span> <span class="st">"path/to/output/folder/"</span>
+<span class="op">)</span></code></pre></div>
 </div>
 </div>
 </div>

@@ -292,29 +292,37 @@
 <span class="co"># Read the TreeQSM file from the Specified path to the TreeQSM file</span>
 <span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/QSM.mat"</span><span class="op">)</span>
 <span class="co"># Use stem_branch_distance_qsm function</span>
-<span class="va">sbd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                                treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, normalisation <span class="op">=</span> <span class="st">"dbh"</span><span class="op">)</span>
+<span class="va">sbd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></span><span class="op">(</span>
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, normalisation <span class="op">=</span> <span class="st">"dbh"</span>
+<span class="op">)</span>
 <span class="co"># Using the point cloud information for more accurate dbh normalisation</span>
 <span class="va">pc_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/point/cloud.txt"</span><span class="op">)</span>
-<span class="va">sbd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, 
-                                treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, normalisation <span class="op">=</span> <span class="st">"dbh"</span>, 
-                                pc <span class="op">=</span> <span class="va">pc_tree</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">sbd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/stem_branch_distance_qsm.html">stem_branch_distance_qsm</a></span><span class="op">(</span>
+  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,
+  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, normalisation <span class="op">=</span> <span class="st">"dbh"</span>,
+  pc <span class="op">=</span> <span class="va">pc_tree</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 <p>Calculating a summary data.frame with the basic structural metrics (tree position, dbh, dab, tree height, projected area, 3D alpha volume) that can be obtained from individual tree point clouds for all point clouds in a specific folder:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lmterryn/ITSMe" class="external-link">ITSMe</a></span><span class="op">)</span>
-<span class="co">#Run summary function with default parameter settings</span>
-<span class="va">basic_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/cloud/folder/"</span>, 
-                                                  extension <span class="op">=</span> <span class="st">".txt"</span><span class="op">)</span></code></pre></div>
+<span class="co"># Run summary function with default parameter settings</span>
+<span class="va">basic_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/cloud/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".txt"</span>
+<span class="op">)</span></code></pre></div>
 <p>If you set the plot parameter TRUE and provide an OUT_path, this function saves a summary figure for each tree:</p>
 <p align="center"><img src="reference/figures/summary.jpeg" height="500"></p>
 <p>Calculating a summary data.frame with the structural metrics defined by Terryn et al. (2020) for all TreeQSMs in a specific folder:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lmterryn/ITSMe" class="external-link">ITSMe</a></span><span class="op">)</span>
-<span class="co">#Run summary function with default parameter settings</span>
-<span class="va">qsm_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/QSM/folder/"</span>, 
-                                      version <span class="op">=</span> <span class="st">"2.3.0"</span>,
-                                      PCs_path <span class="op">=</span> <span class="st">"path/to/point/cloud/folder/"</span>, 
-                                      extension <span class="op">=</span> <span class="st">".txt"</span><span class="op">)</span></code></pre></div>
+<span class="co"># Run summary function with default parameter settings</span>
+<span class="va">qsm_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>
+  QSMs_path <span class="op">=</span> <span class="st">"path/to/QSM/folder/"</span>,
+  version <span class="op">=</span> <span class="st">"2.3.0"</span>,
+  PCs_path <span class="op">=</span> <span class="st">"path/to/point/cloud/folder/"</span>,
+  extension <span class="op">=</span> <span class="st">".txt"</span>
+<span class="op">)</span></code></pre></div>
 </div>
 
   </main><aside class="col-md-3"><div class="links">

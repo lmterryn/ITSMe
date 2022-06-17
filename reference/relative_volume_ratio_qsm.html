@@ -91,8 +91,10 @@ of Photogrammetry and Remote Sensing, 168, 170-181.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># Read tree qsm and calculate the relative volume ratio</span></span>
 <span class="r-in"><span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>QSM_path <span class="op">=</span> <span class="st">"path/to/qsm.mat"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">rvr</span> <span class="op">&lt;-</span> <span class="fu">relative_volume_ratio_qsm</span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
-<span class="r-in">                                 treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">rvr</span> <span class="op">&lt;-</span> <span class="fu">relative_volume_ratio_qsm</span><span class="op">(</span></span>
+<span class="r-in">  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
+<span class="r-in">  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
