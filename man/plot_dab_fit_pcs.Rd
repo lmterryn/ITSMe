@@ -51,14 +51,18 @@ the circle fitting.
 \examples{
 \dontrun{
 # Calculate DABs with default settings and save circle fitting figures
-dab_values <- plot_dab_fit_pcs(PCs_path = "path/to/folder/PCs/",
-                               extension = ".txt",
-                               OUT_path = "path/to/figure/folder/")
+dab_values <- plot_dab_fit_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/figure/folder/"
+)
 # Calculate DABs with non-default settings and save circle fitting figures
-dab_values <- plot_dab_fit_pcs(PCs_path = "path/to/folder/PCs/",
-                               extension = ".txt",
-                               OUT_path = "path/to/figure/folder/",
-                               thresholdbuttress = 0.002,
-                               maxbuttressheight = 5)
+dab_values <- plot_dab_fit_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/figure/folder/",
+  thresholdbuttress = 0.002,
+  maxbuttressheight = 5
+)
 }
 }

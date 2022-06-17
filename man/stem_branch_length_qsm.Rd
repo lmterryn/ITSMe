@@ -77,22 +77,29 @@ Terryn et al., 2020). DBH and tree height are calculated with
 # Read tree qsm and calculate the stem branch radius
 # from Akerblom et al. (2017)
 qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-sbl <- stem_branch_length_qsm(branch = qsm$branch,
-                              treedata = qsm$treedata,
-                              normalisation = "dbh")
+sbl <- stem_branch_length_qsm(
+  branch = qsm$branch,
+  treedata = qsm$treedata,
+  normalisation = "dbh"
+)
 # with point cloud data for a buttressed tree
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata,
-                              normalisation = "dbh", pc = pc_tree,
-                              buttress = TRUE)
+sbl <- stem_branch_length_qsm(
+  branch = qsm$branch, treedata = qsm$treedata,
+  normalisation = "dbh", pc = pc_tree,
+  buttress = TRUE
+)
 # from Terryn et al. (2020)
-sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata,
-                              normalisation = "treeheight")
+sbl <- stem_branch_length_qsm(
+  branch = qsm$branch, treedata = qsm$treedata,
+  normalisation = "treeheight"
+)
 # with point cloud data
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata,
-                              normalisation = "treeheight", pc = pc_tree)
-
+sbl <- stem_branch_length_qsm(
+  branch = qsm$branch, treedata = qsm$treedata,
+  normalisation = "treeheight", pc = pc_tree
+)
 }
 }
 \references{

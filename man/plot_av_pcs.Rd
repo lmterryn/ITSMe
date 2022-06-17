@@ -89,14 +89,20 @@ this function.
 \examples{
 \dontrun{
 # Calculate the volume with default settings and save alpha shape figures
-vs <- plot_av_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-                  OUT_path = "path/to/figure/folder/")
+vs <- plot_av_pcs(
+  PCs_path = "path/to/folder/PCs/", extension = ".txt",
+  OUT_path = "path/to/figure/folder/"
+)
 # Calculate the volume with non-default settings and save alpha shape figures
-vs <- plot_av_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-                  OUT_path = "path/to/figure/folder/", alpha = 2)
+vs <- plot_av_pcs(
+  PCs_path = "path/to/folder/PCs/", extension = ".txt",
+  OUT_path = "path/to/figure/folder/", alpha = 2
+)
 # Calculate crown volume and save alpha shape figures
-cvs <- plot_av_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-                   OUT_path = "path/to/figure/folder/", alpha = 2,
-                   crown = TRUE, minheight = 4, buttress = TRUE)
+cvs <- plot_av_pcs(
+  PCs_path = "path/to/folder/PCs/", extension = ".txt",
+  OUT_path = "path/to/figure/folder/", alpha = 2,
+  crown = TRUE, minheight = 4, buttress = TRUE
+)
 }
 }

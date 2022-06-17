@@ -37,8 +37,10 @@ qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
 ch <- crown_height_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder)
 # with point cloud data
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-ch <- crown_height_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder,
-                       pc = pc_tree)
+ch <- crown_height_qsm(
+  treedata = qsm$treedata, cylinder = qsm$cylinder,
+  pc = pc_tree
+)
 }
 }
 \references{

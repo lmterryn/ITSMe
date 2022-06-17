@@ -67,16 +67,22 @@ The vertical bin radius estimates are calculated with
 \dontrun{
 # Read tree qsm and calculate the dbh minimum tree radius ratio
 qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata,
-                                cylinder = qsm$cylinder)
+dmrr <- dbh_minradius_ratio_qsm(
+  treedata = qsm$treedata,
+  cylinder = qsm$cylinder
+)
 # with point cloud data
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata,
-                                cylinder = qsm$cylinder, pc = pc_tree)
+dmrr <- dbh_minradius_ratio_qsm(
+  treedata = qsm$treedata,
+  cylinder = qsm$cylinder, pc = pc_tree
+)
 # for a buttressed tree
-dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata,
-                                cylinder = qsm$cylinder, pc = pc_tree,
-                                buttress = TRUE)
+dmrr <- dbh_minradius_ratio_qsm(
+  treedata = qsm$treedata,
+  cylinder = qsm$cylinder, pc = pc_tree,
+  buttress = TRUE
+)
 }
 }
 \references{

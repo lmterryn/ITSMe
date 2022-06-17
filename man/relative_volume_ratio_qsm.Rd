@@ -28,8 +28,10 @@ of the tree height" (Terryn et al., 2020).
 \dontrun{
 # Read tree qsm and calculate the relative volume ratio
 qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-rvr <- relative_volume_ratio_qsm(cylinder = qsm$cylinder,
-                                 treedata = qsm$treedata)
+rvr <- relative_volume_ratio_qsm(
+  cylinder = qsm$cylinder,
+  treedata = qsm$treedata
+)
 }
 }
 \references{

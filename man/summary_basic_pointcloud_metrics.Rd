@@ -105,12 +105,16 @@ and \code{\link{alpha_volume_pc}} respectively.
 \examples{
 \dontrun{
 # Calculate the summary with default parameters and export to csv
-summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
-                                            OUT_path = "path/to/out/folder/")
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/folder/PCs/",
+  OUT_path = "path/to/out/folder/"
+)
 # Calculate the summary with non-default parameter values
 # recommended for buttressed trees
-summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/folder/PCs/",
-                                            extension = ".ply", crown = TRUE,
-                                            minheight = 4, buttress = TRUE)
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".ply", crown = TRUE,
+  minheight = 4, buttress = TRUE
+)
 }
 }

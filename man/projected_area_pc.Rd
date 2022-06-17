@@ -39,9 +39,11 @@ pta <- projected_crown_area_pc(pc = pc_tree)
 output <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
 pca <- output$pca
 # classify the tree point cloud and calculate the projected crown area
-crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                              thresholdR2, thresholdbuttress,
-                              maxbuttressheight, FALSE)
+crown_pc <- classify_crown_pc(
+  pc, thresholdbranch, minheight, buttress,
+  thresholdR2, thresholdbuttress,
+  maxbuttressheight, FALSE
+)
 pca <- projected_crown_area_pc(pc = crown_pc$crownpoints)
 }
 }

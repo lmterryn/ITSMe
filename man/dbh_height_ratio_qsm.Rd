@@ -64,8 +64,10 @@ dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata)
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = pc_tree)
 # for buttressed trees
-dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = pc_tree,
-                            buttress = TRUE)
+dhr <- dbh_height_ratio_qsm(
+  treedata = qsm$treedata, pc = pc_tree,
+  buttress = TRUE
+)
 }
 }
 \references{

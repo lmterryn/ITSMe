@@ -92,14 +92,20 @@ this function.
 \examples{
 \dontrun{
 # Calculate projected area with default settings and save projection figures
-pas <- plot_pa_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-                     OUT_path = "path/to/figure/folder/")
+pas <- plot_pa_pcs(
+  PCs_path = "path/to/folder/PCs/", extension = ".txt",
+  OUT_path = "path/to/figure/folder/"
+)
 # With non-default settings and save projection figures
-pas <- plot_pa_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-                     OUT_path = "path/to/figure/folder/", concavity = 3)
+pas <- plot_pa_pcs(
+  PCs_path = "path/to/folder/PCs/", extension = ".txt",
+  OUT_path = "path/to/figure/folder/", concavity = 3
+)
 # Calculate projected crown area and save projection figures
-pcas <- plot_pa_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-                     OUT_path = "path/to/figure/folder/", concavity = 3,
-                     crown = TRUE, minheight = 4, buttress = TRUE)
+pcas <- plot_pa_pcs(
+  PCs_path = "path/to/folder/PCs/", extension = ".txt",
+  OUT_path = "path/to/figure/folder/", concavity = 3,
+  crown = TRUE, minheight = 4, buttress = TRUE
+)
 }
 }

@@ -166,7 +166,7 @@ stem_branch_angle_qsm <- function(branch) {
 #' }
 stem_branch_cluster_size_qsm <- function(cylinder) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-                                cylinder$BranchOrder == 1)
+    cylinder$BranchOrder == 1)
   if (length(ind_stem_cyl) > 0) {
     cyl_heights <- cylinder$start[ind_stem_cyl, 3]
     cyl_heights <- cyl_heights[order(cyl_heights)]
@@ -176,7 +176,7 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
     cluster <- c()
     for (i in 1:length(cyl_heights)) {
       ind_in_interval <- which(cyl_heights > start_heights[i] &
-                                 cyl_heights < end_heights[i])
+        cyl_heights < end_heights[i])
       num_clusters <- 0
       for (j in 1:length(ind_in_interval)) {
         if (label[ind_in_interval[j]] == 1) {
@@ -240,28 +240,34 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' # Read tree qsm and calculate the stem branch radius
 #' # from Akerblom et al. (2017)
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder,
-#'                               treedata = qsm$treedata,
-#'                               normalisation = "parentcyl")
+#' sbr <- stem_branch_radius_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata,
+#'   normalisation = "parentcyl"
+#' )
 #' # from Terryn et al. (2020)
-#' sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder,
-#'                               treedata = qsm$treedata,
-#'                               normalisation = "treeheight")
+#' sbr <- stem_branch_radius_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata,
+#'   normalisation = "treeheight"
+#' )
 #' # with point cloud data
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder,
-#'                               treedata = qsm$treedata,
-#'                               normalisation = "treeheight",
-#'                               pc = pc_tree)
+#' sbr <- stem_branch_radius_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata,
+#'   normalisation = "treeheight",
+#'   pc = pc_tree
+#' )
 #' }
 stem_branch_radius_qsm <- function(cylinder, treedata,
                                    normalisation = "treeheight", pc = NA) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-                          cylinder$BranchOrder == 1)
+    cylinder$BranchOrder == 1)
   if (length(ind_stem_cyl) > 0) {
     branch_rad <- cylinder$radius[ind_stem_cyl]
-    branch_ind_sorted <- ind_stem_cyl[order(branch_rad,decreasing = TRUE)]
-    branch_rad_sorted <- branch_rad[order(branch_rad,decreasing = TRUE)]
+    branch_ind_sorted <- ind_stem_cyl[order(branch_rad, decreasing = TRUE)]
+    branch_rad_sorted <- branch_rad[order(branch_rad, decreasing = TRUE)]
     if (length(branch_ind_sorted) < 10) {
       ind_b10 <- branch_ind_sorted
       rad_b10 <- branch_rad_sorted
@@ -349,22 +355,29 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #' # Read tree qsm and calculate the stem branch radius
 #' # from Akerblom et al. (2017)
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' sbl <- stem_branch_length_qsm(branch = qsm$branch,
-#'                               treedata = qsm$treedata,
-#'                               normalisation = "dbh")
+#' sbl <- stem_branch_length_qsm(
+#'   branch = qsm$branch,
+#'   treedata = qsm$treedata,
+#'   normalisation = "dbh"
+#' )
 #' # with point cloud data for a buttressed tree
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata,
-#'                               normalisation = "dbh", pc = pc_tree,
-#'                               buttress = TRUE)
+#' sbl <- stem_branch_length_qsm(
+#'   branch = qsm$branch, treedata = qsm$treedata,
+#'   normalisation = "dbh", pc = pc_tree,
+#'   buttress = TRUE
+#' )
 #' # from Terryn et al. (2020)
-#' sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata,
-#'                               normalisation = "treeheight")
+#' sbl <- stem_branch_length_qsm(
+#'   branch = qsm$branch, treedata = qsm$treedata,
+#'   normalisation = "treeheight"
+#' )
 #' # with point cloud data
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata,
-#'                               normalisation = "treeheight", pc = pc_tree)
-#'
+#' sbl <- stem_branch_length_qsm(
+#'   branch = qsm$branch, treedata = qsm$treedata,
+#'   normalisation = "treeheight", pc = pc_tree
+#' )
 #' }
 stem_branch_length_qsm <- function(branch, treedata,
                                    normalisation = "treeheight", pc = NA,
@@ -376,8 +389,10 @@ stem_branch_length_qsm <- function(branch, treedata,
   if (length(ind_stem_branches) > 0) {
     branch_len <- branch$length[ind_stem_branches]
     if (normalisation == "dbh") {
-      dbh <- dbh(treedata, pc, buttress, thresholdR2, slice_thickness,
-                 thresholdbuttress, maxbuttressheight)
+      dbh <- dbh(
+        treedata, pc, buttress, thresholdR2, slice_thickness,
+        thresholdbuttress, maxbuttressheight
+      )
       sbl <- mean(branch_len) / dbh
     } else if (normalisation == "treeheight") {
       tree_height <- tree_height(treedata, pc)
@@ -451,19 +466,25 @@ stem_branch_length_qsm <- function(branch, treedata,
 #' # Read tree qsm and calculate the stem branch distance
 #' # from Akerblom et al. (2017)
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
-#'                                 treedata = qsm$treedata,
-#'                                 normalisation = "dbh")
+#' sbd <- stem_branch_distance_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata,
+#'   normalisation = "dbh"
+#' )
 #' # with point cloud data for buttressed trees
 #' pc <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
-#'                                 treedata = qsm$treedata,
-#'                                 normalisation = "dbh", pc = tree_pc,
-#'                                 buttress = TRUE)
+#' sbd <- stem_branch_distance_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata,
+#'   normalisation = "dbh", pc = tree_pc,
+#'   buttress = TRUE
+#' )
 #' # from Terryn et al. (2020)
-#' sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder,
-#'                                 treedata = qsm$treedata,
-#'                                 normalisation = "no")
+#' sbd <- stem_branch_distance_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata,
+#'   normalisation = "no"
+#' )
 #' }
 stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
                                      pc = NA, buttress = FALSE,
@@ -472,7 +493,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
                                      thresholdbuttress = 0.001,
                                      maxbuttressheight = 7) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-                          cylinder$BranchOrder == 1)
+    cylinder$BranchOrder == 1)
   cyl_heights <- cylinder$start[ind_stem_cyl, 3]
   cyl_heights <- cyl_heights[order(cyl_heights)]
   if (length(ind_stem_cyl) > 0) {
@@ -484,7 +505,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
     average_distance <- c()
     for (i in 1:length(cyl_heights)) {
       ind_in_interval <- which(cyl_heights > start_heights[i] &
-                                 cyl_heights < end_heights[i])
+        cyl_heights < end_heights[i])
       if (length(ind_in_interval) == 1) {
         average_distance <- append(average_distance, 0.5)
       } else {
@@ -496,8 +517,10 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
       }
     }
     if (normalisation == "dbh") {
-      dbh <- dbh(treedata, pc, buttress, thresholdR2, slice_thickness,
-                 thresholdbuttress, maxbuttressheight)
+      dbh <- dbh(
+        treedata, pc, buttress, thresholdR2, slice_thickness,
+        thresholdbuttress, maxbuttressheight
+      )
       sbd <- mean(average_distance) / dbh
     } else {
       # print("No normalisation")
@@ -562,15 +585,19 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = pc_tree)
 #' # for buttressed trees
-#' dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = pc_tree,
-#'                             buttress = TRUE)
+#' dhr <- dbh_height_ratio_qsm(
+#'   treedata = qsm$treedata, pc = pc_tree,
+#'   buttress = TRUE
+#' )
 #' }
 dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
                                  thresholdR2 = 0.001, slice_thickness = 0.06,
                                  thresholdbuttress = 0.001,
                                  maxbuttressheight = 7) {
-  dbh <- dbh(treedata, pc, buttress, thresholdR2, slice_thickness,
-             thresholdbuttress, maxbuttressheight)
+  dbh <- dbh(
+    treedata, pc, buttress, thresholdR2, slice_thickness,
+    thresholdbuttress, maxbuttressheight
+  )
   tree_height <- tree_height(treedata, pc)
   return(dbh / tree_height)
 }
@@ -628,16 +655,20 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 #' pc_tree <- read_tree_pc("path/to/point_cloud.txt")
 #' dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = pc_tree)
 #' # for buttressed trees
-#' dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = pc_tree,
-#'                             buttress = TRUE)
+#' dvr <- dbh_volume_ratio_qsm(
+#'   treedata = qsm$treedata, pc = pc_tree,
+#'   buttress = TRUE
+#' )
 #' }
 dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
                                  thresholdR2 = 0.001, slice_thickness = 0.06,
                                  thresholdbuttress = 0.001,
                                  maxbuttressheight = 7) {
-  dbh <- dbh(treedata, pc, buttress, thresholdR2, slice_thickness,
-             thresholdbuttress, maxbuttressheight)
-  volume <- tree_volume_qsm(treedata)/1000
+  dbh <- dbh(
+    treedata, pc, buttress, thresholdR2, slice_thickness,
+    thresholdbuttress, maxbuttressheight
+  )
+  volume <- tree_volume_qsm(treedata) / 1000
   return(dbh / volume)
 }
 
@@ -670,15 +701,17 @@ dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 #' \dontrun{
 #' # Read tree qsm and calculate the volume below 55
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' vol_55 <- volume_below_55_qsm(cylinder = qsm$cylinder,
-#'                               treedata = qsm$treedata)
+#' vol_55 <- volume_below_55_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata
+#' )
 #' }
 volume_below_55_qsm <- function(cylinder, treedata) {
   tree_height <- tree_height_qsm(treedata)
   volume_branches <- total_branch_volume_qsm(treedata) / 1000
   height_at_55 <- tree_height * 0.55 + min(cylinder$start[, 3])
   ind_branch_cyl_u55 <- which(cylinder$start[, 3] < height_at_55 &
-                                               cylinder$BranchOrder != 0)
+    cylinder$BranchOrder != 0)
   vol_branch_cyl_u55 <- cylinder$length[ind_branch_cyl_u55] * pi %*%
     cylinder$radius[ind_branch_cyl_u55]**2
   vb55 <- sum(vol_branch_cyl_u55) / volume_branches
@@ -753,18 +786,20 @@ cylinder_length_volume_ratio_qsm <- function(treedata) {
 #' \dontrun{
 #' # Read tree qsm and calculate the shedding ratio
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' sr <- shedding_ratio_qsm(branch = qsm$branch, cylinder = qsm$cylinder,
-#'                          treedata = qsm$treedata)
+#' sr <- shedding_ratio_qsm(
+#'   branch = qsm$branch, cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata
+#' )
 #' }
 shedding_ratio_qsm <- function(branch, cylinder, treedata) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-                          cylinder$BranchOrder == 1)
-  height_33 <- treedata$TreeHeight[1] / 3 + min(cylinder$start[,3])
+    cylinder$BranchOrder == 1)
+  height_33 <- treedata$TreeHeight[1] / 3 + min(cylinder$start[, 3])
   if (length(ind_stem_cyl) > 0) {
     ind_stem_cyl_u3rd <- which(cylinder$PositionInBranch == 1 &
-                                 cylinder$BranchOrder == 1 &
-                                 cylinder$start[,3] < height_33)
-    if (length(ind_stem_cyl_u3rd)==0) {
+      cylinder$BranchOrder == 1 &
+      cylinder$start[, 3] < height_33)
+    if (length(ind_stem_cyl_u3rd) == 0) {
       sr <- 0
     } else {
       num_stem_branches_u3rd <- length(ind_stem_cyl_u3rd)
@@ -854,8 +889,10 @@ branch_angle_ratio_qsm <- function(branch) {
 #' \dontrun{
 #' # Read tree qsm and calculate the relative volume ratio
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' rvr <- relative_volume_ratio_qsm(cylinder = qsm$cylinder,
-#'                                  treedata = qsm$treedata)
+#' rvr <- relative_volume_ratio_qsm(
+#'   cylinder = qsm$cylinder,
+#'   treedata = qsm$treedata
+#' )
 #' }
 relative_volume_ratio_qsm <- function(cylinder, treedata) {
   tree_height <- treedata$TreeHeight[1]
@@ -868,9 +905,9 @@ relative_volume_ratio_qsm <- function(cylinder, treedata) {
     interval_start <- min_z_coo + i * interval
     interval_end <- interval_start + interval
     ind_cyl_in_interval <- which(cyl_z_coo >= interval_start &
-                                   cyl_z_coo < interval_end)
+      cyl_z_coo < interval_end)
     vol_cyl_in_interval <- sum(cylinder$length[ind_cyl_in_interval] * pi %*%
-                                 cylinder$radius[ind_cyl_in_interval]**2)
+      cylinder$radius[ind_cyl_in_interval]**2)
     vol_dist <- append(vol_dist, vol_cyl_in_interval)
   }
   rel_vol_dist <- vol_dist
@@ -937,16 +974,16 @@ crownset_qsm <- function(cylinder) {
     }
     # STEP 3
     crownset_parent0 <- crownset[cylinder$BranchOrder
-                                 [cylinder$parent[crownset]] == 0]
+    [cylinder$parent[crownset]] == 0]
     min_height <- min(cylinder$start[crownset_parent0, 3])
     crownset <- unique(append(crownset, which(cylinder$start[, 3] > min_height &
-                                                cylinder$BranchOrder > 0)))
+      cylinder$BranchOrder > 0)))
     # STEP 4
     init_length <- 0
     while (length(crownset) > init_length) {
       init_length <- length(crownset)
       c <- children[crownset]
-      crownset <- unique(append(crownset,unlist(c, recursive = FALSE)))
+      crownset <- unique(append(crownset, unlist(c, recursive = FALSE)))
     }
   }
   return(crownset)
@@ -986,18 +1023,22 @@ crownset_qsm <- function(cylinder) {
 #' \dontrun{
 #' # Read tree qsm and calculate the crown start height
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' csh <- crown_start_height_qsm(treedata = qsm$treedata,
-#'                               cylinder = qsm$cylinder)
+#' csh <- crown_start_height_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder
+#' )
 #' # with point cloud data
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' csh <- crown_start_height_qsm(treedata = qsm$treedata,
-#'                               cylinder = qsm$cylinder, pc = pc_tree)
+#' csh <- crown_start_height_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder, pc = pc_tree
+#' )
 #' }
 crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
   crownset <- crownset_qsm(cylinder)
   tree_height <- tree_height(treedata, pc)
   crownset_parent0 <- crownset[cylinder$BranchOrder
-                               [cylinder$parent[crownset]] == 0]
+  [cylinder$parent[crownset]] == 0]
   min_height <- min(cylinder$start[crownset_parent0, 3])
   if (length(crownset) > 0) {
     sh <- (min_height - min(cylinder$start[, 3])) / tree_height
@@ -1045,8 +1086,10 @@ crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
 #' ch <- crown_height_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder)
 #' # with point cloud data
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' ch <- crown_height_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder,
-#'                        pc = pc_tree)
+#' ch <- crown_height_qsm(
+#'   treedata = qsm$treedata, cylinder = qsm$cylinder,
+#'   pc = pc_tree
+#' )
 #' }
 crown_height_qsm <- function(treedata, cylinder, pc = NA) {
   crownset <- crownset_qsm(cylinder)
@@ -1097,20 +1140,25 @@ crown_height_qsm <- function(treedata, cylinder, pc = NA) {
 crown_evenness_qsm <- function(cylinder) {
   crownset <- crownset_qsm(cylinder)
   if (length(crownset) > 0) {
-    bins <- c(0 * 2 * pi / 8 - pi, 1 * 2 * pi / 8 - pi, 2 * 2 * pi / 8 - pi,
+    bins <- c(
+      0 * 2 * pi / 8 - pi, 1 * 2 * pi / 8 - pi, 2 * 2 * pi / 8 - pi,
       3 * 2 * pi / 8 - pi, 4 * 2 * pi / 8 - pi, 5 * 2 * pi / 8 - pi,
-      6 * 2 * pi / 8 - pi, 7 * 2 * pi / 8 - pi, 2 * pi / 1 - pi)
+      6 * 2 * pi / 8 - pi, 7 * 2 * pi / 8 - pi, 2 * pi / 1 - pi
+    )
     crownset_bo1 <- crownset[cylinder$BranchOrder[crownset] == 1]
     crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[
-      cylinder$parent[crownset_bo1]] == 0]
+      cylinder$parent[crownset_bo1]
+    ] == 0]
     center_z <- min(cylinder$start[crownset_bo1_po0, 3])
     center <- crownset_bo1_po0[cylinder$start[crownset_bo1_po0, 3] == center_z]
     center_x <- cylinder$start[center, 1]
     center_y <- cylinder$start[center, 2]
     R <- sqrt(((cylinder$start[crownset, 1] - center_x)^2 +
-                 (cylinder$start[crownset, 2] - center_y)^2))
-    theta <- atan2((cylinder$start[crownset, 2] - center_y),
-                   (cylinder$start[crownset, 1] - center_x))
+      (cylinder$start[crownset, 2] - center_y)^2))
+    theta <- atan2(
+      (cylinder$start[crownset, 2] - center_y),
+      (cylinder$start[crownset, 1] - center_x)
+    )
     minimums <- c()
     Ind_Bin <- c()
     for (i in 2:length(bins)) {
@@ -1120,7 +1168,7 @@ crown_evenness_qsm <- function(cylinder) {
         minimums <- append(minimums, min(cylinder$start[crownset[ind_bin], 3]))
       }
     }
-    if (length(minimums) == length(bins)-1) {
+    if (length(minimums) == length(bins) - 1) {
       ce <- (min(minimums) - min(cylinder$start[, 3])) /
         (max(minimums) - min(cylinder$start[, 3]))
     } else {
@@ -1167,8 +1215,10 @@ crown_evenness_qsm <- function(cylinder) {
 #' \dontrun{
 #' # Read tree qsm and calculate the vertical bin radii
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' radii <- vertical_bin_radii_qsm(treedata = qsm$treedata,
-#'                                 cylinder = qsm$cylinder)
+#' radii <- vertical_bin_radii_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder
+#' )
 #' }
 vertical_bin_radii_qsm <- function(treedata, cylinder) {
   dbh <- dbh_qsm(treedata)
@@ -1330,13 +1380,17 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
 #' \dontrun{
 #' # Read tree qsm and calculate the crown diameter height ratio
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' cdh_ratio <- crown_diameterheight_ratio_qsm(treedata = qsm$treedata,
-#'                                             cylinder = qsm$cylinder)
+#' cdh_ratio <- crown_diameterheight_ratio_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder
+#' )
 #' # with point cloud data
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' cdh_ratio <- crown_diameterheight_ratio_qsm(treedata = qsm$treedata,
-#'                                             cylinder = qsm$cylinder,
-#'                                             pc = pc_tree)
+#' cdh_ratio <- crown_diameterheight_ratio_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder,
+#'   pc = pc_tree
+#' )
 #' }
 crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
@@ -1401,16 +1455,22 @@ crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
 #' \dontrun{
 #' # Read tree qsm and calculate the dbh minimum tree radius ratio
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-#' dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata,
-#'                                 cylinder = qsm$cylinder)
+#' dmrr <- dbh_minradius_ratio_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder
+#' )
 #' # with point cloud data
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata,
-#'                                 cylinder = qsm$cylinder, pc = pc_tree)
+#' dmrr <- dbh_minradius_ratio_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder, pc = pc_tree
+#' )
 #' # for a buttressed tree
-#' dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata,
-#'                                 cylinder = qsm$cylinder, pc = pc_tree,
-#'                                 buttress = TRUE)
+#' dmrr <- dbh_minradius_ratio_qsm(
+#'   treedata = qsm$treedata,
+#'   cylinder = qsm$cylinder, pc = pc_tree,
+#'   buttress = TRUE
+#' )
 #' }
 dbh_minradius_ratio_qsm <- function(treedata, cylinder, pc = NA,
                                     buttress = FALSE, thresholdR2 = 0.001,
@@ -1419,7 +1479,9 @@ dbh_minradius_ratio_qsm <- function(treedata, cylinder, pc = NA,
                                     maxbuttressheight = 7) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- min(radii) * 2
-  dbh <- dbh(treedata, pc, buttress, thresholdR2, slice_thickness,
-             thresholdbuttress, maxbuttressheight)
+  dbh <- dbh(
+    treedata, pc, buttress, thresholdR2, slice_thickness,
+    thresholdbuttress, maxbuttressheight
+  )
   return(dbh / diameter)
 }

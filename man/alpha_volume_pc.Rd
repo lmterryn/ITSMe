@@ -41,9 +41,11 @@ vol_tree <- alpha_volume_pc(pc = pc_tree)
 output <- alpha_volume_pc(pc = pc_tree, plot = TRUE)
 vol_tree <- output$volume
 # classify the tree point cloud and calculate the crown volume
-crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                              thresholdR2, thresholdbuttress,
-                              maxbuttressheight, FALSE)
+crown_pc <- classify_crown_pc(
+  pc, thresholdbranch, minheight, buttress,
+  thresholdR2, thresholdbuttress,
+  maxbuttressheight, FALSE
+)
 vol_crown <- volume_crown_pc(pc = crown_pc$crownpoints, alpha = 2)
 }
 }

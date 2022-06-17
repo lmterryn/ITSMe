@@ -31,8 +31,10 @@ et al., 2017 & Terryn et al., 2020).
 \dontrun{
 # Read tree qsm and calculate the shedding ratio
 qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
-sr <- shedding_ratio_qsm(branch = qsm$branch, cylinder = qsm$cylinder,
-                         treedata = qsm$treedata)
+sr <- shedding_ratio_qsm(
+  branch = qsm$branch, cylinder = qsm$cylinder,
+  treedata = qsm$treedata
+)
 }
 }
 \references{

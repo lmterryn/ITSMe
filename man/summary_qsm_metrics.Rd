@@ -125,19 +125,25 @@ Metrics Terryn et al. (2020): stem branch angle (sba,
 \dontrun{
 # Calculate the summary with default parameters and export to csv
 # recommended for non-buttressed trees
-summary <- summary_qsm_metrics(QSMs_path = "path/to/folder/QSMs/",
-                               OUT_path = "path/to/out/folder/")
+summary <- summary_qsm_metrics(
+  QSMs_path = "path/to/folder/QSMs/",
+  OUT_path = "path/to/out/folder/"
+)
 # also using point cloud info
-summary <- summary_qsm_metrics(QSMs_path = "path/to/folder/QSMs/",
-                               PCs_path = "path/to/folder/PCs/",
-                               extension = ".txt",
-                               OUT_path = "path/to/out/folder/")
+summary <- summary_qsm_metrics(
+  QSMs_path = "path/to/folder/QSMs/",
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/out/folder/"
+)
 # Calculate the summary with non-default parameter values
 # recommended for buttressed trees
-summary <- summary_qsm_metrics(QSMs_path = "path/to/folder/QSMs/",
-                               PCs_path = "path/to/folder/PCs/",
-                               extension = ".txt", buttress = TRUE,
-                               OUT_path = "path/to/out/folder/")
+summary <- summary_qsm_metrics(
+  QSMs_path = "path/to/folder/QSMs/",
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt", buttress = TRUE,
+  OUT_path = "path/to/out/folder/"
+)
 }
 }
 \references{

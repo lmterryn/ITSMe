@@ -27,21 +27,29 @@
 #' @examples
 #' \dontrun{
 #' # Calculate tree height and save figures
-#' height_values <- plot_tree_height_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                   extension = ".txt",
-#'                                   OUT_path = "path/to/figure/folder/")
+#' height_values <- plot_tree_height_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' # Calculate tree height using dtm of resolution 2 and save figures
 #' dtm_df <- read_tree_pc("path/to/dtm.txt")
-#' height_values <- plot_tree_height_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                   extension = ".txt", dtm = dtm_df, r = 2,
-#'                                   OUT_path = "path/to/figure/folder/")
+#' height_values <- plot_tree_height_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt", dtm = dtm_df, r = 2,
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' }
 plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
                                  r = 5, OUT_path = "./") {
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   Hs <- c()
   Plots <- list()
   for (i in 1:length(file_names)) {
@@ -49,14 +57,17 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
     pc <- read_tree_pc(file_paths[i])
     out <- tree_height_pc(pc, dtm, r, TRUE)
     filename <- paste(OUT_path, "tree_height_",
-                      strsplit(file_names[i], extension)[[1]], ".jpeg",
-                      sep = "")
-    ggplot2::ggsave(filename, plot = out$plot, bg = "white", width = 60,
-                    height = 36, units = "cm")
+      strsplit(file_names[i], extension)[[1]], ".jpeg",
+      sep = ""
+    )
+    ggplot2::ggsave(filename,
+      plot = out$plot, bg = "white", width = 60,
+      height = 36, units = "cm"
+    )
     Hs <- append(Hs, out$h)
     Plots <- append(Plots, out$plot)
   }
-  return(list("Heights"=Hs, "Plots"=Plots))
+  return(list("Heights" = Hs, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{diameter_slice_pc}} function
@@ -94,22 +105,30 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
 #' @examples
 #' \dontrun{
 #' # Calculate diameters at breast height (1.3m) and save circle fitting figures
-#' diam_values <- plot_circle_fit_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                   extension = ".txt",
-#'                                   OUT_path = "path/to/figure/folder/")
+#' diam_values <- plot_circle_fit_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' # Calculate diameters at 2.5 m with a slice of 20 cm and save the figures
-#' diam_values <- plot_circle_fit_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                   extension = ".txt", slice_height = 2.5,
-#'                                   slice_thickness = 0.2,
-#'                                   OUT_path = "path/to/figure/folder/")
+#' diam_values <- plot_circle_fit_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt", slice_height = 2.5,
+#'   slice_thickness = 0.2,
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' }
 plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
                                 slice_height = 1.3, slice_thickness = 0.06,
                                 OUT_path = "./") {
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   Ds <- c()
   Rs <- c()
   fDs <- c()
@@ -119,16 +138,18 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
     pc <- read_tree_pc(file_paths[i])
     out <- diameter_slice_pc(pc, slice_height, slice_thickness, TRUE)
     filename <- paste(OUT_path, "circle_",
-                      strsplit(file_names[i], extension)[[1]], "_",
-                      as.character(slice_height), "_",
-                      as.character(slice_thickness), "_", ".jpeg", sep = "")
+      strsplit(file_names[i], extension)[[1]], "_",
+      as.character(slice_height), "_",
+      as.character(slice_thickness), "_", ".jpeg",
+      sep = ""
+    )
     ggplot2::ggsave(filename, plot = out$plot)
     Ds <- append(Ds, out$diameter)
     Rs <- append(Rs, out$R2)
     fDs <- append(fDs, out$fdiameter)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("Diams"=Ds, "R2s"=Rs, "fDiams"=fDs, "Plots"=Plots))
+  return(list("Diams" = Ds, "R2s" = Rs, "fDiams" = fDs, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{dbh_pc}} function
@@ -164,16 +185,22 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #' @examples
 #' \dontrun{
 #' # Calculate DBHs and save circle fitting figures
-#' dbh_values <- plot_dbh_fit_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                extension = ".txt",
-#'                                OUT_path = "path/to/figure/folder/")
+#' dbh_values <- plot_dbh_fit_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' }
 plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
                              slice_thickness = 0.06, OUT_path = "./") {
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   DBHs <- c()
   Rs <- c()
   fDBHs <- c()
@@ -183,16 +210,18 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
     pc <- read_tree_pc(file_paths[i])
     out <- dbh_pc(pc, thresholdR2, slice_thickness, TRUE)
     filename <- paste(OUT_path, "dbh_",
-                     strsplit(file_names[i], extension)[[1]], "_",
-                     as.character(thresholdR2), "_",
-                     as.character(slice_thickness), ".jpeg", sep = "")
+      strsplit(file_names[i], extension)[[1]], "_",
+      as.character(thresholdR2), "_",
+      as.character(slice_thickness), ".jpeg",
+      sep = ""
+    )
     ggplot2::ggsave(filename, plot = out$plot)
     DBHs <- append(DBHs, out$dbh)
     Rs <- append(Rs, out$R2)
     fDBHs <- append(fDBHs, out$fdbh)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DBHs"=DBHs, "R2s"=Rs, "fDBHs"=fDBHs, "Plots"=Plots))
+  return(list("DBHs" = DBHs, "R2s" = Rs, "fDBHs" = fDBHs, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{dab_pc}} function
@@ -230,22 +259,30 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #' @examples
 #' \dontrun{
 #' # Calculate DABs with default settings and save circle fitting figures
-#' dab_values <- plot_dab_fit_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                extension = ".txt",
-#'                                OUT_path = "path/to/figure/folder/")
+#' dab_values <- plot_dab_fit_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' # Calculate DABs with non-default settings and save circle fitting figures
-#' dab_values <- plot_dab_fit_pcs(PCs_path = "path/to/folder/PCs/",
-#'                                extension = ".txt",
-#'                                OUT_path = "path/to/figure/folder/",
-#'                                thresholdbuttress = 0.002,
-#'                                maxbuttressheight = 5)
+#' dab_values <- plot_dab_fit_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/",
+#'   thresholdbuttress = 0.002,
+#'   maxbuttressheight = 5
+#' )
 #' }
 plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                              thresholdbuttress = 0.001, maxbuttressheight = 7) {
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   DABs <- c()
   Rs <- c()
   fDABs <- c()
@@ -254,16 +291,18 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, TRUE)
-    filename = paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
-                     "_", as.character(thresholdbuttress), "_",
-                     as.character(maxbuttressheight), ".jpeg", sep = "")
+    filename <- paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
+      "_", as.character(thresholdbuttress), "_",
+      as.character(maxbuttressheight), ".jpeg",
+      sep = ""
+    )
     ggplot2::ggsave(filename, plot = out$plot)
     DABs <- append(DABs, out$dab)
     Rs <- append(Rs, out$R2)
     fDABs <- append(fDABs, out$fdab)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DABs"=DABs, "R2s"=Rs, "fDABs"=fDABs, "Plots"=Plots))
+  return(list("DABs" = DABs, "R2s" = Rs, "fDABs" = fDABs, "Plots" = Plots))
 }
 
 #' Save figures of \code{\link{classify_crown_pc}} function
@@ -318,22 +357,28 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #' @examples
 #' \dontrun{
 #' # Run the crown classification with default settings and save figures
-#' plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
-#'                               extension = ".txt",
-#'                               OUT_path = "path/to/figure/folder/")
+#' plot_crown_classification_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' # Run the crown classification with non-default settings and save figures
-#' plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
-#'                               extension = ".txt",
-#'                               OUT_path = "path/to/figure/folder/",
-#'                               thresholdbranch = 2, minheight = 4)
+#' plot_crown_classification_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/",
+#'   thresholdbranch = 2, minheight = 4
+#' )
 #' # Run the crown classification with non-default settings and save figures
 #' # for buttressed trees
-#' plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
-#'                               extension = ".txt",
-#'                               OUT_path = "path/to/figure/folder/",
-#'                               thresholdbranch = 2, minheight = 4,
-#'                               buttress = TRUE, thresholdbuttress = 0.002,
-#'                               maxbuttressheight = 5)
+#' plot_crown_classification_pcs(
+#'   PCs_path = "path/to/folder/PCs/",
+#'   extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/",
+#'   thresholdbranch = 2, minheight = 4,
+#'   buttress = TRUE, thresholdbuttress = 0.002,
+#'   maxbuttressheight = 5
+#' )
 #' }
 plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                                           OUT_path = "./",
@@ -342,25 +387,35 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                                           thresholdR2 = 0.001,
                                           slice_thickness = 0.06,
                                           thresholdbuttress = 0.001,
-                                          maxbuttressheight = 7){
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+                                          maxbuttressheight = 7) {
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                             thresholdR2, slice_thickness, thresholdbuttress,
-                             maxbuttressheight, TRUE)
-    filename = paste(OUT_path, "crown_",
-                     strsplit(file_names[i], extension)[[1]], "_",
-                     as.character(thresholdbranch), "_",
-                     as.character(minheight),
-                     ".jpeg", sep = "")
-    ggplot2::ggsave(filename, plot = out$plot, bg = "white", width = 60,
-                    height = 36, units = "cm")
+    out <- classify_crown_pc(
+      pc, thresholdbranch, minheight, buttress,
+      thresholdR2, slice_thickness, thresholdbuttress,
+      maxbuttressheight, TRUE
+    )
+    filename <- paste(OUT_path, "crown_",
+      strsplit(file_names[i], extension)[[1]], "_",
+      as.character(thresholdbranch), "_",
+      as.character(minheight),
+      ".jpeg",
+      sep = ""
+    )
+    ggplot2::ggsave(filename,
+      plot = out$plot, bg = "white", width = 60,
+      height = 36, units = "cm"
+    )
     Plots <- append(Plots, list(out$plot))
   }
   return(Plots)
@@ -428,52 +483,73 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #' @examples
 #' \dontrun{
 #' # Calculate projected area with default settings and save projection figures
-#' pas <- plot_pa_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-#'                      OUT_path = "path/to/figure/folder/")
+#' pas <- plot_pa_pcs(
+#'   PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' # With non-default settings and save projection figures
-#' pas <- plot_pa_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-#'                      OUT_path = "path/to/figure/folder/", concavity = 3)
+#' pas <- plot_pa_pcs(
+#'   PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/", concavity = 3
+#' )
 #' # Calculate projected crown area and save projection figures
-#' pcas <- plot_pa_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-#'                      OUT_path = "path/to/figure/folder/", concavity = 3,
-#'                      crown = TRUE, minheight = 4, buttress = TRUE)
+#' pcas <- plot_pa_pcs(
+#'   PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/", concavity = 3,
+#'   crown = TRUE, minheight = 4, buttress = TRUE
+#' )
 #' }
 plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         concavity = 2, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
                         slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7){
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+                        maxbuttressheight = 7) {
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   PAs <- c()
   Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    if (crown){
-      crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                    thresholdR2, slice_thickness,
-                                    thresholdbuttress, maxbuttressheight, FALSE)
+    if (crown) {
+      crown_pc <- classify_crown_pc(
+        pc, thresholdbranch, minheight, buttress,
+        thresholdR2, slice_thickness,
+        thresholdbuttress, maxbuttressheight, FALSE
+      )
       out <- projected_area_pc(crown_pc$crownpoints, concavity, TRUE)
       plot_area <- out$plot +
-        ggplot2::ggtitle(bquote(PCA == .(round(out$pa,2)) ~ m^2))
-      filename = paste(OUT_path, "pca_", strsplit(file_names[i],
-                                                  extension)[[1]],
-                       "_", as.character(concavity), ".jpeg", sep = "")
+        ggplot2::ggtitle(bquote(PCA == .(round(out$pa, 2)) ~ m^2))
+      filename <- paste(OUT_path, "pca_", strsplit(
+        file_names[i],
+        extension
+      )[[1]],
+      "_", as.character(concavity), ".jpeg",
+      sep = ""
+      )
     } else {
       out <- projected_area_pc(pc, concavity, TRUE)
       plot_area <- out$plot
-      filename = paste(OUT_path, "pa_", strsplit(file_names[i], extension)[[1]],
-                       "_", as.character(concavity), ".jpeg", sep = "")
+      filename <- paste(OUT_path, "pa_",
+        strsplit(file_names[i], extension)[[1]], "_", as.character(concavity),
+        ".jpeg",
+        sep = ""
+      )
     }
-    ggplot2::ggsave(filename, plot = plot_area, bg = "white", width = 60,
-                    height = 36, units = "cm")
+    ggplot2::ggsave(filename,
+      plot = plot_area, bg = "white", width = 60,
+      height = 36, units = "cm"
+    )
     PAs <- append(PAs, out$pa)
     Plots <- append(Plots, list(plot))
   }
-  return(list("PAs"=PAs, "Plots"=Plots))
+  return(list("PAs" = PAs, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{alpha_volume_pc}} function
@@ -535,42 +611,60 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #' @examples
 #' \dontrun{
 #' # Calculate the volume with default settings and save alpha shape figures
-#' vs <- plot_av_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-#'                   OUT_path = "path/to/figure/folder/")
+#' vs <- plot_av_pcs(
+#'   PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/"
+#' )
 #' # Calculate the volume with non-default settings and save alpha shape figures
-#' vs <- plot_av_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-#'                   OUT_path = "path/to/figure/folder/", alpha = 2)
+#' vs <- plot_av_pcs(
+#'   PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/", alpha = 2
+#' )
 #' # Calculate crown volume and save alpha shape figures
-#' cvs <- plot_av_pcs(PCs_path = "path/to/folder/PCs/", extension = ".txt",
-#'                    OUT_path = "path/to/figure/folder/", alpha = 2,
-#'                    crown = TRUE, minheight = 4, buttress = TRUE)
+#' cvs <- plot_av_pcs(
+#'   PCs_path = "path/to/folder/PCs/", extension = ".txt",
+#'   OUT_path = "path/to/figure/folder/", alpha = 2,
+#'   crown = TRUE, minheight = 4, buttress = TRUE
+#' )
 #' }
 plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         alpha = 1, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
                         slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7){
-  file_paths <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = TRUE)
-  file_names <- list.files(PCs_path, pattern = paste("*", extension, sep = ""),
-                           full.names = FALSE)
+                        maxbuttressheight = 7) {
+  file_paths <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = TRUE
+  )
+  file_names <- list.files(PCs_path,
+    pattern = paste("*", extension, sep = ""),
+    full.names = FALSE
+  )
   AVs <- c()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    if (crown){
-      crown_pc <- classify_crown_pc(pc, thresholdbranch, minheight, buttress,
-                                    thresholdR2, slice_thickness,
-                                    thresholdbuttress, maxbuttressheight, FALSE)
+    if (crown) {
+      crown_pc <- classify_crown_pc(
+        pc, thresholdbranch, minheight, buttress,
+        thresholdR2, slice_thickness,
+        thresholdbuttress, maxbuttressheight, FALSE
+      )
       out <- alpha_volume_pc(crown_pc$crownpoints, alpha, TRUE)
-      fig_name <- paste(OUT_path, "cv_", strsplit(file_names[i], extension)[[1]],
-                      "_", as.character(alpha), ".png", sep = "")
+      fig_name <- paste(OUT_path, "cv_",
+        strsplit(file_names[i], extension)[[1]], "_", as.character(alpha),
+        ".png",
+        sep = ""
+      )
     } else {
       out <- alpha_volume_pc(pc, alpha, TRUE)
-      fig_name <- paste(OUT_path, "av_", strsplit(file_names[i], extension)[[1]],
-                        "_", as.character(alpha), ".png", sep = "")
+      fig_name <- paste(OUT_path, "av_",
+        strsplit(file_names[i], extension)[[1]], "_", as.character(alpha),
+        ".png",
+        sep = ""
+      )
     }
-    rgl::rgl.snapshot(fig_name, fmt = 'png')
+    rgl::rgl.snapshot(fig_name, fmt = "png")
     rgl::rgl.close()
     AVs <- append(AVs, out$av)
     gc()

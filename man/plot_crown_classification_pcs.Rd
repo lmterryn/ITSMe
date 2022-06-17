@@ -80,21 +80,27 @@ tree point cloud and plot the classification.
 \examples{
 \dontrun{
 # Run the crown classification with default settings and save figures
-plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
-                              extension = ".txt",
-                              OUT_path = "path/to/figure/folder/")
+plot_crown_classification_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/figure/folder/"
+)
 # Run the crown classification with non-default settings and save figures
-plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
-                              extension = ".txt",
-                              OUT_path = "path/to/figure/folder/",
-                              thresholdbranch = 2, minheight = 4)
+plot_crown_classification_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/figure/folder/",
+  thresholdbranch = 2, minheight = 4
+)
 # Run the crown classification with non-default settings and save figures
 # for buttressed trees
-plot_crown_classification_pcs(PCs_path = "path/to/folder/PCs/",
-                              extension = ".txt",
-                              OUT_path = "path/to/figure/folder/",
-                              thresholdbranch = 2, minheight = 4,
-                              buttress = TRUE, thresholdbuttress = 0.002,
-                              maxbuttressheight = 5)
+plot_crown_classification_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/figure/folder/",
+  thresholdbranch = 2, minheight = 4,
+  buttress = TRUE, thresholdbuttress = 0.002,
+  maxbuttressheight = 5
+)
 }
 }

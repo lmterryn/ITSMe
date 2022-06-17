@@ -133,13 +133,17 @@ library(ITSMe)
 # Read the TreeQSM file from the Specified path to the TreeQSM file
 qsm <- read_tree_qsm(path = "path/to/QSM.mat")
 # Use stem_branch_distance_qsm function
-sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
-                                treedata = qsm$treedata, normalisation = "dbh")
+sbd <- stem_branch_distance_qsm(
+  cylinder = qsm$cylinder,
+  treedata = qsm$treedata, normalisation = "dbh"
+)
 # Using the point cloud information for more accurate dbh normalisation
 pc_tree <- read_tree_pc(path = "path/to/point/cloud.txt")
-sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
-                                treedata = qsm$treedata, normalisation = "dbh", 
-                                pc = pc_tree, buttress = TRUE)
+sbd <- stem_branch_distance_qsm(
+  cylinder = qsm$cylinder,
+  treedata = qsm$treedata, normalisation = "dbh",
+  pc = pc_tree, buttress = TRUE
+)
 ```
 
 Calculating a summary data.frame with the basic structural metrics (tree
@@ -149,9 +153,11 @@ in a specific folder:
 
 ``` r
 library(ITSMe)
-#Run summary function with default parameter settings
-basic_summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/cloud/folder/", 
-                                                  extension = ".txt")
+# Run summary function with default parameter settings
+basic_summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/point/cloud/folder/",
+  extension = ".txt"
+)
 ```
 
 If you set the plot parameter TRUE and provide an OUT_path, this
@@ -166,9 +172,11 @@ Terryn et al. (2020) for all TreeQSMs in a specific folder:
 
 ``` r
 library(ITSMe)
-#Run summary function with default parameter settings
-qsm_summary <- summary_qsm_metrics(QSMs_path = "path/to/QSM/folder/", 
-                                      version = "2.3.0",
-                                      PCs_path = "path/to/point/cloud/folder/", 
-                                      extension = ".txt")
+# Run summary function with default parameter settings
+qsm_summary <- summary_qsm_metrics(
+  QSMs_path = "path/to/QSM/folder/",
+  version = "2.3.0",
+  PCs_path = "path/to/point/cloud/folder/",
+  extension = ".txt"
+)
 ```

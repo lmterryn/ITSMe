@@ -72,7 +72,6 @@ X, Y, Z columns.
 ```{r eval = FALSE}
 # Read the point cloud file from its' specified path
 tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
-
 ```
 
 #### Measure position of tree point cloud
@@ -83,7 +82,6 @@ point cloud.
 ```{r eval = FALSE}
 # Measure tree position from the tree point cloud
 XYZ_pos <- tree_position_pc(pc = tree_pc)
-
 ```
 
 #### Measure tree height
@@ -132,10 +130,11 @@ you are not sure if this is the case for your tree, you can check the slice
 
 ```{r eval = FALSE}
 # Measure DBH from the tree point cloud and plot the circle fitting
-slice1 <- diameter_slice_pc(pc = tree_pc, slice_height = 1.3, 
-                            slice_thickness = 0.06, plot = TRUE)
+slice1 <- diameter_slice_pc(
+  pc = tree_pc, slice_height = 1.3,
+  slice_thickness = 0.06, plot = TRUE
+)
 diameter <- slice1$diameter
-
 ```
 
 ![](../man/figures/diameter_slice_example.jpeg)
@@ -154,7 +153,6 @@ plots the circle fitting.
 # Measure DBH from the tree point cloud and plot the circle fitting
 DBH_out <- dbh_pc(pc = tree_pc, plot = TRUE)
 DBH <- DBH_out$dbh
-
 ```
 ![](../man/figures/dbh_example.jpeg)
 
@@ -190,7 +188,6 @@ with a *thresholdbuttress* increased with 0.0005.
 # Measure DAB from the tree point cloud with default settings and plot the circle fitting
 DAB_out <- dab_pc(pc = tree_pc, plot = TRUE)
 DAB <- DAB_out$dab
-
 ```
 ![](../man/figures/dab_example.jpeg)
 
@@ -243,11 +240,12 @@ It is recommended to increase the *minheight* for buttressed trees.
 
 ```{r eval = FALSE}
 # Classify the tree point cloud of a buttressed tree and plot the classification results
-out <- classify_crown_pc(pc = tree_pc, minheight = 4, buttress = TRUE, 
-                              plot = TRUE)
+out <- classify_crown_pc(
+  pc = tree_pc, minheight = 4, buttress = TRUE,
+  plot = TRUE
+)
 crown_pc <- out$crownpoints
 plot <- out$plot
-
 ```
 ![](../man/figures/crown_example_tropical.jpeg)
 
@@ -262,7 +260,6 @@ plot is made when parameter *plot* equals TRUE.
 out <- projected_area_pc(pc = crown_pc, plot = TRUE)
 pca <- out$pa
 plot <- out$plot
-
 ```
 ![](../man/figures/pca_example.jpeg)
 
@@ -306,51 +303,62 @@ the rendered figures. Optionally change the attributes of the functions:
 # Tree height:
 # Plot the tree point clouds (check for outliers)
 # Specify dtm and r in case lower part of tree is not sampled
-Hs <- plot_tree_height_pcs(PCs_path = "path/to/point/clouds/folder/" , 
-                         extension = ".ply",
-                         OUT_path = "path/to/output/folder/",
-                         dtm = DTM, r = 2)
+Hs <- plot_tree_height_pcs(
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".ply",
+  OUT_path = "path/to/output/folder/",
+  dtm = DTM, r = 2
+)
 
 # DBH:
 # try out different thresholdR2 and slice_thickness values when default values fail
-DBHs <- plot_dbh_fit_pcs(PCs_path = "path/to/point/clouds/folder/" , 
-                         extension = ".ply", 
-                         OUT_path = "path/to/output/folder/",
-                         thresholdR2 = 0.0025, slice_thickness = 0.2)
-# DAB: 
+DBHs <- plot_dbh_fit_pcs(
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".ply",
+  OUT_path = "path/to/output/folder/",
+  thresholdR2 = 0.0025, slice_thickness = 0.2
+)
+# DAB:
 # try out different values for thresholdbuttress and maxbuttressheight when default values fail
-DABs <- plot_dab_fit_pcs(PCs_path = "path/to/point/clouds/folder/" , 
-                         extension = ".las", 
-                         OUT_path = "path/to/output/folder/", 
-                         thresholdbuttress = 0.002, maxbuttressheight = 9)
+DABs <- plot_dab_fit_pcs(
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".las",
+  OUT_path = "path/to/output/folder/",
+  thresholdbuttress = 0.002, maxbuttressheight = 9
+)
 # Crown classification:
 # For non-buttressed trees: (buttress = FALSE,) specify thresholdR2 and slice_thickness chosen in previous step
 # For buttressed trees: buttress = TRUE, specify thresholdbuttress and maxbuttressheight chosen in previous step
-# Try out different values for thresholdbranch and minheight 
-crown_pcs <- plot_crown_classification_pcs(PCs_path = "path/to/point/clouds/folder/", 
-                         extension = ".txt", 
-                         OUT_path = "path/to/output/folder/", 
-                         thresholdbranch = 2, minheight = 3, buttress = TRUE,
-                         thresholdbuttress = 0.002, maxbuttressheight = 9)
+# Try out different values for thresholdbranch and minheight
+crown_pcs <- plot_crown_classification_pcs(
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".txt",
+  OUT_path = "path/to/output/folder/",
+  thresholdbranch = 2, minheight = 3, buttress = TRUE,
+  thresholdbuttress = 0.002, maxbuttressheight = 9
+)
 # Projected area
-# Try out a different value for concavity 
+# Try out a different value for concavity
 # indicate crown = TRUE if you want to calculate projected area on the crown points only
 # In this case: also specify the values for the crown classification chosen in previous step
-PAs <- plot_pa_pcs(PCs_path = "path/to/point/clouds/folder/" , 
-                         extension = ".ply", 
-                         OUT_path = "path/to/output/folder/", concavity = 3,
-                         thresholdbranch = 2, minheight = 3, buttress = TRUE,
-                         thresholdbuttress = 0.002, maxbuttressheight = 9)
+PAs <- plot_pa_pcs(
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".ply",
+  OUT_path = "path/to/output/folder/", concavity = 3,
+  thresholdbranch = 2, minheight = 3, buttress = TRUE,
+  thresholdbuttress = 0.002, maxbuttressheight = 9
+)
 # 3D alpha volume
 # Try out a different value for alpha
 # indicate crown = TRUE if you want to calculate projected area on the crown points only
 # In this case: also specify the values for the crown classification chosen in previous step
-AVs <- plot_av_pcs(PCs_path = "path/to/point/clouds/folder/" , 
-                         extension = ".las", 
-                         OUT_path = "path/to/output/folder/", alpha = 2,
-                         thresholdbranch = 2, minheight = 3, buttress = TRUE,
-                         thresholdbuttress = 0.002, maxbuttressheight = 9)
-
+AVs <- plot_av_pcs(
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".las",
+  OUT_path = "path/to/output/folder/", alpha = 2,
+  thresholdbranch = 2, minheight = 3, buttress = TRUE,
+  thresholdbuttress = 0.002, maxbuttressheight = 9
+)
 ```
 
 #### Summarise
@@ -370,9 +378,11 @@ separately. Afterwards the outputs can be combined.
 ```{r eval = FALSE}
 # Summary with default setting for non-buttressed trees and plot the summary
 summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/clouds/folder_non-buttressed_trees/")
-# Summary with default setting (except minheight and buttress) for buttressed trees 
-summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/clouds/folder_buttressed_trees/", 
-                                            minheight = 4, buttress = TRUE)
+# Summary with default setting (except minheight and buttress) for buttressed trees
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/point/clouds/folder_buttressed_trees/",
+  minheight = 4, buttress = TRUE
+)
 ```
 
 ![](../man/figures/summary.jpeg)
@@ -437,8 +447,10 @@ argument and the TreeQSM *version* as a second (default = "2.4.0") argument.
 # Read the TreeQSM file from its' specified path
 qsm <- read_tree_qsm(path = "path/to/treeqsm.mat")
 # Read the TreeQSM file of version "2.3.0" from its' specified path into the global environment
-qsm <- read_tree_qsm(path = "path/to/treeqsm.mat", version = "2.3.0", 
-                     global = TRUE)
+qsm <- read_tree_qsm(
+  path = "path/to/treeqsm.mat", version = "2.3.0",
+  global = TRUE
+)
 ```
 #### Extract metrics Terryn et al. (2020)
 
@@ -450,7 +462,7 @@ only one of the TreeQSM components.
 # Calculate the stem branch angle and branch angle ratio from the branch component
 sba <- stem_branch_angle_qsm(branch = qsm$branch)
 bar <- branch_angle_ratio_qsm(branch = qsm$branch)
-# Calculate stem branch cluster size and crown evenness from the cylinder component 
+# Calculate stem branch cluster size and crown evenness from the cylinder component
 sbcs <- stem_branch_cluster_size_qsm(cylinder = qsm$cylinder)
 ce <- crown_evenness_qsm(cylinder = qsm$cylinder)
 # Calculate the cylinder length volume ratio from the treedata component
@@ -459,11 +471,13 @@ clvr <- cylinder_length_volume_ratio_qsm(treedata = qsm$treedata)
 Other metrics rely on two of the TreeQSM components.
 
 ```{r eval = FALSE}
-# Calculate the volume below 55 and the relative volume ratio from 
+# Calculate the volume below 55 and the relative volume ratio from
 # the cylinder and treedata component
 vol_55 <- volume_below_55_qsm(cylinder = qsm$cylinder, treedata = qsm$treedata)
-relvol_ratio <- relative_volume_ratio_qsm(cylinder = qsm$cylinder, 
-                                          treedata = qsm$treedata)
+relvol_ratio <- relative_volume_ratio_qsm(
+  cylinder = qsm$cylinder,
+  treedata = qsm$treedata
+)
 # Calculate the shedding ratio from the branch and treedata component
 shed_ratio <- shedding_ratio_qsm(branch = qsm$branch, treedata = qsm$treedata)
 ```
@@ -480,26 +494,37 @@ sections),
 # Read the tree point cloud
 tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
 # Calculate the dbh min tree radius and volume ratio using additional point cloud data
-dmrr <- dbh_minradius_ratio_qsm(treedata = qsm$treedata, 
-                                cylinder = qsm$cylinder, pc = tree_pc, 
-                                thresholdR2 = 0.0025)
-dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = tree_pc, 
-                            slice_thickness = 0.1)
+dmrr <- dbh_minradius_ratio_qsm(
+  treedata = qsm$treedata,
+  cylinder = qsm$cylinder, pc = tree_pc,
+  thresholdR2 = 0.0025
+)
+dvr <- dbh_volume_ratio_qsm(
+  treedata = qsm$treedata, pc = tree_pc,
+  slice_thickness = 0.1
+)
 # Calculate the dbh height ratio of a buttressed tree using additional point cloud data
 # Specify the optimised thresholdbuttress and maxbuttressheight when needed
-dhr <- dbh_height_ratio_qsm(treedata = qsm$treedata, pc = tree_pc, 
-                            buttress = TRUE, thresholdbuttress = 0.002, 
-                            maxbuttressheight = 5)
+dhr <- dbh_height_ratio_qsm(
+  treedata = qsm$treedata, pc = tree_pc,
+  buttress = TRUE, thresholdbuttress = 0.002,
+  maxbuttressheight = 5
+)
 # Calculate the crown start height, crown height and crown diameter height ratio
 # using additional point cloud data
-csh <- crown_start_height_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder, 
-                              pc = tree_pc)
-ch <- crown_height_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder, 
-                         pc = tree_pc)
-cdhr <- crown_diameterheight_ratio_qsm(treedata = qsm$treedata, 
-                                            cylinder = qsm$cylinder, 
-                                            pc =tree_pc)
-
+csh <- crown_start_height_qsm(
+  treedata = qsm$treedata, cylinder = qsm$cylinder,
+  pc = tree_pc
+)
+ch <- crown_height_qsm(
+  treedata = qsm$treedata, cylinder = qsm$cylinder,
+  pc = tree_pc
+)
+cdhr <- crown_diameterheight_ratio_qsm(
+  treedata = qsm$treedata,
+  cylinder = qsm$cylinder,
+  pc = tree_pc
+)
 ```
 
 Normalisation according to Terryn et al. (2020) as well as 
@@ -509,18 +534,24 @@ included in the functions of the metrics that were adapted by Terryn et al.
 
 ```{r eval = FALSE}
 # Calculate the stem branch radius according to Åkerblom et al. (2017)
-sbr <- stem_branch_radius_qsm(cylinder = qsm$cylinder, treedata = qsm$treedata, 
-                              normalisation = "parentcylinder")
-# Calculate the stem branch length according to Terryn et al. (2020) 
-sbl <- stem_branch_length_qsm(branch = qsm$branch, treedata = qsm$treedata, 
-                              normalisation = "treeheight")
+sbr <- stem_branch_radius_qsm(
+  cylinder = qsm$cylinder, treedata = qsm$treedata,
+  normalisation = "parentcylinder"
+)
+# Calculate the stem branch length according to Terryn et al. (2020)
+sbl <- stem_branch_length_qsm(
+  branch = qsm$branch, treedata = qsm$treedata,
+  normalisation = "treeheight"
+)
 # Calculate the stem branch distance according to Åkerblom et al. (2017) and
-# using point cloud information 
-sbd <- stem_branch_distance_qsm(cylinder = qsm$cylinder, 
-                                treedata = qsm$treedata, normalisation = "dbh", 
-                                pc =  tree_pc, buttress = TRUE, 
-                                thresholdbuttress = 0.002, 
-                                maxbuttressheight = 5)
+# using point cloud information
+sbd <- stem_branch_distance_qsm(
+  cylinder = qsm$cylinder,
+  treedata = qsm$treedata, normalisation = "dbh",
+  pc = tree_pc, buttress = TRUE,
+  thresholdbuttress = 0.002,
+  maxbuttressheight = 5
+)
 ```
 ### Workflow for multiple trees
 
@@ -553,14 +584,18 @@ summary_qsm_metrics(QSMs_path = "path/to/treeqsm/folder/")
 # Run the summary function with multiple QSMs per *mat file
 summary_qsm_metrics(QSMs_path = "path/to/treeqsm/folder/", multiple = TRUE)
 # Run the summary function with default settings with point cloud info
-summary_qsm_metrics(QSMs_path = "path/to/treeqsms/folder/", 
-                    PCs_path = "path/to/point/clouds/folder/")
+summary_qsm_metrics(
+  QSMs_path = "path/to/treeqsms/folder/",
+  PCs_path = "path/to/point/clouds/folder/"
+)
 # Run the summary function with non-default settings with point cloud info
-summary_qsm_metrics(QSMs_path = "path/to/treeqsms/folder/", version = "2.4.0", 
-                    sbr_normalisation = "parentcylinder", 
-                    sbl_normalisation = "dbh", sbd_normalisation = "dbh", 
-                    PCs_path = "path/to/point/clouds/folder/", 
-                    extension = ".ply", buttress = TRUE, 
-                    thresholdbuttress = 0.002, maxbuttressheight = 5, 
-                    OUT_path = "path/to/output/folder/")
+summary_qsm_metrics(
+  QSMs_path = "path/to/treeqsms/folder/", version = "2.4.0",
+  sbr_normalisation = "parentcylinder",
+  sbl_normalisation = "dbh", sbd_normalisation = "dbh",
+  PCs_path = "path/to/point/clouds/folder/",
+  extension = ".ply", buttress = TRUE,
+  thresholdbuttress = 0.002, maxbuttressheight = 5,
+  OUT_path = "path/to/output/folder/"
+)
 ```

@@ -64,8 +64,10 @@ dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata)
 pc_tree <- read_tree_pc("path/to/point_cloud.txt")
 dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = pc_tree)
 # for buttressed trees
-dvr <- dbh_volume_ratio_qsm(treedata = qsm$treedata, pc = pc_tree,
-                            buttress = TRUE)
+dvr <- dbh_volume_ratio_qsm(
+  treedata = qsm$treedata, pc = pc_tree,
+  buttress = TRUE
+)
 }
 }
 \references{

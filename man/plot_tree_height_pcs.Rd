@@ -45,13 +45,17 @@ height and plot the tree point cloud.
 \examples{
 \dontrun{
 # Calculate tree height and save figures
-height_values <- plot_tree_height_pcs(PCs_path = "path/to/folder/PCs/",
-                                  extension = ".txt",
-                                  OUT_path = "path/to/figure/folder/")
+height_values <- plot_tree_height_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt",
+  OUT_path = "path/to/figure/folder/"
+)
 # Calculate tree height using dtm of resolution 2 and save figures
 dtm_df <- read_tree_pc("path/to/dtm.txt")
-height_values <- plot_tree_height_pcs(PCs_path = "path/to/folder/PCs/",
-                                  extension = ".txt", dtm = dtm_df, r = 2,
-                                  OUT_path = "path/to/figure/folder/")
+height_values <- plot_tree_height_pcs(
+  PCs_path = "path/to/folder/PCs/",
+  extension = ".txt", dtm = dtm_df, r = 2,
+  OUT_path = "path/to/figure/folder/"
+)
 }
 }
