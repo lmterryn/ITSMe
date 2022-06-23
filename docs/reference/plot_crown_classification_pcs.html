@@ -148,22 +148,28 @@ tree point cloud and plot the classification.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># Run the crown classification with default settings and save figures</span></span>
-<span class="r-in"><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                              extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
-<span class="r-in">                              OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span></span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># Run the crown classification with non-default settings and save figures</span></span>
-<span class="r-in"><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                              extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
-<span class="r-in">                              OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span>,</span>
-<span class="r-in">                              thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span></span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span>,</span>
+<span class="r-in">  thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">4</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># Run the crown classification with non-default settings and save figures</span></span>
 <span class="r-in"><span class="co"># for buttressed trees</span></span>
-<span class="r-in"><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
-<span class="r-in">                              extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
-<span class="r-in">                              OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span>,</span>
-<span class="r-in">                              thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">4</span>,</span>
-<span class="r-in">                              buttress <span class="op">=</span> <span class="cn">TRUE</span>, thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>,</span>
-<span class="r-in">                              maxbuttressheight <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">plot_crown_classification_pcs</span><span class="op">(</span></span>
+<span class="r-in">  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/PCs/"</span>,</span>
+<span class="r-in">  extension <span class="op">=</span> <span class="st">".txt"</span>,</span>
+<span class="r-in">  OUT_path <span class="op">=</span> <span class="st">"path/to/figure/folder/"</span>,</span>
+<span class="r-in">  thresholdbranch <span class="op">=</span> <span class="fl">2</span>, minheight <span class="op">=</span> <span class="fl">4</span>,</span>
+<span class="r-in">  buttress <span class="op">=</span> <span class="cn">TRUE</span>, thresholdbuttress <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span class="r-in">  maxbuttressheight <span class="op">=</span> <span class="fl">5</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>

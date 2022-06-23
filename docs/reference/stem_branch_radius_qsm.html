@@ -109,19 +109,25 @@ Photogrammetry and Remote Sensing, 168, 170-181.</p>
 <span class="r-in"><span class="co"># Read tree qsm and calculate the stem branch radius</span></span>
 <span class="r-in"><span class="co"># from Akerblom et al. (2017)</span></span>
 <span class="r-in"><span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>QSM_path <span class="op">=</span> <span class="st">"path/to/qsm.mat"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu">stem_branch_radius_qsm</span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
-<span class="r-in">                              treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
-<span class="r-in">                              normalisation <span class="op">=</span> <span class="st">"parentcyl"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu">stem_branch_radius_qsm</span><span class="op">(</span></span>
+<span class="r-in">  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
+<span class="r-in">  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
+<span class="r-in">  normalisation <span class="op">=</span> <span class="st">"parentcyl"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># from Terryn et al. (2020)</span></span>
-<span class="r-in"><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu">stem_branch_radius_qsm</span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
-<span class="r-in">                              treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
-<span class="r-in">                              normalisation <span class="op">=</span> <span class="st">"treeheight"</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu">stem_branch_radius_qsm</span><span class="op">(</span></span>
+<span class="r-in">  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
+<span class="r-in">  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
+<span class="r-in">  normalisation <span class="op">=</span> <span class="st">"treeheight"</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="co"># with point cloud data</span></span>
 <span class="r-in"><span class="va">pc_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>PC_path <span class="op">=</span> <span class="st">"path/to/point_cloud.txt"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu">stem_branch_radius_qsm</span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
-<span class="r-in">                              treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
-<span class="r-in">                              normalisation <span class="op">=</span> <span class="st">"treeheight"</span>,</span>
-<span class="r-in">                              pc <span class="op">=</span> <span class="va">pc_tree</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu">stem_branch_radius_qsm</span><span class="op">(</span></span>
+<span class="r-in">  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>,</span>
+<span class="r-in">  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
+<span class="r-in">  normalisation <span class="op">=</span> <span class="st">"treeheight"</span>,</span>
+<span class="r-in">  pc <span class="op">=</span> <span class="va">pc_tree</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>

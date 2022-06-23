@@ -51,20 +51,20 @@ LiDAR platforms (e.g. MLS, UAV-LS). Keep in mind that the accuracy of the metric
 measurements will depend on the quality of the data. 
 
 Make sure outliers and points that don't belong to the tree (especially near the 
-trunk) are removed. Down sampling of the point cloud is not required but can 
-reduce computation time for very big tree point clouds (down sampling to 
-2 cm is suggested).
+trunk) are removed. Good segmentation quality leads to reliable measurements.
+Down sampling of the point cloud is not required but can reduce computation time 
+for very big tree point clouds (down sampling to 2 cm is suggested).
 
 ### Workflow for a single tree
 
 Before running the functions on multiple tree point clouds at a time, it is 
-advised to get familiar with the functions by running them on a single tree 
-point cloud. 
+advised to get familiar with the functions and their input parameters by running 
+the functions on a single tree point cloud. 
 
 #### Read the point cloud
 
 All of the point cloud based functions (mentioned above) need a tree point cloud 
-in the form of a data.frame with columns X, Y, Z as their fist argument. The 
+in the form of a data.frame with columns X, Y, Z as their first argument. The 
 ITSMe package provides a function `read_tree_pc` that takes the path to a tree 
 point cloud file (txt, ply or las) as an argument and returns a data.frame with 
 X, Y, Z columns.
@@ -78,7 +78,8 @@ tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
 
 The position of the tree can be easily determined using `tree_position_pc`, 
 which determines the mean X, Y and Z value of the 100 lowest points of the tree 
-point cloud.
+point cloud. Using the 100 lowest points makes it possible to use this function 
+also for UAV-LS tree point clouds that do not sample the stem very well.
 ```{r eval = FALSE}
 # Measure tree position from the tree point cloud
 XYZ_pos <- tree_position_pc(pc = tree_pc)
@@ -95,9 +96,9 @@ the "plot" parameter equals TRUE.
 # Measure tree height from the tree point cloud
 H <- tree_height_pc(pc = tree_pc)
 # also plot the tree point cloud
-out <- tree_height_pc(pc = tree_pc, plot = TRUE)
-H <- out$h
-plot_tree <- out$plotTree
+H_out <- tree_height_pc(pc = tree_pc, plot = TRUE)
+H <- H_out$h
+plot_tree <- H_out$plotTree
 ```
 ![](../man/figures/tree_height_tls_example.jpeg)
 
@@ -105,7 +106,8 @@ However, for tree point clouds that are obtained with for example UAV-LS and
 that do not sample the base of the tree sufficiently the tree height would be 
 underestimated. In this case a digital terrain model (DTM) with a certain 
 resolution can be provided to the `tree_height_pc` function to improve tree 
-height estimation.
+height estimation. The DTM also needs to be supplied in the data.frame format 
+with columns X, Y, and Z.
 
 ```{r eval = FALSE}
 # Read the DTM
@@ -113,9 +115,9 @@ DTM <- read_tree_pc(path = "path/to/dtm.txt")
 # Measure tree height from the tree point cloud and DTM with resolution r
 H <- tree_height_pc(pc = tree_pc, dtm = DTM, r = 1.5)
 # also plot the tree point cloud and estimated lowest point based on DTM
-out <- tree_height_pc(pc = tree_pc, dtm = DTM, r = 1.5, plot = TRUE)
-H <- out$h
-plot_tree <- out$plot
+H_out <- tree_height_pc(pc = tree_pc, dtm = DTM, r = 1.5, plot = TRUE)
+H <- H_out$h
+plot_tree <- H_out$plot
 ```
 ![](../man/figures/tree_height_uavls_example.jpeg)
 The provided resolution (r) value should be at least the resolution of the
@@ -126,28 +128,37 @@ provided DTM.
 Depending on if your trees are buttressed or not, you will make a choice between 
 the diameter at breast height (DBH) and the diameter above buttresses (DAB). If 
 you are not sure if this is the case for your tree, you can check the slice 
-(and circle fitting) at 1.3 m with the `diameter_slice_pc` function.
+(and circle fitting) at 1.3 m with the `diameter_slice_pc` function. The 
+diameter is measured as the circle fit to the slice points. But this function 
+also determines the functional diameter which is calculated as the diameter of 
+the circle with the same area as the concave hull (concavity = 4) fitted to the 
+slice points. This value could be more interesting for trees that inherently 
+have non-circular stems. But this metric is influenced more by point cloud and 
+segmentation quality (e.g. noisy points, or vegetation points which have not 
+been removed from the point cloud).
 
 ```{r eval = FALSE}
 # Measure DBH from the tree point cloud and plot the circle fitting
-slice1 <- diameter_slice_pc(
+D_out <- diameter_slice_pc(
   pc = tree_pc, slice_height = 1.3,
   slice_thickness = 0.06, plot = TRUE
 )
-diameter <- slice1$diameter
+diameter <- D_out$diameter
+functional_diameter <- D_out$fdiameter
 ```
 
+For a regular non-buttressed tree:
 ![](../man/figures/diameter_slice_example.jpeg)
-
+For a buttressed tree:
 ![](../man/figures/diameter_slice_example_butt.jpeg)
 
-The DBH is measured using `dbh_pc` as the diameter of the optimal circle fitted 
-through a default 6mm thick horizontal slice (from 1.27 m to 1.33 m above the 
-lowest tree point). If branch or vegetation points are present in the slice, the 
-lower (till 1.5 m above lowest point) trunk is extracted (so without 
-branch/vegetation points) and the fit is done again. The `dbh_pc` function needs 
-the tree point cloud as an input. If the argument *plot* is set TRUE it also 
-plots the circle fitting. 
+The DBH is measured using `dbh_pc` and based on the `diameter_slice_pc` function 
+with *slice_height* of 1.3 m and a chosen *slice_thickness* (default = 0.06 m). 
+If branch or vegetation points are present in the slice, the lower (till 1.5 m 
+above lowest point) trunk is extracted (so without branch/vegetation points) and 
+the fit is done again. The `dbh_pc` function needs the tree point cloud as an 
+input. If the argument *plot* is set TRUE it also plots the circle fitting. This 
+function also reports the functional DBH (fDBH).
 
 ```{r eval = FALSE}
 # Measure DBH from the tree point cloud and plot the circle fitting
@@ -157,32 +168,40 @@ DBH <- DBH_out$dbh
 ![](../man/figures/dbh_example.jpeg)
 
 Generally running the `dbh_pc` with default values is fine. But there are two 
-other parameters that can be optimised. The *thresholdR2* parameter 
-(default = 0.001) determines when the trunk extraction is done. For point trees 
-with non-circular stems this value should be increased. Also for smaller trees 
-(DBH < 10 cm) or tree point cloud with a sub-optimal co-registration of scan 
-positions, for example due to wind) a higher value will lead to better results. 
-The *slice_thickness* parameter determines the thickness of the slice at 1.3 m 
-and is default 6 mm. For tree point clouds with a lower point density at the 
-stem (e.g. UAV-LS) increasing the slice_thickness to for example 20 cm is 
-crucial for DBH measurements.
+other parameters that can be optimised which influence the trunk extraction. The 
+*thresholdR2* parameter (default = 0.001) determines when the trunk extraction 
+is done. The trunk is extracted when the initial diameter estimation at breast 
+height results in NaN, a value higher than 2 m, the residuals are higher than 
+the thresholdR2 times the estimated diameter or the estimated diameter is 
+smaller than the diameter estimated at 0.15 m. For trees with non-circular stems
+this value should be increased. Also for smaller trees (DBH < 10 cm) or tree 
+point cloud with a sub-optimal co-registration of scan positions, for example 
+due to wind) a higher value will lead to better results. The *slice_thickness* 
+parameter determines the thickness of the slice at 1.3 m and is default 0.06 m. 
+For tree point clouds with a lower point density at the stem (e.g. UAV-LS) 
+increasing the slice_thickness to for example 20 cm is crucial for DBH 
+measurements.
 
 For buttressed trees `dbh_pc` would result in:
 
 ![](../man/figures/dbh_example_buttress.jpeg)
 
 
-In this case determining the DAB with `dab_pc` is the better option. With 
-`dab_pc`, the diameter (from the optimal circle fitted through a 6mm thick 
-horizontal slice) is measured above the buttresses. The height at which the 
-horizontal slice is taken (the height above buttresses), is determined 
-iteratively, starting at breast height. The average residual between the points 
-and the fitted circle is calculated. When the average residual exceeds a value 
-of *thresholdbuttress* times the radius, indicating a non-circular (irregular) 
-stem shape and presumably buttresses, and the *maxbuttressheight* is not 
-exceeded, the process is repeated with a new slice 6 mm higher than the previous 
-one. When the *maxbuttressheight* is exceeded the iterative process is restarted 
-with a *thresholdbuttress* increased with 0.0005.
+In this case determining the DAB with `dab_pc` is the better option. Also for 
+trees with DBH larger than 2 m and no branches at or below breast height this 
+function is recommended (even if buttresses are not present). With `dab_pc`, the 
+diameter (from the optimal circle fitted through a 6mm thick horizontal slice) 
+is measured above the buttresses (if there are no buttresses the diameter is 
+measured at breast height). The height at which the horizontal slice is taken 
+(the height above buttresses), is determined iteratively, starting at breast 
+height. The average residual between the points and the fitted circle is 
+calculated. When the average residual exceeds a value of *thresholdbuttress* 
+times the radius, indicating a non-circular (irregular) stem shape and 
+presumably buttresses, and the *maxbuttressheight* is not exceeded, the process 
+is repeated with a new slice 6 mm higher than the previous one. When the 
+*maxbuttressheight* is exceeded the iterative process is restarted with a 
+*thresholdbuttress* increased with 0.0005. Also in this case a functional 
+DAB (fDAB) is reported.
 
 ```{r eval = FALSE}
 # Measure DAB from the tree point cloud with default settings and plot the circle fitting
@@ -217,9 +236,9 @@ with the DBH or DAB.
 
 ```{r eval = FALSE}
 # Classify the tree point cloud with default settings and plot the classification results
-out <- classify_crown_pc(pc = tree_pc, plot = TRUE)
-crown_pc <- out$crownpoints
-plot <- out$plot
+C_out <- classify_crown_pc(pc = tree_pc, plot = TRUE)
+crown_pc <- C_out$crownpoints
+plot <- C_out$plot
 ```
 
 ![](../man/figures/crown_example.jpeg)
@@ -234,18 +253,20 @@ tree if default values do not lead to the desired results:
  * increase *minheight* to the height above the widest part of the lower stem 
  (for example above the buttresses).
 
-For buttressed trees, the attribute *buttress* has to be set TRUE and previously 
-chosen attributes *thresholdbuttress* and *maxbuttressheight* can be specified.
-It is recommended to increase the *minheight* for buttressed trees.
+For non-buttressed trees, specify the previosuly determined *thresholdR2* and 
+*slice_thickness* parameters. For buttressed trees, the attribute *buttress* has 
+to be set TRUE and previously chosen attributes *thresholdbuttress* and 
+*maxbuttressheight* can be specified. It is recommended to increase the 
+*minheight* for buttressed trees.
 
 ```{r eval = FALSE}
 # Classify the tree point cloud of a buttressed tree and plot the classification results
-out <- classify_crown_pc(
+C_out <- classify_crown_pc(
   pc = tree_pc, minheight = 4, buttress = TRUE,
   plot = TRUE
 )
-crown_pc <- out$crownpoints
-plot <- out$plot
+crown_pc <- C_out$crownpoints
+plot <- C_out$plot
 ```
 ![](../man/figures/crown_example_tropical.jpeg)
 
@@ -253,8 +274,11 @@ plot <- out$plot
 
 The projected (crown) area of a tree point cloud can be measured with 
 `projected_area_pc` which calculates the area of a concave hull (based on [concaveman](https://cran.r-project.org/web/packages/concaveman/index.html)) 
-fitted to the (crown) points. The *concavity* (default=2) can be chosen and a 
-plot is made when parameter *plot* equals TRUE. 
+fitted to the input point cloud. The *concavity* (default=2) can be chosen and a 
+plot is made when parameter *plot* equals TRUE. If the input point cloud is the 
+full tree point cloud the output is the projected tree area. If the input is the 
+crown point cloud (determined with `classify_crown_pc` or in your own way) the 
+output is the projected crown area.
 ```{r eval = FALSE}
 # Measure the projected crown area and plot the results
 out <- projected_area_pc(pc = crown_pc, plot = TRUE)

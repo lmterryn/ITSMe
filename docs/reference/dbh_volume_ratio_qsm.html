@@ -125,8 +125,10 @@ Photogrammetry and Remote Sensing, 168, 170-181.</p>
 <span class="r-in"><span class="va">pc_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span><span class="st">"path/to/point_cloud.txt"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu">dbh_volume_ratio_qsm</span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">pc_tree</span><span class="op">)</span></span>
 <span class="r-in"><span class="co"># for buttressed trees</span></span>
-<span class="r-in"><span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu">dbh_volume_ratio_qsm</span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">pc_tree</span>,</span>
-<span class="r-in">                            buttress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">dvr</span> <span class="op">&lt;-</span> <span class="fu">dbh_volume_ratio_qsm</span><span class="op">(</span></span>
+<span class="r-in">  treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>, pc <span class="op">=</span> <span class="va">pc_tree</span>,</span>
+<span class="r-in">  buttress <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span class="r-in"><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
