@@ -4,8 +4,8 @@ authors:
   - family-names: Louise
     given-names: Terryn
     orcid: https://orcid.org/0000-0001-8405-2788
-title: "lmterryn/ITSMe: pre-publish release"
-version: v.0.1.1
-doi: 10.5281/zenodo.6560321
-date-released: 2022-05-18
+title: "lmterryn/ITSMe: submission release"
+version: v1.0.0
+doi: 10.5281/zenodo.6769105
+date-released: 2022-06-28
 url: "https://github.com/lmterryn/ITSMe"
