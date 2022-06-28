@@ -46,6 +46,7 @@ read_tree_pc <- function(path, samplefactor = 1) {
     pc <- data.frame("X" = ply$vb[1, ], "Y" = ply$vb[2, ], "Z" = ply$vb[3, ])
   } else {
     print("This extension is not recognized. Try txt, las or ply format")
+    pc <- c()
   }
   if (samplefactor != 1) {
     pc <- pc[sample(nrow(pc),
