@@ -1,6 +1,6 @@
 Package: ITSMe
 Title: Individual Tree Structural Metrics 
-Version: 0.1.1
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Louise", 
              family = "Terryn", 
@@ -45,5 +45,7 @@ Depends:
 LazyData: true
 Suggests: 
     rmarkdown,
-    knitr
+    knitr,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3
