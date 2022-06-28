@@ -1036,11 +1036,11 @@ crownset_qsm <- function(cylinder) {
 #' }
 crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
   crownset <- crownset_qsm(cylinder)
-  tree_height <- tree_height(treedata, pc)
-  crownset_parent0 <- crownset[cylinder$BranchOrder
-  [cylinder$parent[crownset]] == 0]
-  min_height <- min(cylinder$start[crownset_parent0, 3])
   if (length(crownset) > 0) {
+    tree_height <- tree_height(treedata, pc)
+    crownset_parent0 <- crownset[cylinder$BranchOrder
+                                 [cylinder$parent[crownset]] == 0]
+    min_height <- min(cylinder$start[crownset_parent0, 3])
     sh <- (min_height - min(cylinder$start[, 3])) / tree_height
   } else {
     sh <- NaN
