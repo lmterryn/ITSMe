@@ -293,10 +293,12 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
       pa <- sf::st_area(hull)
       fdiam <- sqrt(pa / pi) * 2
     } else {
-      R <- diam <- residu <- center_estimate <- fdiam <- NaN
+      return(list(
+        "diameter" = NaN, "R2" = NaN, "center" = NaN,
+        "fdiameter" = NaN, "hull" = NaN))
     }
     if (!is.nan(R)) {
-      if (R > 3) {
+      if (R > 1.5) {
         R <- diam <- center_estimate <- NaN
       }
     }
