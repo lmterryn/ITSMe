@@ -8,7 +8,7 @@ alpha_volume_pc(pc, alpha = 1, plot = FALSE)
 }
 \arguments{
 \item{pc}{The point cloud as a data.frame with columns X,Y,Z (e.g. output of
-\code{\link{read_tree_pc}}.}
+\code{\link{read_tree_pc}}).}
 
 \item{alpha}{Numeric value (default=1) alpha for the computation of the 3D
 alpha-shape of the point cloud based on

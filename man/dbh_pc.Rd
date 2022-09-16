@@ -32,18 +32,20 @@ included in the list output.
 }
 \description{
 Returns the diameter at breast height (DBH) and functional diameter at breast
-height of a tree measured from a tree point cloud. There should be only one
-stem at breast height.
+height (fDBH) of a tree measured from a tree point cloud. There should be
+only one stem at breast height.
 }
 \details{
 The DBH is measured as the diameter of the optimal circle fitted through a
 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree
 point) using \code{\link{diameter_slice_pc}}. A least squares circle fitting
 algorithm is applied to find the optimal fit. Also the functional diameter at
-breast height (fDBH) is determined using \code{\link{diameter_slice_pc}}. In
-case there are branches or foliage at this height, the lower trunk is
-extracted using \code{\link{extract_lower_trunk_pc}}. Wether this is the case
-is determined using the thresholdR2 parameter.
+breast height (fDBH) is determined using \code{\link{diameter_slice_pc}}. For
+this the area of the concave hull with (concavity 4) is determined on the
+slice. From this area the diameter is determined as the diameter of a circle
+with this area. In case there are branches or foliage at this height, the
+lower trunk is extracted using \code{\link{extract_lower_trunk_pc}}. Wether
+this is the case is determined using the thresholdR2 parameter.
 }
 \examples{
 \dontrun{

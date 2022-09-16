@@ -81,14 +81,14 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
     pc_norm <- pc
     pc_norm$Z <- pc$Z - z_min
     X <- Y <- Z <- NULL
-    plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = "black") +
+    plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = "blue") +
       ggplot2::geom_point(size = 0.1, shape = ".") +
       ggplot2::coord_fixed(ratio = 1) +
       ggplot2::theme(
         axis.text.x = ggplot2::element_blank(),
         axis.ticks.x = ggplot2::element_blank(),
         plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-        text = ggplot2::element_text(size = 20)
+        text = ggplot2::element_text(size = 12)
       )
     if (is.data.frame(dtm)) {
       dtm_under_tree_norm <- dtm_under_tree
@@ -105,7 +105,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
           axis.text.x = ggplot2::element_blank(),
           axis.ticks.x = ggplot2::element_blank(),
           plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-          text = ggplot2::element_text(size = 20)
+          text = ggplot2::element_text(size = 12)
         )
       plotXZ <- plotXZ + ggplot2::geom_point(
         data = dtm_under_tree_norm,
@@ -134,7 +134,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
       s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
         min(pc$Z)) * 0.5 - 1.05
     } else {
-      plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = "black") +
+      plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = "blue") +
         ggplot2::geom_point(size = 0.1, shape = ".") +
         ggplot2::coord_fixed(ratio = 1) +
         ggplot2::theme(
@@ -144,7 +144,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
           axis.text.x = ggplot2::element_blank(),
           axis.ticks.x = ggplot2::element_blank(),
           plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-          text = ggplot2::element_text(size = 20)
+          text = ggplot2::element_text(size = 12)
         )
       s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
         min(pc$Z)) * 0.48 - 1
@@ -156,7 +156,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
     )
     plotTree <- ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(
       paste("H = ", as.character(round(h, 2)), " m", sep = ""),
-      size = 20
+      size = 12
     ))
     return(list(
       "h" = h, "plot" = plotTree, "plotXZ" = plotXZ,
@@ -329,7 +329,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
           as.character(round(fdiam, 2)), " m",
           sep = ""
         )) +
-        ggplot2::theme(text = ggplot2::element_text(size = 20))
+        ggplot2::theme(text = ggplot2::element_text(size = 12))
       if (!is.nan(R)) {
         data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
         plotDIAM <- plotDIAM +
@@ -364,7 +364,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
                 )
             )
           ) +
-          ggplot2::theme(text = ggplot2::element_text(size = 20))
+          ggplot2::theme(text = ggplot2::element_text(size = 12))
       }
       print(plotDIAM)
       return(list(
@@ -495,17 +495,19 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
 #' Diameter at breast height point cloud
 #'
 #' Returns the diameter at breast height (DBH) and functional diameter at breast
-#' height of a tree measured from a tree point cloud. There should be only one
-#' stem at breast height.
+#' height (fDBH) of a tree measured from a tree point cloud. There should be
+#' only one stem at breast height.
 #'
 #' The DBH is measured as the diameter of the optimal circle fitted through a
 #' 6mm thick horizontal slice (from 1.27 m to 1.33 m above the lowest tree
 #' point) using \code{\link{diameter_slice_pc}}. A least squares circle fitting
 #' algorithm is applied to find the optimal fit. Also the functional diameter at
-#' breast height (fDBH) is determined using \code{\link{diameter_slice_pc}}. In
-#' case there are branches or foliage at this height, the lower trunk is
-#' extracted using \code{\link{extract_lower_trunk_pc}}. Wether this is the case
-#' is determined using the thresholdR2 parameter.
+#' breast height (fDBH) is determined using \code{\link{diameter_slice_pc}}. For
+#' this the area of the concave hull with (concavity 4) is determined on the
+#' slice. From this area the diameter is determined as the diameter of a circle
+#' with this area. In case there are branches or foliage at this height, the
+#' lower trunk is extracted using \code{\link{extract_lower_trunk_pc}}. Wether
+#' this is the case is determined using the thresholdR2 parameter.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -616,7 +618,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
               )
           )
         ) +
-        ggplot2::theme(text = ggplot2::element_text(size = 20))
+        ggplot2::theme(text = ggplot2::element_text(size = 12))
       print(plotDBH)
     } else {
       pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.3 - slice_thickness / 2) &
@@ -680,7 +682,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
               )
           )
         ) +
-        ggplot2::theme(text = ggplot2::element_text(size = 20))
+        ggplot2::theme(text = ggplot2::element_text(size = 12))
       print(plotDBH)
     }
     return(list(
@@ -869,7 +871,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
               )
           )
         ) +
-        ggplot2::theme(text = ggplot2::element_text(size = 20))
+        ggplot2::theme(text = ggplot2::element_text(size = 12))
     } else {
       plotDAB <- ggplot2::ggplot() +
         ggplot2::geom_point(
@@ -924,7 +926,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
               )
           )
         ) +
-        ggplot2::theme(text = ggplot2::element_text(size = 20))
+        ggplot2::theme(text = ggplot2::element_text(size = 12))
     }
     print(plotDAB)
     return(list(
@@ -1132,7 +1134,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             axis.text.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
             plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-            text = ggplot2::element_text(size = 20)
+            text = ggplot2::element_text(size = 12)
           ) +
           ggplot2::scale_color_manual(
             name = "class",
@@ -1160,7 +1162,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             axis.text.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
             plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-            text = ggplot2::element_text(size = 20)
+            text = ggplot2::element_text(size = 12)
           ) +
           ggplot2::scale_color_manual(
             name = "class",
@@ -1184,7 +1186,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         )
         plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
           "Crown classification",
-          size = 20
+          size = 12
         ))
       } else {
         trunk <- trunk_pc[sample(nrow(trunk_pc),
@@ -1254,7 +1256,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         )
         plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
           "Crown classification",
-          size = 20
+          size = 12
         ))
       }
       print(plotCrown)
@@ -1331,7 +1333,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       )
       plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
         "Crown classification",
-        size = 20
+        size = 12
       ))
       return(list(
         "crownpoints" = crown_pc, "trunkpoints" = pc,
@@ -1437,7 +1439,7 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
             )
         )
       ) +
-      ggplot2::theme(text = ggplot2::element_text(size = 20))
+      ggplot2::theme(text = ggplot2::element_text(size = 12))
     print(plotPA)
     return(list("pa" = pa, "plot" = plotPA))
   } else {
@@ -1454,7 +1456,7 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
 #' alpha-shape fitted to the point cloud.
 #'
 #' @param pc The point cloud as a data.frame with columns X,Y,Z (e.g. output of
-#'   \code{\link{read_tree_pc}}.
+#'   \code{\link{read_tree_pc}}).
 #' @param alpha Numeric value (default=1) alpha for the computation of the 3D
 #'   alpha-shape of the point cloud based on
 #'   \code{\link[alphashape3d]{ashape3d}}.
