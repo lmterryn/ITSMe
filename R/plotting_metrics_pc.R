@@ -208,14 +208,23 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- dbh_pc(pc, thresholdR2, slice_thickness, TRUE)
+    out <- tryCatch(
+      {
+        dbh_pc(pc, thresholdR2, slice_thickness, TRUE)
+        },
+      error = function(cond){
+        message(cond)
+        return(list("dbh" = NaN, "R2" = NaN, "fdbh" = NaN,
+                    "plot" = ggplot2::ggplot()))
+      }
+    )
     filename <- paste(OUT_path, "dbh_",
       strsplit(file_names[i], extension)[[1]], "_",
       as.character(thresholdR2), "_",
       as.character(slice_thickness), ".jpeg",
       sep = ""
     )
-    ggplot2::ggsave(filename, plot = out$plot)
+    ggplot2::ggsave(filename, plot = out$plot, width =  15, height = 10, units = "cm")
     DBHs <- append(DBHs, out$dbh)
     Rs <- append(Rs, out$R2)
     fDBHs <- append(fDBHs, out$fdbh)
