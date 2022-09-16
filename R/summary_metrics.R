@@ -90,25 +90,25 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              OUT_path = FALSE, plot = FALSE) {
   trees <- data.frame(
     "tree_id" = character(), "X_position" = double(),
-    "Y_position" = double(), "tree_height" = double(),
-    "diameter_at_breast_height" = double(),
-    "functional_diameter_at_breast_height" = double(),
-    "diameter_above_buttresses" = double(),
-    "functional_diameter_above_buttresses" = double(),
-    "projected_area" = double(), "alpha_volume" = double()
+    "Y_position" = double(), "tree_height_m" = double(),
+    "diameter_at_breast_height_m" = double(),
+    "functional_diameter_at_breast_height_m" = double(),
+    "diameter_above_buttresses_m" = double(),
+    "functional_diameter_above_buttresses_m" = double(),
+    "projected_area_m2" = double(), "alpha_volume_m3" = double()
   )
-  diameter_above_buttresses <- diameter_at_breast_height <- NULL
-  functional_diameter_above_buttresses <-
-    functional_diameter_at_breast_height <- NULL
+  diameter_above_buttresses_m <- diameter_at_breast_height_m <- NULL
+  functional_diameter_above_buttresses_m <-
+    functional_diameter_at_breast_height_m <- NULL
   if (buttress == FALSE) {
     trees <- subset(trees, select = -c(
-      diameter_above_buttresses,
-      functional_diameter_above_buttresses
+      diameter_above_buttresses_m,
+      functional_diameter_above_buttresses_m
     ))
   } else {
     trees <- subset(trees, select = -c(
-      diameter_at_breast_height,
-      functional_diameter_at_breast_height
+      diameter_at_breast_height_m,
+      functional_diameter_at_breast_height_m
     ))
   }
   filepaths <- list.files(PCs_path,
@@ -125,23 +125,45 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     pos <- tree_position_pc(pc)
     h_out <- tree_height_pc(pc, dtm, r, plot)
     if (buttress) {
-      dab_out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
+      dab_out <- tryCatch(
+        {
+          dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
+        },
+        error = function(cond){
+          message(cond)
+          return(list("dab" = NaN, "R2" = NaN, "fdab" = NaN, "plot" = NaN))
+        }
+      )
       dab <- dab_out$dab
       fdab <- dab_out$fdab
       dbh <- fdbh <- NaN
     } else {
-      dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, plot)
+      dbh_out <- tryCatch(
+        {
+          dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, plot)
+        },
+        error = function(cond){
+          message(cond)
+          return(list("dbh" = NaN, "R2" = NaN, "fdbh" = NaN, "plot" = NaN))
+        }
+      )
       dbh <- dbh_out$dbh
       fdbh <- dbh_out$fdbh
       dab <- fdab <- NaN
     }
     if (crown) {
-      classify_out <- classify_crown_pc(
-        pc, thresholdbranch, minheight,
-        buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight,
-        plot
-      )
+      classify_out <- tryCatch(
+        {
+          classify_crown_pc(pc, thresholdbranch, minheight, buttress,
+                            thresholdR2, slice_thickness, thresholdbuttress,
+                            maxbuttressheight, plot)
+          },
+        error = function(cond){
+          message(paste(cond, "!crown classification not possible, will calculate tree area and volume", sep = ""))
+          return(list("crownpoints" = pc, "trunkpoints" = NaN,
+                      "plot" = NaN, "plotXZ" = NaN, "plotYZ" = NaN))
+          }
+        )
       pc <- classify_out$crownpoints
     }
     pa_out <- projected_area_pc(pc, concavity, plot)
@@ -155,28 +177,28 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     }
     tree <- data.frame(
       "tree_id" = filenames[i], "X_position" = pos[1],
-      "Y_position" = pos[2], "tree_height" = h,
-      "diameter_at_breast_height" = dbh,
-      "functional_diameter_at_breast_height" = fdbh,
-      "diameter_above_buttresses" = dab,
-      "functional_diameter_above_buttresses" = fdab,
-      "projected_area" = pa, "alpha_volume" = av
+      "Y_position" = pos[2], "tree_height_m" = h,
+      "diameter_at_breast_height_m" = dbh,
+      "functional_diameter_at_breast_height_m" = fdbh,
+      "diameter_above_buttresses_m" = dab,
+      "functional_diameter_above_buttresses_m" = fdab,
+      "projected_area_m2" = pa, "alpha_volume_m3" = av
     )
     if (buttress == FALSE) {
       tree <- subset(tree, select = -c(
-        diameter_above_buttresses,
-        functional_diameter_above_buttresses
+        diameter_above_buttresses_m,
+        functional_diameter_above_buttresses_m
       ))
     } else {
       tree <- subset(tree, select = -c(
-        diameter_at_breast_height,
-        functional_diameter_at_breast_height
+        diameter_at_breast_height_m,
+        functional_diameter_at_breast_height_m
       ))
     }
     trees <- rbind(trees, tree)
     if (plot) {
       p0 <- pa_out$plot
-      if (crown) {
+      if (crown & length(classify_out$trunkpoints) > 1) {
         p0 <- p0 + ggplot2::ggtitle(
           label = bquote(PCA == .(round(pa, 2)) ~ m^2),
           subtitle = bquote(ACV == .(round(av, 2))
@@ -380,15 +402,15 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
     tree_ids <- append(tree_ids, id)
   }
   df <- results <- data.frame(
-    X_position = double(), Y_position = double(),
-    dbh = double(), tree_height = double(),
-    tree_vol = double(), trunk_vol = double(),
-    sba = double(), sbcs = double(), sbr = double(),
-    sbl = double(), sbd = double(), dhr = double(),
-    dvr = double(), vb55 = double(), clvr = double(),
-    sr = double(), bar = double(), rvr = double(),
-    csh = double(), ch = double(), ce = double(),
-    cdhr = double(), dmr = double()
+    "X_position" = double(), "Y_position" = double(),
+    "dbh_m" = double(), "tree_height_m" = double(),
+    "tree_vol_L" = double(), "trunk_vol_L" = double(),
+    "sba_degrees" = double(), "sbcs" = double(), "sbr" = double(),
+    "sbl" = double(), "sbd" = double(), "dhr" = double(),
+    "dvr_m-2" = double(), "vb55" = double(), "clvr_m-2" = double(),
+    "sr" = double(), "bar" = double(), "rvr" = double(),
+    "csh" = double(), "ch" = double(), "ce" = double(),
+    "cdhr" = double(), "dmr" = double()
   )
   summary <- summary_means <- summary_sds <- cbind(
     tree_id = character(),
@@ -469,13 +491,13 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
         thresholdbuttress, maxbuttressheight
       )
       tree <- data.frame(
-        X_position = X_position, Y_position = Y_position,
-        dbh = dbh, tree_height = tree_height,
-        tree_vol = tree_vol, trunk_vol = trunk_vol, sba = sba,
-        sbcs = sbcs, sbr = sbr, sbl = sbl, sbd = sbd,
-        dhr = dhr, dvr = dvr, vb55 = vb55, clvr = clvr,
-        sr = sr, bar = bar, rvr = rvr, csh = csh, ch = ch,
-        ce = ce, cdhr = cdhr, dmr = dmr
+        "X_position" = X_position, "Y_position" = Y_position,
+        "dbh_m" = dbh, "tree_height_m" = tree_height,
+        "tree_vol_L" = tree_vol, "trunk_vol_L" = trunk_vol, "sba_degrees" = sba,
+        "sbcs" = sbcs, "sbr" = sbr, "sbl" = sbl, "sbd" = sbd,
+        "dhr" = dhr, "dvr_m-2" = dvr, "vb55" = vb55, "clvr_m-2" = clvr,
+        "sr" = sr, "bar" = bar, "rvr" = rvr, "csh" = csh, "ch" = ch,
+        "ce" = ce, "cdhr" = cdhr, "dmr" = dmr
       )
       trees <- rbind(trees, tree)
     }
