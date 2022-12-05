@@ -53,6 +53,9 @@ total_cyl_length_qsm <- function(treedata) {
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
+#' @param cylindercutoff This is the cutoff radius in meters for which cylinders
+#'   are to be included in the volume calculation.Default of 0 includes all
+#'   cylinders.
 #'
 #' @return The total volume of the TreeQSM in liters. If the trunk was modeled
 #'   with triangulation the total volume is the sum of the triangulated volume
@@ -66,12 +69,23 @@ total_cyl_length_qsm <- function(treedata) {
 #' # Read tree qsm and extract tree volume
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
 #' tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
+#' # Only include cylinders larger than 2.5 cm in radius
+#' tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
 #' }
-tree_volume_qsm <- function(treedata) {
-  if (length(treedata) > 83) {
-    volume <- treedata$MixTotalVolume[1]
+tree_volume_qsm <- function(treedata, cylindercutoff = 0) {
+  if (cylindercutoff > 0) {
+    trunk_vol <- trunk_volume_qsm(treedata)
+    cylinder_ind <- which(qsm$cylinder$BranchOrder > 0 &
+                            qsm$cylinder$radius > cylindercutoff)
+    branch_vol <- sum((qsm$cylinder$radius[cylinder_ind])^2 * pi *
+                        (qsm$cylinder$length[cylinder_ind]))*1000
+    volume <- trunk_vol + branch_vol
   } else {
-    volume <- treedata$TotalVolume[1]
+      if (length(treedata) > 83) {
+      volume <- treedata$MixTotalVolume[1]
+    } else {
+      volume <- treedata$TotalVolume[1]
+    }
   }
   return(volume)
 }
@@ -195,4 +209,27 @@ dbh_qsm <- function(treedata) {
     dbh <- treedata$DBHqsm[1]
   }
   return(dbh)
+}
+
+#' Alpha crown area TreeQSM
+#'
+#' Extracts the alpha crown area from the treedata of a TreeQSM. This is
+#' calculated during the TreeQSM process as the area (m$^2$) of the crown's
+#' planar projection's alpha shape.
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The alpha crown area of the TreeQSM in square meters.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read tree qsm and extract tree height
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' caa <- crown_area_alpha_qsm(treedata = qsm$treedata)
+#' }
+crown_area_alpha_qsm <- function(treedata) {
+  return(treedata$CrownAreaAlpha)
 }
