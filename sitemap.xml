@@ -37,6 +37,9 @@
     <loc>https://lmterryn.github.io/ITSMe/reference/classify_crown_pc.html</loc>
   </url>
   <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/crown_area_alpha_qsm.html</loc>
+  </url>
+  <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/crown_diameterheight_ratio_qsm.html</loc>
   </url>
   <url>
@@ -83,6 +86,9 @@
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/lm_eqn.html</loc>
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/normalize_pc.html</loc>
@@ -137,6 +143,9 @@
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/stem_branch_radius_qsm.html</loc>
+  </url>
+  <url>
+    <loc>https://lmterryn.github.io/ITSMe/reference/stem_tapering_pc.html</loc>
   </url>
   <url>
     <loc>https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics.html</loc>
