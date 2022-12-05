@@ -360,8 +360,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
         plotDIAM <- plotDIAM +
           ggplot2::geom_point(
             data = data_circle,
-            ggplot2::aes(x0, y0, color = "estimated center"),
-            size = 1
+            ggplot2::aes(x0, y0, color = "estimated center"), linewidth = 1
           ) +
           ggforce::geom_circle(
             data = data_circle,
@@ -370,7 +369,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
               color = "fitted circle"
             ),
             inherit.aes = FALSE, show.legend = TRUE,
-            size = 1
+            linewidth = 1
           ) +
           ggplot2::scale_color_manual(
             name = "",
@@ -391,7 +390,6 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
           ) +
           ggplot2::theme(text = ggplot2::element_text(size = 12))
       }
-      print(plotDIAM)
       return(list(
         "diameter" = diam, "R2" = residu, "center" = center_estimate,
         "fdiameter" = fdiam, "hull" = hull, "plot" = plotDIAM
@@ -644,7 +642,6 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
           )
         ) +
         ggplot2::theme(text = ggplot2::element_text(size = 12))
-      print(plotDBH)
     } else {
       pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.3 - slice_thickness / 2) &
         (pc$Z < min(pc$Z) + 1.3 + slice_thickness / 2), ]
@@ -677,7 +674,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
             color = "fitted circle"
           ),
           inherit.aes = FALSE, show.legend = TRUE,
-          size = 1
+          linewidth = 1
         ) +
         ggplot2::ggtitle("DBH") +
         ggplot2::labs(caption = paste("DBH = ",
@@ -708,7 +705,6 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
           )
         ) +
         ggplot2::theme(text = ggplot2::element_text(size = 12))
-      print(plotDBH)
     }
     return(list(
       "dbh" = out_130$diameter, "R2" = out_130$R2,
@@ -864,7 +860,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
             color = "fitted circle"
           ),
           inherit.aes = FALSE, show.legend = TRUE,
-          size = 1
+          linewidth = 1
         ) +
         ggplot2::ggtitle(paste("DAB at ",
           as.character(round(slice_height, 2)), " m",
@@ -923,7 +919,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
             color = "fitted circle"
           ),
           inherit.aes = FALSE, show.legend = TRUE,
-          size = 1
+          linewidth = 1
         ) +
         ggplot2::ggtitle("DBH") +
         ggplot2::labs(caption = paste("DBH = ",
@@ -955,7 +951,6 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ) +
         ggplot2::theme(text = ggplot2::element_text(size = 12))
     }
-    print(plotDAB)
     return(list(
       "dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter,
       "h" = round(slice_height, 2), "plot" = plotDAB
@@ -1287,7 +1282,6 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           size = 12
         ))
       }
-      print(plotCrown)
       return(list(
         "crownpoints" = crown_pc, "trunkpoints" = trunk_pc,
         "plot" = plotCrown, "plotXZ" = plotXZ, "plotYZ" = plotYZ
@@ -1468,7 +1462,6 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
         )
       ) +
       ggplot2::theme(text = ggplot2::element_text(size = 12))
-    print(plotPA)
     return(list("pa" = pa, "plot" = plotPA))
   } else {
     return(pa)
