@@ -339,7 +339,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
         ggplot2::geom_sf(
           data = sf::st_geometry(hull),
           ggplot2::aes(color = "concave hull"),
-          col = "green", size = 1,
+          size = 1,
           fill = NA
         ) +
         ggplot2::ggtitle(paste("diameter at ",
@@ -354,13 +354,29 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
           as.character(round(fdiam, 2)), " m",
           sep = ""
         )) +
-        ggplot2::theme(text = ggplot2::element_text(size = 12))
+        ggplot2::theme(text = ggplot2::element_text(size = 12)) +
+        ggplot2::scale_color_manual(
+          name = "",
+          values = c(
+            "points stem slice" = "black",
+            "concave hull" = "green"
+          ),
+          guide = ggplot2::guide_legend(
+            override.aes =
+              list(
+                linetype = c(1, 0),
+                shape = c(NA, 16),
+                size = c(1, 2)
+              )
+          )
+        )
       if (!is.nan(R)) {
         data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
         plotDIAM <- plotDIAM +
           ggplot2::geom_point(
             data = data_circle,
-            ggplot2::aes(x0, y0, color = "estimated center"), linewidth = 1
+            ggplot2::aes(x0, y0, color = "estimated center"),
+            size = 1
           ) +
           ggforce::geom_circle(
             data = data_circle,
@@ -368,8 +384,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
               x0 = x0, y0 = y0, r = r,
               color = "fitted circle"
             ),
-            inherit.aes = FALSE, show.legend = TRUE,
-            linewidth = 1
+            inherit.aes = FALSE, show.legend = TRUE
           ) +
           ggplot2::scale_color_manual(
             name = "",
@@ -382,9 +397,9 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
             guide = ggplot2::guide_legend(
               override.aes =
                 list(
-                  linetype = c(0, 1, 0, 1),
-                  shape = c(16, NA, 16, NA),
-                  size = c(2, 1, 2, 1)
+                  linetype = c(1, 0, 1, 0),
+                  shape = c(NA, 16, NA, 16),
+                  size = c(1, 2, 1, 2)
                 )
             )
           ) +
@@ -660,7 +675,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
         ggplot2::geom_sf(
           data = sf::st_geometry(out_130$hull),
           ggplot2::aes(color = "concave hull"),
-          col = "green", size = 1, fill = NA
+          size = 1, fill = NA
         ) +
         ggplot2::geom_point(
           data = data_circle,
@@ -674,7 +689,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
             color = "fitted circle"
           ),
           inherit.aes = FALSE, show.legend = TRUE,
-          linewidth = 1
+          size = 1
         ) +
         ggplot2::ggtitle("DBH") +
         ggplot2::labs(caption = paste("DBH = ",
@@ -698,9 +713,9 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
           guide = ggplot2::guide_legend(
             override.aes =
               list(
-                linetype = c(0, 1, 0, 1),
-                shape = c(16, NA, 16, NA),
-                size = c(2, 1, 2, 1)
+                linetype = c(1, 0, 1, 0),
+                shape = c(NA, 16, NA, 16),
+                size = c(1, 2, 1, 2)
               )
           )
         ) +
@@ -846,7 +861,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ggplot2::geom_sf(
           data = sf::st_geometry(out$hull),
           ggplot2::aes(color = "concave hull"),
-          col = "green", size = 1, fill = NA
+          size = 1, fill = NA
         ) +
         ggplot2::geom_point(
           data = data_circle,
@@ -860,7 +875,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
             color = "fitted circle"
           ),
           inherit.aes = FALSE, show.legend = TRUE,
-          linewidth = 1
+          size = 1
         ) +
         ggplot2::ggtitle(paste("DAB at ",
           as.character(round(slice_height, 2)), " m",
@@ -888,9 +903,9 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
           guide = ggplot2::guide_legend(
             override.aes =
               list(
-                linetype = c(0, 0, 1, 0, 1),
-                shape = c(16, 16, NA, 16, NA),
-                size = c(2, 2, 1, 2, 1)
+                linetype = c(1, 0, 1, 0, 0),
+                shape = c(NA, 16, NA, 16, 16),
+                size = c(1, 2, 1, 2, 2)
               )
           )
         ) +
@@ -905,7 +920,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ggplot2::geom_sf(
           data = sf::st_geometry(out$hull),
           ggplot2::aes(color = "concave hull"),
-          col = "green", size = 1, fill = NA
+          size = 1, fill = NA
         ) +
         ggplot2::geom_point(
           data = data_circle,
@@ -919,7 +934,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
             color = "fitted circle"
           ),
           inherit.aes = FALSE, show.legend = TRUE,
-          linewidth = 1
+          size = 1
         ) +
         ggplot2::ggtitle("DBH") +
         ggplot2::labs(caption = paste("DBH = ",
@@ -943,9 +958,9 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
           guide = ggplot2::guide_legend(
             override.aes =
               list(
-                linetype = c(0, 1, 0, 1),
-                shape = c(16, NA, 16, NA),
-                size = c(2, 1, 2, 1)
+                linetype = c(1, 0, 1, 0),
+                shape = c(NA, 16, NA, 16),
+                size = c(1, 2, 1, 2)
               )
           )
         ) +
