@@ -16,15 +16,15 @@
 #' }
 lm_eqn <- function(df){
   m <- stats::lm(height ~ diameter, df);
-  if(coef(m)[2]<0){
+  if(stats::coef(m)[2]<0){
     eq <- substitute(italic(height) == a - b %.% italic(diameter)*","~~italic(r)^2~"="~r2,
-                   list(a = format(unname(coef(m)[1]), digits = 2),
-                        b = format(unname(abs(coef(m)[2])), digits = 2),
+                   list(a = format(unname(stats::coef(m)[1]), digits = 2),
+                        b = format(unname(abs(stats::coef(m)[2])), digits = 2),
                         r2 = format(summary(m)$r.squared, digits = 3)))
   } else {
     eq <- substitute(italic(height) == a + b %.% italic(diameter)*","~~italic(r)^2~"="~r2,
-                     list(a = format(unname(coef(m)[1]), digits = 2),
-                          b = format(unname(coef(m)[2]), digits = 2),
+                     list(a = format(unname(stats::coef(m)[1]), digits = 2),
+                          b = format(unname(stats::coef(m)[2]), digits = 2),
                           r2 = format(summary(m)$r.squared, digits = 3)))
   }
   as.character(as.expression(eq));
@@ -111,11 +111,13 @@ stem_tapering_pc <- function(pc, slice_thickness = 0.1, maxtaperheight = 10,
   if(length(I) > 1){
       D_median <- c()
       for (i in 1:(length(I)-1)){
-        D_median <- append(D_median, median(D[x][S[x] > I[i] & S[x] < I[i+1]]))
+        D_median <- append(D_median,
+                           stats::median(D[x][S[x] > I[i] & S[x] < I[i+1]]))
       }
       T <- data.frame(diameter=D_median, height=I[2:length(I)])
       if(nrow(T) > 1){
         if(plot == TRUE){
+          diameter <- height <- NULL
           taper_plot <- ggplot2::ggplot(T, ggplot2::aes(diameter, height)) +
             ggplot2::geom_point() +
             ggplot2::geom_smooth(method='lm') +
@@ -125,7 +127,7 @@ stem_tapering_pc <- function(pc, slice_thickness = 0.1, maxtaperheight = 10,
         } else {
           taper_plot <- NaN
         }
-        linear_model <- summary(lm(T$height~T$diameter))
+        linear_model <- summary(stats::lm(T$height~T$diameter))
         b <- linear_model$coefficients[1]
         a <- linear_model$coefficients[2]
         r2 <- linear_model$adj.r.squared
