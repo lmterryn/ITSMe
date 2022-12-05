@@ -5,7 +5,7 @@
 </p>
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/lmterryn/ITSMe/workflows/R-CMD-check/badge.svg)](https://github.com/lmterryn/ITSMe/actions)
+[![R-CMD-check](https://github.com/lmterryn/ITSMe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lmterryn/ITSMe/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Goal
@@ -40,18 +40,18 @@ summarised in the tables below.
 
 ### Basic structural metrics
 
-| structural metric                   |          function name          |            input |
-|-------------------------------------|:-------------------------------:|-----------------:|
-| diameter at breast height (m)       |         dbh_pc, dbh_qsm         | point cloud, QSM |
-| diameter above buttresses (m)       |             dab_pc              |      point cloud |
-| tree height (m)                     | tree_height_pc, tree_height_qsm | point cloud, QSM |
-| projected area (m<sup>2</sup>)      |        projected_area_pc        |      point cloud |
-| alpha volume (m<sup>3</sup>)        |         alpha_volume_pc         |      point cloud |
-| tree volume (m<sup>3</sup>)         |         tree_volume_qsm         |              QSM |
-| trunk volume (m<sup>3</sup>)        |        trunk_volume_qsm         |              QSM |
-| total branch volume (m<sup>3</sup>) |     total_branch_volume_qsm     |              QSM |
-| total branch length (m)             |     total_branch_length_qsm     |              QSM |
-| total cylinder length (m)           |      total_cyl_length_qsm       |              QSM |
+| structural metric             |          function name          |            input |
+|-------------------------------|:-------------------------------:|-----------------:|
+| diameter at breast height (m) |         dbh_pc, dbh_qsm         | point cloud, QSM |
+| diameter above buttresses (m) |             dab_pc              |      point cloud |
+| tree height (m)               | tree_height_pc, tree_height_qsm | point cloud, QSM |
+| projected area (m$^{2}$)      |        projected_area_pc        |      point cloud |
+| alpha volume (m$^{3}$)        |         alpha_volume_pc         |      point cloud |
+| tree volume (m$^{3}$)         |         tree_volume_qsm         |              QSM |
+| trunk volume (m$^{3}$)        |        trunk_volume_qsm         |              QSM |
+| total branch volume (m$^{3}$) |     total_branch_volume_qsm     |              QSM |
+| total branch length (m)       |     total_branch_length_qsm     |              QSM |
+| total cylinder length (m)     |      total_cyl_length_qsm       |              QSM |
 
 ### Structural metrics from Terryn et al. (2020)
 
@@ -70,25 +70,25 @@ tree height values are based on the point clouds rather than the QSMs.
 When the buttress parameter is indicated “TRUE” the diameter above
 buttresses instead of the diameter at breast height is used.
 
-| structural metric                             |          function name           |              input |
-|-----------------------------------------------|:--------------------------------:|-------------------:|
-| stem branch angle (degrees)                   |      stem_branch_angle_qsm       |                QSM |
-| stem branch cluster size                      |   stem_branch_cluster_size_qsm   |                QSM |
-| stem branch radius (-/m)                      |      stem_branch_radius_qsm      | QSM (+point cloud) |
-| stem branch length (-/m)                      |      stem_branch_length_qsm      | QSM (+point cloud) |
-| stem branch distance (-/m)                    |     stem_branch_distance_qsm     | QSM (+point cloud) |
-| dbh tree height ratio                         |       dbh_height_ratio_qsm       | QSM (+point cloud) |
-| dbh tree volume ratio (m<sup>−2</sup>)        |       dbh_volume_ratio_qsm       | QSM (+point cloud) |
-| volume below 55                               |       volume_below_55_qsm        |                QSM |
-| cylinder length volume ratio (m<sup>−2</sup>) | cylinder_length_volume_ratio_qsm |                QSM |
-| shedding ratio                                |        shedding_ratio_qsm        |                QSM |
-| branch angle ratio                            |      branch_angle_ratio_qsm      |                QSM |
-| relative volume ratio                         |    relative_volume_ratio_qsm     |                QSM |
-| crown start height                            |      crown_start_height_qsm      | QSM (+point cloud) |
-| crown height                                  |         crown_height_qsm         | QSM (+point cloud) |
-| crown evenness                                |        crown_evenness_qsm        |                QSM |
-| crown diameter crown height ratio             |  crown_diameterheight_ratio_qsm  | QSM (+point cloud) |
-| dbh minimum tree radius ratio                 |     dbh_minradius_ratio_qsm      | QSM (+point cloud) |
+| structural metric                       |          function name           |              input |
+|-----------------------------------------|:--------------------------------:|-------------------:|
+| stem branch angle (degrees)             |      stem_branch_angle_qsm       |                QSM |
+| stem branch cluster size                |   stem_branch_cluster_size_qsm   |                QSM |
+| stem branch radius (-/m)                |      stem_branch_radius_qsm      | QSM (+point cloud) |
+| stem branch length (-/m)                |      stem_branch_length_qsm      | QSM (+point cloud) |
+| stem branch distance (-/m)              |     stem_branch_distance_qsm     | QSM (+point cloud) |
+| dbh tree height ratio                   |       dbh_height_ratio_qsm       | QSM (+point cloud) |
+| dbh tree volume ratio (m$^{-2}$)        |       dbh_volume_ratio_qsm       | QSM (+point cloud) |
+| volume below 55                         |       volume_below_55_qsm        |                QSM |
+| cylinder length volume ratio (m$^{-2}$) | cylinder_length_volume_ratio_qsm |                QSM |
+| shedding ratio                          |        shedding_ratio_qsm        |                QSM |
+| branch angle ratio                      |      branch_angle_ratio_qsm      |                QSM |
+| relative volume ratio                   |    relative_volume_ratio_qsm     |                QSM |
+| crown start height                      |      crown_start_height_qsm      | QSM (+point cloud) |
+| crown height                            |         crown_height_qsm         | QSM (+point cloud) |
+| crown evenness                          |        crown_evenness_qsm        |                QSM |
+| crown diameter crown height ratio       |  crown_diameterheight_ratio_qsm  | QSM (+point cloud) |
+| dbh minimum tree radius ratio           |     dbh_minradius_ratio_qsm      | QSM (+point cloud) |
 
 ## Examples
 

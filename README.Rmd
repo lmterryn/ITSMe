@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 </p>
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/lmterryn/ITSMe/workflows/R-CMD-check/badge.svg)](https://github.com/lmterryn/ITSMe/actions)
+[![R-CMD-check](https://github.com/lmterryn/ITSMe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lmterryn/ITSMe/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Goal
