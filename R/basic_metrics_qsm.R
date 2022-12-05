@@ -53,6 +53,9 @@ total_cyl_length_qsm <- function(treedata) {
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}, (default = NA - you do not need cylinder when
+#'   cylindercutoff == 0).
 #' @param cylindercutoff This is the cutoff radius in meters for which cylinders
 #'   are to be included in the volume calculation.Default of 0 includes all
 #'   cylinders.
@@ -70,15 +73,16 @@ total_cyl_length_qsm <- function(treedata) {
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
 #' tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
 #' # Only include cylinders larger than 2.5 cm in radius
-#' tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
+#' tot_vol <- tree_volume_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder,
+#'                            cylindercutoff = 0.25)
 #' }
-tree_volume_qsm <- function(treedata, cylindercutoff = 0) {
-  if (cylindercutoff > 0) {
+tree_volume_qsm <- function(treedata, cylinder = NA, cylindercutoff = 0) {
+  if (cylindercutoff > 0 & length(cylinder)>1) {
     trunk_vol <- trunk_volume_qsm(treedata)
-    cylinder_ind <- which(qsm$cylinder$BranchOrder > 0 &
-                            qsm$cylinder$radius > cylindercutoff)
-    branch_vol <- sum((qsm$cylinder$radius[cylinder_ind])^2 * pi *
-                        (qsm$cylinder$length[cylinder_ind]))*1000
+    cylinder_ind <- which(cylinder$BranchOrder > 0 &
+                            cylinder$radius > cylindercutoff)
+    branch_vol <- sum((cylinder$radius[cylinder_ind])^2 * pi *
+                        (cylinder$length[cylinder_ind]))*1000
     volume <- trunk_vol + branch_vol
   } else {
       if (length(treedata) > 83) {
