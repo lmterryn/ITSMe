@@ -33,7 +33,7 @@ test_that("plot crown classification works", {
                                   OUT_path = "../output/")), 2)
 })
 
-test_that("plot porjected area works", {
+test_that("plot projected area works", {
   # output is a list with length 2
   expect_equal(length(
     plot_pa_pcs(PCs_path = "../non_buttressed_trees/",
