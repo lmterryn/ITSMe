@@ -1458,7 +1458,7 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
       ggplot2::geom_sf(
         data = sf::st_geometry(hull),
         ggplot2::aes(color = "concave hull"),
-        col = "red", show.legend = "line", size = 1, fill = NA
+        show.legend = "line", size = 1, fill = NA
       ) +
       ggplot2::ggtitle(bquote(PA == .(round(pa, 2)) ~ m^2)) +
       ggplot2::scale_color_manual(
