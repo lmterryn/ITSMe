@@ -52,8 +52,8 @@ buttresses (higher than breast height). Only relevant when crown == TRUE.}
 height. Only relevant when crown == TRUE and buttress == FALSE.}
 
 \item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
-\code{\link{dbh_pc}} function used to calculate the diameter at breast
-height. Only relevant when buttress == FALSE.}
+\code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+the diameter at breast height and above buttresses.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above

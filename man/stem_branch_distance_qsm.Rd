@@ -27,8 +27,8 @@ stem_branch_distance_qsm(
 average distance is divided by the DBH (Akerblom et al., 2017).}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
-cloud is available. Only relevant if normalisation equals "dbh".}
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
+is available. Only relevant if normalisation equals "dbh".}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available and normalisation equals
@@ -40,19 +40,19 @@ height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.}
 
 \item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
-\code{\link{dbh_pc}} function used to calculate the diameter at breast
-height. Only relevant if the tree point cloud is available and buttress ==
-FALSE.}
+\code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+the diameter at breast height and above buttresses. Only relevant if the
+tree point cloud is available.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
-buttresses. Only relevant if the tree point cloud is available and
-buttress == TRUE.}
+buttresses. Only relevant if the tree point cloud is available and buttress
+== TRUE.}
 
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter at breast
-height. Only relevant if the tree point cloud is available and buttress
-== TRUE.}
+height. Only relevant if the tree point cloud is available and buttress ==
+TRUE.}
 }
 \value{
 The stem branch distance. Unitless with normalisation, in meters

@@ -40,8 +40,8 @@
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if buttress == FALSE.
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
-#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant when buttress == FALSE.
+#'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+#'   the diameter at breast height and above buttresses.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant when buttress == TRUE.
@@ -127,7 +127,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     if (buttress) {
       dab_out <- tryCatch(
         {
-          dab_pc(pc, thresholdbuttress, maxbuttressheight, plot)
+          dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
+                 plot)
         },
         error = function(cond){
           message(cond)
@@ -328,9 +329,9 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   FALSE.
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
-#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant if the tree point cloud is available and buttress ==
-#'   FALSE.
+#'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+#'   the diameter at breast height and above buttresses. Only relevant if the
+#'   tree point cloud is available.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point clouds are available and

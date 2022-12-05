@@ -68,9 +68,9 @@ height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.}
 
 \item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
-\code{\link{dbh_pc}} function used to calculate the diameter at breast
-height. Only relevant if the tree point cloud is available and buttress ==
-FALSE.}
+\code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+the diameter at breast height and above buttresses. Only relevant if the
+tree point cloud is available.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above

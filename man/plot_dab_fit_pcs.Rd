@@ -9,7 +9,8 @@ plot_dab_fit_pcs(
   extension = ".txt",
   OUT_path = "./",
   thresholdbuttress = 0.001,
-  maxbuttressheight = 7
+  maxbuttressheight = 7,
+  slice_thickness = 0.06
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ buttresses.}
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses.}
+
+\item{slice_thickness}{Numeric value (default = 0.06) that determines the
+thickness of the slice which is used to measure the diameter.}
 }
 \value{
 A list with in the first element a numeric containing the dab values

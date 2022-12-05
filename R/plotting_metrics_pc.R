@@ -256,6 +256,8 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #' @param maxbuttressheight Numeric value (default=7). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses.
+#' @param slice_thickness Numeric value (default = 0.06) that determines the
+#'   thickness of the slice which is used to measure the diameter.
 #'
 #' @return A list with in the first element a numeric containing the dab values
 #'   for each tree point cloud, the second element the residuals on the circle
@@ -283,7 +285,8 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #' )
 #' }
 plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
-                             thresholdbuttress = 0.001, maxbuttressheight = 7) {
+                             thresholdbuttress = 0.001, maxbuttressheight = 7,
+                             slice_thickness = 0.06) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -295,23 +298,26 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
   DABs <- c()
   Rs <- c()
   fDABs <- c()
+  Hs <- c()
   Plots <- list()
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, TRUE)
+    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
+                  TRUE)
     filename <- paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
       "_", as.character(thresholdbuttress), "_",
       as.character(maxbuttressheight), ".jpeg",
       sep = ""
     )
-    ggplot2::ggsave(filename, plot = out$plot)
+    ggplot2::ggsave(filename, plot = out$plot, width =  15, height = 10, units = "cm")
     DABs <- append(DABs, out$dab)
     Rs <- append(Rs, out$R2)
     fDABs <- append(fDABs, out$fdab)
+    Hs <- append(Hs, out$h)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DABs" = DABs, "R2s" = Rs, "fDABs" = fDABs, "Plots" = Plots))
+  return(list("DABs" = DABs, "R2s" = Rs, "fDABs" = fDABs, "Hs" = Hs, "Plots" = Plots))
 }
 
 #' Save figures of \code{\link{classify_crown_pc}} function
@@ -347,8 +353,8 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when buttress == FALSE.
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
-#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant when buttress == FALSE.
+#'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+#'   the diameter at breast height and above buttresses.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -472,8 +478,8 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when crown == TRUE and buttress == FALSE.
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
-#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant when buttress == FALSE.
+#'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+#'   the diameter at breast height and above buttresses.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
@@ -601,8 +607,8 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when crown == TRUE and buttress == FALSE.
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
-#'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
-#'   height. Only relevant when buttress == FALSE.
+#'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
+#'   the diameter at breast height and above buttresses.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant

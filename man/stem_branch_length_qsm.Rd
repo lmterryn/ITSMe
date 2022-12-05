@@ -31,9 +31,8 @@ tree height (Terryn et al., 2020). When something different than "dbh" or
 normalisation.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is NA and indicates no tree point
-cloud is available. Only relevant if normalisation equals "dbh" or
-"treeheight".}
+\code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
+is available. Only relevant if normalisation equals "dbh" or "treeheight".}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available and normalisation equals
@@ -50,14 +49,14 @@ height. Only relevant if the tree point cloud is available and buttress ==
 FALSE.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
-\code{\link{dab_pc}} function used to calculate the diameter above
-buttresses. Only relevant if the tree point cloud is available and
-buttress == TRUE.}
+\code{\link{dab_pc}} and \code{\link{dab_pc}} functions used to calculate
+the diameter at breast height and above buttresses. Only relevant if the
+tree point cloud is available.}
 
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter at breast
-height. Only relevant if the tree point cloud is available and buttress
-== TRUE.}
+height. Only relevant if the tree point cloud is available and buttress ==
+TRUE.}
 }
 \value{
 The stem branch length. Unitless with normalisation, in meters

@@ -4,7 +4,13 @@
 \alias{dab_pc}
 \title{Diameter above buttresses point cloud}
 \usage{
-dab_pc(pc, thresholdbuttress = 0.001, maxbuttressheight = 7, plot = FALSE)
+dab_pc(
+  pc,
+  thresholdbuttress = 0.001,
+  maxbuttressheight = 7,
+  slice_thickness = 0.06,
+  plot = FALSE
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -24,6 +30,9 @@ which the diameter is measured. When this height is reached (because
 residuals do not become smaller than thresholdbuttress * R), the
 thresholdbuttress value is increased with 0.0005 and the fitting starts
 again at 1.3 m.}
+
+\item{slice_thickness}{Numeric value (default = 0.06) that determines the
+thickness of the slice which is used to measure the diameter.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}

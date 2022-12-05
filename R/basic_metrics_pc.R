@@ -63,107 +63,118 @@ tree_position_pc <- function(pc) {
 #' tree_height <- tree_height_pc(pc = pc_tree, dtm = dtm, r = 1)
 #' }
 tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
-  z_min <- min(pc$Z)
-  if (!is.data.frame(dtm)) {
-    h <- max(pc$Z) - min(pc$Z)
-  } else {
-    lowest_points <- pc[order(pc$Z, decreasing = FALSE), ][1:10, ]
-    dtm_under_tree <- dtm[(dtm$X >= min(lowest_points$X) - r) &
-      (dtm$X <= max(lowest_points$X) + r) &
-      (dtm$Y >= min(lowest_points$Y) - r) &
-      (dtm$Y <= max(lowest_points$Y) + r), ]
-    dtm_under_tree <- dtm_under_tree[dtm_under_tree$Z <
-      min(dtm_under_tree$Z) + 1.5, ]
-    lowest_point <- stats::median(dtm_under_tree$Z)
-    h <- max(pc$Z) - lowest_point
-  }
-  if (plot) {
-    pc_norm <- pc
-    pc_norm$Z <- pc$Z - z_min
-    X <- Y <- Z <- NULL
-    plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = "blue") +
-      ggplot2::geom_point(size = 0.1, shape = ".") +
-      ggplot2::coord_fixed(ratio = 1) +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_blank(),
-        axis.ticks.x = ggplot2::element_blank(),
-        plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-        text = ggplot2::element_text(size = 12)
-      )
-    if (is.data.frame(dtm)) {
-      dtm_under_tree_norm <- dtm_under_tree
-      dtm_under_tree_norm$Z <- dtm_under_tree$Z - z_min
-      plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z,
-        col = "tree points"
-      )) +
-        ggplot2::geom_point(size = 0.1, shape = ".") +
-        ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::theme(
-          axis.text.y = ggplot2::element_blank(),
-          axis.title.y = ggplot2::element_blank(),
-          axis.ticks.y = ggplot2::element_blank(),
-          axis.text.x = ggplot2::element_blank(),
-          axis.ticks.x = ggplot2::element_blank(),
-          plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-          text = ggplot2::element_text(size = 12)
-        )
-      plotXZ <- plotXZ + ggplot2::geom_point(
-        data = dtm_under_tree_norm,
-        ggplot2::aes(X, Z), col = "red",
-        size = 0.5
-      ) +
-        ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min),
-          col = "green"
-        )
-      plotYZ <- plotYZ + ggplot2::geom_point(
-        data = dtm_under_tree_norm,
-        ggplot2::aes(Y, Z,
-          col = "dtm points"
-        ),
-        size = 0.5
-      ) +
-        ggplot2::geom_hline(ggplot2::aes(
-          yintercept = lowest_point - z_min,
-          col = "lowest point height"
-        )) +
-        ggplot2::scale_color_manual(values = c(
-          "tree points" = "black",
-          "dtm points" = "red",
-          "lowest point height" = "green"
-        ))
-      s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-        min(pc$Z)) * 0.5 - 1.05
+  if(nrow(pc) == 0){
+    if(plot){
+      empty_plot <- ggplot2::ggplot()
+      return(list(
+      "h" = 0, "plot" = empty_plot, "plotXZ" = empty_plot,
+      "plotYZ" = empty_plot))
     } else {
-      plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = "blue") +
+      return(0)
+    }
+  } else {
+    z_min <- min(pc$Z)
+    if (!is.data.frame(dtm)) {
+      h <- max(pc$Z) - min(pc$Z)
+    } else {
+      lowest_points <- pc[order(pc$Z, decreasing = FALSE), ][1:10, ]
+      dtm_under_tree <- dtm[(dtm$X >= min(lowest_points$X) - r) &
+        (dtm$X <= max(lowest_points$X) + r) &
+        (dtm$Y >= min(lowest_points$Y) - r) &
+        (dtm$Y <= max(lowest_points$Y) + r), ]
+      dtm_under_tree <- dtm_under_tree[dtm_under_tree$Z <
+        min(dtm_under_tree$Z) + 1.5, ]
+      lowest_point <- stats::median(dtm_under_tree$Z)
+      h <- max(pc$Z) - lowest_point
+    }
+    if (plot) {
+      pc_norm <- pc
+      pc_norm$Z <- pc$Z - z_min
+      X <- Y <- Z <- NULL
+      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = "blue") +
         ggplot2::geom_point(size = 0.1, shape = ".") +
         ggplot2::coord_fixed(ratio = 1) +
         ggplot2::theme(
-          axis.text.y = ggplot2::element_blank(),
-          axis.title.y = ggplot2::element_blank(),
-          axis.ticks.y = ggplot2::element_blank(),
           axis.text.x = ggplot2::element_blank(),
           axis.ticks.x = ggplot2::element_blank(),
           plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
           text = ggplot2::element_text(size = 12)
         )
-      s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-        min(pc$Z)) * 0.48 - 1
+      if (is.data.frame(dtm)) {
+        dtm_under_tree_norm <- dtm_under_tree
+        dtm_under_tree_norm$Z <- dtm_under_tree$Z - z_min
+        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z,
+          col = "tree points"
+        )) +
+          ggplot2::geom_point(size = 0.1, shape = ".") +
+          ggplot2::coord_fixed(ratio = 1) +
+          ggplot2::theme(
+            axis.text.y = ggplot2::element_blank(),
+            axis.title.y = ggplot2::element_blank(),
+            axis.ticks.y = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_blank(),
+            axis.ticks.x = ggplot2::element_blank(),
+            plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
+            text = ggplot2::element_text(size = 12)
+          )
+        plotXZ <- plotXZ + ggplot2::geom_point(
+          data = dtm_under_tree_norm,
+          ggplot2::aes(X, Z), col = "red",
+          size = 0.5
+        ) +
+          ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min),
+            col = "green"
+          )
+        plotYZ <- plotYZ + ggplot2::geom_point(
+          data = dtm_under_tree_norm,
+          ggplot2::aes(Y, Z,
+            col = "dtm points"
+          ),
+          size = 0.5
+        ) +
+          ggplot2::geom_hline(ggplot2::aes(
+            yintercept = lowest_point - z_min,
+            col = "lowest point height"
+          )) +
+          ggplot2::scale_color_manual(values = c(
+            "tree points" = "black",
+            "dtm points" = "red",
+            "lowest point height" = "green"
+          ))
+        s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
+          min(pc$Z)) * 0.5 - 1.05
+      } else {
+        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = "blue") +
+          ggplot2::geom_point(size = 0.1, shape = ".") +
+          ggplot2::coord_fixed(ratio = 1) +
+          ggplot2::theme(
+            axis.text.y = ggplot2::element_blank(),
+            axis.title.y = ggplot2::element_blank(),
+            axis.ticks.y = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_blank(),
+            axis.ticks.x = ggplot2::element_blank(),
+            plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
+            text = ggplot2::element_text(size = 12)
+          )
+        s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
+          min(pc$Z)) * 0.48 - 1
+      }
+      plotTree <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
+        nrow = 1, ncol = 3,
+        common.legend = TRUE, heights = c(5, 5),
+        widths = c(1, s, 1)
+      )
+      plotTree <- ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(
+        paste("H = ", as.character(round(h, 2)), " m", sep = ""),
+        size = 12
+      ))
+      return(list(
+        "h" = h, "plot" = plotTree, "plotXZ" = plotXZ,
+        "plotYZ" = plotYZ
+      ))
+    } else {
+      return(h)
     }
-    plotTree <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
-      nrow = 1, ncol = 3,
-      common.legend = TRUE, heights = c(5, 5),
-      widths = c(1, s, 1)
-    )
-    plotTree <- ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(
-      paste("H = ", as.character(round(h, 2)), " m", sep = ""),
-      size = 12
-    ))
-    return(list(
-      "h" = h, "plot" = plotTree, "plotXZ" = plotXZ,
-      "plotYZ" = plotYZ
-    ))
-  } else {
-    return(h)
   }
 }
 
@@ -278,20 +289,34 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
       y_slice <- xy_slice$Y
       x_m <- mean(x_slice) # first estimate of the center
       y_m <- mean(y_slice)
-      center_estimate <- stats::optim(
-        par = c(x_m, y_m), fn = f, x = x_slice,
-        y = y_slice
+      center_estimate <- tryCatch(
+        {
+          stats::optim(
+            par = c(x_m, y_m), fn = f, x = x_slice,
+            y = y_slice, method = "L-BFGS-B"
+          )
+        },
+        error = function(cond){
+          message(cond)
+          return(NaN)
+        }
       )
-      x_c <- center_estimate$par[1]
-      y_c <- center_estimate$par[2]
-      Ri <- calc_r(x_slice, y_slice, x_c, y_c)
-      R <- mean(Ri) # radius (DBH/2)
-      residu <- sum((Ri - R)**2) / length(Ri) # average residual
-      diam <- 2 * R
-      points <- sf::st_as_sf(unique(xy_slice), coords = c("X", "Y"))
-      hull <- concaveman::concaveman(points, 4)
-      pa <- sf::st_area(hull)
-      fdiam <- sqrt(pa / pi) * 2
+      if(is.list(center_estimate)){
+        x_c <- center_estimate$par[1]
+        y_c <- center_estimate$par[2]
+        Ri <- calc_r(x_slice, y_slice, x_c, y_c)
+        R <- mean(Ri) # radius (DBH/2)
+        residu <- sum((Ri - R)**2) / length(Ri) # average residual
+        diam <- 2 * R
+        points <- sf::st_as_sf(unique(xy_slice), coords = c("X", "Y"))
+        hull <- concaveman::concaveman(points, 4)
+        pa <- sf::st_area(hull)
+        fdiam <- sqrt(pa / pi) * 2
+      } else {
+        return(list(
+          "diameter" = NaN, "R2" = NaN, "center" = NaN,
+          "fdiameter" = NaN, "hull" = NaN))
+      }
     } else {
       return(list(
         "diameter" = NaN, "R2" = NaN, "center" = NaN,
@@ -732,6 +757,8 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #'   residuals do not become smaller than thresholdbuttress * R), the
 #'   thresholdbuttress value is increased with 0.0005 and the fitting starts
 #'   again at 1.3 m.
+#' @param slice_thickness Numeric value (default = 0.06) that determines the
+#'   thickness of the slice which is used to measure the diameter.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -754,9 +781,8 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #' dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5)
 #' }
 dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
-                   plot = FALSE) {
+                   slice_thickness = 0.06, plot = FALSE) {
   slice_height <- 1.30
-  slice_thickness <- 0.06
   residu <- 1
   R <- 0.5
   r_diff <- 1
@@ -765,15 +791,16 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
   while (loop == 1) {
     while ((residu > thresholdbuttress * R) &
       (slice_height + slice_thickness / 2 < maxbuttressheight) |
-      (R > 2) | (r_diff > 2)) {
+      (R > 2) | (r_diff > 1.2 | r_diff < 0.8)) {
       out <- diameter_slice_pc(
         pc = pc, slice_height = slice_height,
         slice_thickness = slice_thickness, plot = FALSE
       )
       if (is.nan(out$diameter)) {
-        loop <- 0
-        dab <- R <- residu <- NaN
+        dab <- R <- 0
         fdab <- out$fdiameter
+        slice_height <- slice_height + slice_thickness
+        R_slices <- append(R_slices, R)
       } else {
         dab <- out$diameter
         R <- dab / 2
@@ -931,10 +958,11 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
     print(plotDAB)
     return(list(
       "dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter,
-      "plot" = plotDAB
+      "h" = round(slice_height, 2), "plot" = plotDAB
     ))
   } else {
-    return(list("dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter))
+    return(list("dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter,
+                "h" = round(slice_height, 2)))
   }
 }
 
@@ -996,7 +1024,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                               slice_thickness = 0.06, thresholdbuttress = 0.001,
                               maxbuttressheight = 7, plot = FALSE) {
   if (buttress) {
-    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight)
+    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness)
     dab <- out$dab
   } else {
     out <- dbh_pc(pc, thresholdR2, slice_thickness)
