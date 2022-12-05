@@ -4,11 +4,15 @@
 \alias{tree_volume_qsm}
 \title{Total tree volume TreeQSM}
 \usage{
-tree_volume_qsm(treedata, cylindercutoff = 0)
+tree_volume_qsm(treedata, cylinder = NA, cylindercutoff = 0)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
 \code{\link{read_tree_qsm}}.}
+
+\item{cylinder}{Cylinder field of a TreeQSM that is returned by
+\code{\link{read_tree_qsm}}, (default = NA - you do not need cylinder when
+cylindercutoff == 0).}
 
 \item{cylindercutoff}{This is the cutoff radius in meters for which cylinders
 are to be included in the volume calculation.Default of 0 includes all
@@ -29,6 +33,7 @@ Extracts the total tree volume from the treedata of a TreeQSM.
 qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
 tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
 # Only include cylinders larger than 2.5 cm in radius
-tot_vol <- tree_volume_qsm(treedata = qsm$treedata)
+tot_vol <- tree_volume_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder,
+                           cylindercutoff = 0.25)
 }
 }
