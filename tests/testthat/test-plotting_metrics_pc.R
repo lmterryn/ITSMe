@@ -23,7 +23,7 @@ test_that("plot dab pcs works", {
   # output is a list with length 2
   expect_equal(length(
     plot_dab_fit_pcs(PCs_path = "../buttressed_trees/",
-                     OUT_path = "../output/")), 4)
+                     OUT_path = "../output/")), 5)
 })
 
 test_that("plot crown classification works", {

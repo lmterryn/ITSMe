@@ -79,11 +79,11 @@ test_that("dab calculation from a tree point cloud works", {
   # output is a list of 3
   expect_equal(length(
     dab_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"))),
-    3) &
+    4) &
     # with plot TRUE, output is a list of 4
     expect_equal(length(
       dab_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"),
-             plot = TRUE)), 4)
+             plot = TRUE)), 5)
 })
 
 test_that("classify crown method works", {
