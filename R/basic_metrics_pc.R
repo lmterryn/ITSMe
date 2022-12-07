@@ -168,6 +168,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
         paste("H = ", as.character(round(h, 2)), " m", sep = ""),
         size = 12
       ))
+      print(plotTree)
       return(list(
         "h" = h, "plot" = plotTree, "plotXZ" = plotXZ,
         "plotYZ" = plotYZ
@@ -405,6 +406,7 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
           ) +
           ggplot2::theme(text = ggplot2::element_text(size = 12))
       }
+      print(plotDIAM)
       return(list(
         "diameter" = diam, "R2" = residu, "center" = center_estimate,
         "fdiameter" = fdiam, "hull" = hull, "plot" = plotDIAM
@@ -721,6 +723,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
         ) +
         ggplot2::theme(text = ggplot2::element_text(size = 12))
     }
+    print(plotDBH)
     return(list(
       "dbh" = out_130$diameter, "R2" = out_130$R2,
       "fdbh" = out_130$fdiameter, "plot" = plotDBH
@@ -966,6 +969,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ) +
         ggplot2::theme(text = ggplot2::element_text(size = 12))
     }
+    print(plotDAB)
     return(list(
       "dab" = dab, "R2" = out$R2, "fdab" = out$fdiameter,
       "h" = round(slice_height, 2), "plot" = plotDAB
@@ -1297,6 +1301,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           size = 12
         ))
       }
+      print(plotCrown)
       return(list(
         "crownpoints" = crown_pc, "trunkpoints" = trunk_pc,
         "plot" = plotCrown, "plotXZ" = plotXZ, "plotYZ" = plotYZ
@@ -1372,6 +1377,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         "Crown classification",
         size = 12
       ))
+      print(plotCrown)
       return(list(
         "crownpoints" = crown_pc, "trunkpoints" = pc,
         "plot" = plotCrown, "plotXZ" = plotXZ, "plotYZ" = plotYZ
@@ -1477,6 +1483,7 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
         )
       ) +
       ggplot2::theme(text = ggplot2::element_text(size = 12))
+    print(plotPA)
     return(list("pa" = pa, "plot" = plotPA))
   } else {
     return(pa)
