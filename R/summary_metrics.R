@@ -166,6 +166,11 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
           }
         )
       pc <- classify_out$crownpoints
+    } else {
+      classify_out <- classify_out_empty <- setNames(data.frame(matrix(ncol = 2,
+                                                                       nrow = 0)),
+                                                     c("crownpoints",
+                                                       "trunkpoints"))
     }
     pa_out <- projected_area_pc(pc, concavity, plot)
     av <- alpha_volume_pc(pc, alpha)
