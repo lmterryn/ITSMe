@@ -98,7 +98,7 @@ H <- tree_height_pc(pc = tree_pc)
 # also plot the tree point cloud
 H_out <- tree_height_pc(pc = tree_pc, plot = TRUE)
 H <- H_out$h
-plot_tree <- H_out$plotTree
+plot_tree <- H_out$plot
 ```
 ![](../man/figures/tree_height_tls_example.jpeg)
 
