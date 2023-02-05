@@ -1044,6 +1044,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
     out <- dbh_pc(pc, thresholdR2, slice_thickness)
     dab <- out$dbh
   }
+  th <- tree_height_pc(pc)
   if (!is.nan(dab)) {
     d <- thresholdbranch * dab + 0.1
     dh <- 0.25
@@ -1051,7 +1052,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
     uh <- minheight
     S_X <- S_Y <- 0
     n <- 0
-    while ((S_X < d) & (S_Y < d)) {
+    while ((S_X < d) & (S_Y < d) & (uh+dh < th)) {
       n <- n + 1
       lh <- lh + dh
       uh <- uh + dh
@@ -1079,7 +1080,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       }
     }
     if (n == 1) {
-      while (((S_X > d) | (S_Y > d)) & (lh > dh)) {
+      while (((S_X > d) | (S_Y > d)) & (lh > dh) & (uh+dh < th)) {
         lh <- lh - dh / 10
         uh <- uh - dh / 10
         pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
@@ -1106,65 +1107,65 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         }
       }
     }
-    lh <- lh - dh
-    uh <- uh - dh
-    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
-    k1 <- stats::kmeans(pc_slice, centers = 1, nstart = 10, iter.max = 100)
-    pc_slice$C <- k1$cluster
-    center_trunk <- k1$centers
-    trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
-    crown_pc <- pc[FALSE, ]
-    d <- thresholdbranch * dab
-    S_X <- S_Y <- n <- stop <- 0
-    while ((S_X < d) & (S_Y < d) & (stop == 0)) {
-      if (n > 0) {
-        crown_pc <- rbind(
-          crown_pc,
-          pc_slice[pc_slice$C %in% crown, c("X", "Y", "Z")]
-        )
-        trunk_pc <- rbind(trunk_pc, trunk_slice)
-      }
-      n <- n + 1
-      lh <- lh + dh
-      uh <- uh + dh
+    if ((uh+dh > th)){
+      trunk_pc <- pc
+      crown_pc <- setNames(data.frame(matrix(ncol = 3, nrow = 0)),
+                           c("X", "Y", "Z"))
+    } else {
+      lh <- lh - dh
+      uh <- uh - dh
       pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
-      k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25, iter.max = 100)
-      pc_slice$C <- k10$cluster
-      distance_to_centers <- c()
-      centers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-      for (i in 1:10) {
-        distance_to_centers <- append(
-          distance_to_centers,
-          ((k10$centers[i, "X"] - k1$centers[1, "X"])^2 +
-            (k10$centers[i, "Y"] - k1$centers[1, "Y"])^2)^(1 / 2)
-        )
+      k1 <- stats::kmeans(pc_slice, centers = 1, nstart = 10, iter.max = 100)
+      pc_slice$C <- k1$cluster
+      center_trunk <- k1$centers
+      trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
+      crown_pc <- pc[FALSE, ]
+      d <- thresholdbranch * dab
+      S_X <- S_Y <- n <- stop <- 0
+      while ((S_X < d) & (S_Y < d) & (stop == 0)) {
+        if (n > 0) {
+          crown_pc <- rbind(
+            crown_pc,
+            pc_slice[pc_slice$C %in% crown, c("X", "Y", "Z")]
+          )
+          trunk_pc <- rbind(trunk_pc, trunk_slice)
+        }
+        n <- n + 1
+        lh <- lh + dh
+        uh <- uh + dh
+        pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+        k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25, iter.max = 100)
+        pc_slice$C <- k10$cluster
+        distance_to_centers <- c()
+        centers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        for (i in 1:10) {
+          distance_to_centers <- append(
+            distance_to_centers,
+            ((k10$centers[i, "X"] - k1$centers[1, "X"])^2 +
+              (k10$centers[i, "Y"] - k1$centers[1, "Y"])^2)^(1 / 2)
+          )
+        }
+        crown <- centers[distance_to_centers > d]
+        trunk_slice <- pc_slice[!(pc_slice$C %in% crown), c("X", "Y", "Z")]
+        if (nrow(trunk_slice) == 0) {
+          stop <- 1
+          S_X <- S_Y <- 0
+        } else {
+          k1 <- stats::kmeans(trunk_slice,
+            centers = 1, nstart = 25,
+            iter.max = 100
+          )
+          center_trunk <- k1$centers
+          S_X <- max(trunk_slice$X) - min(trunk_slice$X)
+          S_Y <- max(trunk_slice$Y) - min(trunk_slice$Y)
+        }
       }
-      crown <- centers[distance_to_centers > d]
-      trunk_slice <- pc_slice[!(pc_slice$C %in% crown), c("X", "Y", "Z")]
-      if (nrow(trunk_slice) == 0) {
-        stop <- 1
-        S_X <- S_Y <- 0
-      } else {
-        k1 <- stats::kmeans(trunk_slice,
-          centers = 1, nstart = 25,
-          iter.max = 100
-        )
-        center_trunk <- k1$centers
-        S_X <- max(trunk_slice$X) - min(trunk_slice$X)
-        S_Y <- max(trunk_slice$Y) - min(trunk_slice$Y)
-      }
+      crown_pc <- rbind(crown_pc, pc[pc$Z > min(pc$Z) + lh, ])
     }
-    crown_pc <- rbind(crown_pc, pc[pc$Z > min(pc$Z) + lh, ])
     if (plot) {
-      downsample <- 0.1
-      crown <- crown_pc[sample(nrow(crown_pc),
-        size = floor(nrow(crown_pc) * downsample),
-        replace = FALSE, prob = NULL
-      ), ]
-      crown$class <- "crown"
-      X <- Y <- Z <- NULL
-      if (nrow(trunk_pc) == 0) {
-        tree <- crown
+      if (nrow(crown_pc) == 0) {
+        tree <- trunk_pc
+        tree$class <- "trunk"
         tree$Z <- tree$Z - min(tree$Z)
         plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
           ggplot2::geom_point(
@@ -1181,13 +1182,12 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           ggplot2::scale_color_manual(
             name = "class",
             values = c(
-              "crown" = "green",
               "trunk" = "brown"
             ),
             guide = ggplot2::guide_legend(
               override.aes = list(
-                shape = c(16, 16),
-                size = c(2, 2)
+                shape = c(16),
+                size = c(2)
               )
             )
           )
@@ -1209,97 +1209,172 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           ggplot2::scale_color_manual(
             name = "class",
             values = c(
-              "crown" = "green",
               "trunk" = "brown"
             ),
             guide = ggplot2::guide_legend(
               override.aes = list(
-                shape = c(16, 16),
-                size = c(2, 2)
+                shape = c(16),
+                size = c(2)
               )
             )
           )
         s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-          min(pc$Z)) * 0.5 - 1.05
+                                                                  min(pc$Z)) * 0.5 - 1.05
         plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
-          nrow = 1, ncol = 3,
-          common.legend = TRUE, heights = c(5, 5),
-          widths = c(1, s, 1)
+                                       nrow = 1, ncol = 3,
+                                       common.legend = TRUE, heights = c(5, 5),
+                                       widths = c(1, s, 1)
         )
         plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
           "Crown classification",
           size = 12
         ))
       } else {
-        trunk <- trunk_pc[sample(nrow(trunk_pc),
-          size = floor(nrow(trunk_pc) * downsample),
+        downsample <- 0.1
+        crown <- crown_pc[sample(nrow(crown_pc),
+          size = floor(nrow(crown_pc) * downsample),
           replace = FALSE, prob = NULL
         ), ]
-        trunk$class <- "trunk"
-        tree <- rbind(crown, trunk)
-        tree$Z <- tree$Z - min(tree$Z)
-        plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
-          ggplot2::geom_point(
-            size = 0.1, ggplot2::aes(col = class),
-            shape = "."
-          ) +
-          ggplot2::coord_fixed(ratio = 1) +
-          ggplot2::theme(
-            axis.text.x = ggplot2::element_blank(),
-            axis.ticks.x = ggplot2::element_blank(),
-            plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
-          ) +
-          ggplot2::scale_color_manual(
-            name = "class",
-            values = c(
-              "crown" = "green",
-              "trunk" = "brown"
-            ),
-            guide = ggplot2::guide_legend(
-              override.aes = list(
-                shape = c(16, 16),
-                size = c(2, 2)
+        crown$class <- "crown"
+        X <- Y <- Z <- NULL
+        if (nrow(trunk_pc) == 0) {
+          tree <- crown
+          tree$Z <- tree$Z - min(tree$Z)
+          plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
+            ggplot2::geom_point(
+              size = 0.1, ggplot2::aes(col = class),
+              shape = "."
+            ) +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::theme(
+              axis.text.x = ggplot2::element_blank(),
+              axis.ticks.x = ggplot2::element_blank(),
+              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
+              text = ggplot2::element_text(size = 12)
+            ) +
+            ggplot2::scale_color_manual(
+              name = "class",
+              values = c(
+                "crown" = "green",
+                "trunk" = "brown"
+              ),
+              guide = ggplot2::guide_legend(
+                override.aes = list(
+                  shape = c(16, 16),
+                  size = c(2, 2)
+                )
               )
             )
-          )
-        plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
-          ggplot2::geom_point(
-            size = 0.1, ggplot2::aes(col = class),
-            shape = "."
-          ) +
-          ggplot2::coord_fixed(ratio = 1) +
-          ggplot2::theme(
-            axis.text.y = ggplot2::element_blank(),
-            axis.title.y = ggplot2::element_blank(),
-            axis.ticks.y = ggplot2::element_blank(),
-            axis.text.x = ggplot2::element_blank(),
-            axis.ticks.x = ggplot2::element_blank(),
-            plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
-          ) +
-          ggplot2::scale_color_manual(
-            name = "class",
-            values = c(
-              "crown" = "green",
-              "trunk" = "brown"
-            ),
-            guide = ggplot2::guide_legend(
-              override.aes = list(
-                shape = c(16, 16),
-                size = c(2, 2)
+          plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
+            ggplot2::geom_point(
+              size = 0.1, ggplot2::aes(col = class),
+              shape = "."
+            ) +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::theme(
+              axis.text.y = ggplot2::element_blank(),
+              axis.title.y = ggplot2::element_blank(),
+              axis.ticks.y = ggplot2::element_blank(),
+              axis.text.x = ggplot2::element_blank(),
+              axis.ticks.x = ggplot2::element_blank(),
+              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
+              text = ggplot2::element_text(size = 12)
+            ) +
+            ggplot2::scale_color_manual(
+              name = "class",
+              values = c(
+                "crown" = "green",
+                "trunk" = "brown"
+              ),
+              guide = ggplot2::guide_legend(
+                override.aes = list(
+                  shape = c(16, 16),
+                  size = c(2, 2)
+                )
               )
             )
+          s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
+            min(pc$Z)) * 0.5 - 1.05
+          plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
+            nrow = 1, ncol = 3,
+            common.legend = TRUE, heights = c(5, 5),
+            widths = c(1, s, 1)
           )
-        s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-          min(pc$Z)) * 0.5 - 1.05
-        plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
-          nrow = 1, ncol = 3,
-          common.legend = TRUE, heights = c(5, 5),
-          widths = c(1, s, 1)
-        )
-        plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
-          "Crown classification",
-          size = 12
-        ))
+          plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
+            "Crown classification",
+            size = 12
+          ))
+        } else {
+          trunk <- trunk_pc[sample(nrow(trunk_pc),
+            size = floor(nrow(trunk_pc) * downsample),
+            replace = FALSE, prob = NULL
+          ), ]
+          trunk$class <- "trunk"
+          tree <- rbind(crown, trunk)
+          tree$Z <- tree$Z - min(tree$Z)
+          plotXZ <- ggplot2::ggplot(tree, ggplot2::aes(X, Z)) +
+            ggplot2::geom_point(
+              size = 0.1, ggplot2::aes(col = class),
+              shape = "."
+            ) +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::theme(
+              axis.text.x = ggplot2::element_blank(),
+              axis.ticks.x = ggplot2::element_blank(),
+              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
+            ) +
+            ggplot2::scale_color_manual(
+              name = "class",
+              values = c(
+                "crown" = "green",
+                "trunk" = "brown"
+              ),
+              guide = ggplot2::guide_legend(
+                override.aes = list(
+                  shape = c(16, 16),
+                  size = c(2, 2)
+                )
+              )
+            )
+          plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
+            ggplot2::geom_point(
+              size = 0.1, ggplot2::aes(col = class),
+              shape = "."
+            ) +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::theme(
+              axis.text.y = ggplot2::element_blank(),
+              axis.title.y = ggplot2::element_blank(),
+              axis.ticks.y = ggplot2::element_blank(),
+              axis.text.x = ggplot2::element_blank(),
+              axis.ticks.x = ggplot2::element_blank(),
+              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
+            ) +
+            ggplot2::scale_color_manual(
+              name = "class",
+              values = c(
+                "crown" = "green",
+                "trunk" = "brown"
+              ),
+              guide = ggplot2::guide_legend(
+                override.aes = list(
+                  shape = c(16, 16),
+                  size = c(2, 2)
+                )
+              )
+            )
+          s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
+            min(pc$Z)) * 0.5 - 1.05
+          plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
+            nrow = 1, ncol = 3,
+            common.legend = TRUE, heights = c(5, 5),
+            widths = c(1, s, 1)
+          )
+          plotCrown <- ggpubr::annotate_figure(plotCrown, top = ggpubr::text_grob(
+            "Crown classification",
+            size = 12
+          ))
+        }
       }
       print(plotCrown)
       return(list(
