@@ -67,7 +67,7 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
     Hs <- append(Hs, out$h)
     Plots <- append(Plots, out$plot)
   }
-  return(list("Heights" = Hs, "Plots" = Plots))
+  return(list("File" = file_names,"Heights" = Hs, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{diameter_slice_pc}} function
@@ -149,7 +149,8 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
     fDs <- append(fDs, out$fdiameter)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("Diams" = Ds, "R2s" = Rs, "fDiams" = fDs, "Plots" = Plots))
+  return(list("File" = file_names, "Diams" = Ds, "R2s" = Rs, "fDiams" = fDs,
+              "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{dbh_pc}} function
@@ -224,13 +225,15 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
       as.character(slice_thickness), ".jpeg",
       sep = ""
     )
-    ggplot2::ggsave(filename, plot = out$plot, width =  15, height = 10, units = "cm")
+    ggplot2::ggsave(filename, plot = out$plot, width =  15, height = 10,
+                    units = "cm")
     DBHs <- append(DBHs, out$dbh)
     Rs <- append(Rs, out$R2)
     fDBHs <- append(fDBHs, out$fdbh)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DBHs" = DBHs, "R2s" = Rs, "fDBHs" = fDBHs, "Plots" = Plots))
+  return(list("File" = file_names, "DBHs" = DBHs, "R2s" = Rs, "fDBHs" = fDBHs,
+              "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{dab_pc}} function
@@ -317,7 +320,8 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     Hs <- append(Hs, out$h)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("DABs" = DABs, "R2s" = Rs, "fDABs" = fDABs, "Hs" = Hs, "Plots" = Plots))
+  return(list("File" = file_names, "DABs" = DABs, "R2s" = Rs, "fDABs" = fDABs,
+              "Hs" = Hs, "Plots" = Plots))
 }
 
 #' Save figures of \code{\link{classify_crown_pc}} function
