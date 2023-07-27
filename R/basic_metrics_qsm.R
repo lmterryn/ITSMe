@@ -237,3 +237,31 @@ dbh_qsm <- function(treedata) {
 crown_area_alpha_qsm <- function(treedata) {
   return(treedata$CrownAreaAlpha)
 }
+
+#' Trunk height TreeQSM
+#'
+#' Extracts the trunk height from the treedata of a TreeQSM. For stems without
+#' and with trangulation it selects the TrunkLenght and TriaTrunkLength object
+#' from treedata respectively.
+#'
+#' @param treedata Treedata field of a TreeQSM that is returned by
+#'   \code{\link{read_tree_qsm}}.
+#'
+#' @return The trunk height of the TreeQSM in meters.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read tree qsm and extract tree height
+#' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
+#' trunk_height <- trunk_height_qsm(treedata = qsm$treedata)
+#' }
+trunk_height_qsm <- function(treedata) {
+  if (length(treedata) > 83) {
+    th <- treedata$TriaTrunkLength[1]
+  } else {
+    th <- treedata$TrunkLength[1]
+  }
+  return(th)
+}
