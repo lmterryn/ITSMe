@@ -8,7 +8,7 @@ read_tree_pc(path, samplefactor = 1)
 }
 \arguments{
 \item{path}{A character with the path to the tree point cloud file. File can
-be \emph{txt}, \emph{las} or \emph{ply} format. The 3D coordinates have to
+be \emph{txt}, \emph{las}, \emph{laz} or \emph{ply} format. The 3D coordinates have to
 be in the first three columns in case of a \emph{txt} file.}
 
 \item{samplefactor}{A numeric value ranging from 0 to 1 (default=1). This
@@ -21,11 +21,11 @@ The tree point cloud as a data.frame (nx3) with X, Y, and Z
 coordinates in the first, second and third column respectively.
 }
 \description{
-Reads a tree point cloud file of txt, las or ply format and returns the tree
+Reads a tree point cloud file of txt, las/laz or ply format and returns the tree
 point cloud as a data.frame with 3 columns (X,Y,Z).
 }
 \details{
-Reading the txt, las and ply files is based on
+Reading the txt, las/laz and ply files is based on
 \code{\link[data.table]{fread}}, \code{\link[lidR]{readTLSLAS}} and
 \code{\link[Rvcg]{vcgPlyRead}} respectively. Sampling is based on
 \code{\link[base]{sample}} and is mainly a useful tool to reduce the amount
@@ -37,7 +37,7 @@ of points for quicker plotting.
 pc_txt <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 # Read a tree point cloud file of the ply format
 pc_ply <- read_tree_pc(PC_path = "path/to/point_cloud.ply")
-# Read a tree point cloud file of the las format
+# Read a tree point cloud file of the las/laz format
 # and subsample to 20 percent of the points
 pc_las <- read_tree_pc(PC_path = "path/to/point_cloud.las", 0.2)
 }

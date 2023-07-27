@@ -11,7 +11,7 @@ total_branch_length_qsm(treedata)
 \code{\link{read_tree_qsm}}.}
 }
 \value{
-The total branch length of the TreeQSM in liters.
+The total branch length of the TreeQSM in meters.
 }
 \description{
 Extracts the total branch length from the treedata of a TreeQSM.
