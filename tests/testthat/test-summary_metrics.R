@@ -17,7 +17,7 @@ test_that("summary basic point cloud metrics works", {
 test_that("summary qsm metrics works", {
   # output is a data frame with length 24
   expect_equal(length(
-    summary_qsm_metrics(QSMs_path = "../non_buttressed_trees/single_qsm/")), 24) &
+    summary_qsm_metrics(QSMs_path = "../non_buttressed_trees/single_qsm/")), 26) &
   # with multiple QSMs, output is a data frame with length 3
     expect_equal(length(
       summary_qsm_metrics(QSMs_path = "../non_buttressed_trees/multiple_qsm/",
