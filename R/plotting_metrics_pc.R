@@ -437,7 +437,7 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
     )
     Plots <- append(Plots, list(out$plot))
   }
-  return(Plots)
+  return(list("File" = file_names, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{projected_area_pc}} function
@@ -568,7 +568,7 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     PAs <- append(PAs, out$pa)
     Plots <- append(Plots, list(plot))
   }
-  return(list("PAs" = PAs, "Plots" = Plots))
+  return(list("File" = file_names, "PAs" = PAs, "Plots" = Plots))
 }
 
 #' Calculate and save figures of \code{\link{alpha_volume_pc}} function
@@ -688,5 +688,5 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     AVs <- append(AVs, out$av)
     gc()
   }
-  return(AVs)
+  return(list("File" = file_names, "AVs" = AVs))
 }
