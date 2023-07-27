@@ -411,6 +411,7 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
     "X_position" = double(), "Y_position" = double(),
     "dbh_m" = double(), "tree_height_m" = double(),
     "tree_vol_L" = double(), "trunk_vol_L" = double(),
+    "branch_len" = double(), "trunk_h" = double(),
     "sba_degrees" = double(), "sbcs" = double(), "sbr" = double(),
     "sbl" = double(), "sbd" = double(), "dhr" = double(),
     "dvr_m-2" = double(), "vb55" = double(), "clvr_m-2" = double(),
@@ -455,6 +456,8 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
       tree_height <- tree_height(qsm$treedata, pc)
       tree_vol <- tree_volume_qsm(qsm$treedata)
       trunk_vol <- trunk_volume_qsm(qsm$treedata)
+      branch_len <- total_branch_length_qsm(qsm$treedata)
+      trunk_height <- trunk_height_qsm(qsm$treedata)
       sba <- stem_branch_angle_qsm(qsm$branch)
       sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
       sbr <- stem_branch_radius_qsm(
@@ -499,7 +502,8 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
       tree <- data.frame(
         "X_position" = X_position, "Y_position" = Y_position,
         "dbh_m" = dbh, "tree_height_m" = tree_height,
-        "tree_vol_L" = tree_vol, "trunk_vol_L" = trunk_vol, "sba_degrees" = sba,
+        "tree_vol_L" = tree_vol, "trunk_vol_L" = trunk_vol,
+        "branch_len" = branch_len, "trunk_h" = trunk_height, "sba_degrees" = sba,
         "sbcs" = sbcs, "sbr" = sbr, "sbl" = sbl, "sbd" = sbd,
         "dhr" = dhr, "dvr_m-2" = dvr, "vb55" = vb55, "clvr_m-2" = clvr,
         "sr" = sr, "bar" = bar, "rvr" = rvr, "csh" = csh, "ch" = ch,
