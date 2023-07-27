@@ -150,7 +150,7 @@ total_branch_volume_qsm <- function(treedata) {
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #'
-#' @return The total branch length of the TreeQSM in liters.
+#' @return The total branch length of the TreeQSM in meters.
 #'
 #' @export
 #'
