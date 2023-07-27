@@ -1109,7 +1109,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
     }
     if ((uh+dh > th)){
       trunk_pc <- pc
-      crown_pc <- setNames(data.frame(matrix(ncol = 3, nrow = 0)),
+      crown_pc <- stats::setNames(data.frame(matrix(ncol = 3, nrow = 0)),
                            c("X", "Y", "Z"))
     } else {
       lh <- lh - dh
