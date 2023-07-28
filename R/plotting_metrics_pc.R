@@ -40,7 +40,7 @@
 #'   OUT_path = "path/to/figure/folder/"
 #' )
 #' }
-plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
+plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
                                  r = 5, OUT_path = "./") {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
@@ -91,6 +91,10 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
 #'   thickness of the slice which is used to measure the diameter. Parameter of
 #'   the \code{\link{diameter_slice_pc}} function used to calculate the diameter
 #'   of a stem slice.
+#' @param dtm The digital terrain model (default = NA), parameter of
+#'   \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r, parameter of
+#'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #' @param OUT_path A character with the path to the folder where the figures
 #'   should be saved (default = current folder).
 #'
@@ -120,7 +124,7 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = "NA",
 #' }
 plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
                                 slice_height = 1.3, slice_thickness = 0.06,
-                                OUT_path = "./") {
+                                dtm = NA, r = 5, OUT_path = "./") {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -136,7 +140,8 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- diameter_slice_pc(pc, slice_height, slice_thickness, TRUE)
+    out <- diameter_slice_pc(pc, slice_height, slice_thickness, dtm = dtm,
+                             r = r, plot = TRUE)
     filename <- paste(OUT_path, "circle_",
       strsplit(file_names[i], extension)[[1]], "_",
       as.character(slice_height), "_",
@@ -172,6 +177,10 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height.
+#' @param dtm The digital terrain model (default = NA), parameter of
+#'   \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r, parameter of
+#'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #' @param OUT_path A character with the path to the folder where the figures
 #'   should be saved (default = current folder).
 #'
@@ -193,7 +202,8 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #' )
 #' }
 plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
-                             slice_thickness = 0.06, OUT_path = "./") {
+                             slice_thickness = 0.06, dtm = NA, r = 5,
+                             OUT_path = "./") {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -211,7 +221,7 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
     pc <- read_tree_pc(file_paths[i])
     out <- tryCatch(
       {
-        dbh_pc(pc, thresholdR2, slice_thickness, TRUE)
+        dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r, plot = TRUE)
         },
       error = function(cond){
         message(cond)
@@ -261,6 +271,10 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #'   buttresses.
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param dtm The digital terrain model (default = NA), parameter of
+#'   \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r, parameter of
+#'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #'
 #' @return A list with in the first element a numeric containing the dab values
 #'   for each tree point cloud, the second element the residuals on the circle
@@ -289,7 +303,7 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #' }
 plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                              thresholdbuttress = 0.001, maxbuttressheight = 7,
-                             slice_thickness = 0.06) {
+                             slice_thickness = 0.06, dtm = NA, r = 5) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -307,7 +321,7 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
-                  TRUE)
+                  dtm = dtm, r = r, plot = TRUE)
     filename <- paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
       "_", as.character(thresholdbuttress), "_",
       as.character(maxbuttressheight), ".jpeg",
@@ -367,6 +381,10 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when buttress == TRUE.
+#' @param dtm The digital terrain model (default = NA), parameter of
+#'   \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r, parameter of
+#'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #'
 #' @return Returns a list with the plots and individual plots saved in the
 #'   output folder.
@@ -406,7 +424,8 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                                           thresholdR2 = 0.001,
                                           slice_thickness = 0.06,
                                           thresholdbuttress = 0.001,
-                                          maxbuttressheight = 7) {
+                                          maxbuttressheight = 7,
+                                          dtm = NA, r = 5) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -422,7 +441,7 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
     out <- classify_crown_pc(
       pc, thresholdbranch, minheight, buttress,
       thresholdR2, slice_thickness, thresholdbuttress,
-      maxbuttressheight, TRUE
+      maxbuttressheight, dtm = dtm, r = r , plot = TRUE
     )
     filename <- paste(OUT_path, "crown_",
       strsplit(file_names[i], extension)[[1]], "_",
@@ -492,6 +511,10 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when crown == TRUE and buttress == FALSE.
+#' @param dtm The digital terrain model (default = NA), parameter of
+#'   \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r, parameter of
+#'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #'
 #' @return A list with in the first element a numeric containing the projected
 #'   area values for each tree point cloud. In the second element there is the
@@ -522,7 +545,7 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         concavity = 2, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
                         slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7) {
+                        maxbuttressheight = 7, dtm = NA, r = 5) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -540,7 +563,7 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
       crown_pc <- classify_crown_pc(
         pc, thresholdbranch, minheight, buttress,
         thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight, FALSE
+        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r, FALSE
       )
       out <- projected_area_pc(crown_pc$crownpoints, concavity, TRUE)
       plot_area <- out$plot +
@@ -621,6 +644,10 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when crown == TRUE and buttress == FALSE.
+#' @param dtm The digital terrain model (default = NA), parameter of
+#'   \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r, parameter of
+#'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #'
 #' @return a numeric containing the volume values for each tree point cloud.
 #'   Figures are saved in the output folder.
@@ -650,7 +677,7 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         alpha = 1, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
                         slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7) {
+                        maxbuttressheight = 7, dtm = NA, r = 5) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -667,7 +694,7 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
       crown_pc <- classify_crown_pc(
         pc, thresholdbranch, minheight, buttress,
         thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight, FALSE
+        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r, plot = FALSE
       )
       out <- alpha_volume_pc(crown_pc$crownpoints, alpha, TRUE)
       fig_name <- paste(OUT_path, "cv_",

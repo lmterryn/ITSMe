@@ -10,7 +10,9 @@ plot_dab_fit_pcs(
   OUT_path = "./",
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
-  slice_thickness = 0.06
+  slice_thickness = 0.06,
+  dtm = NA,
+  r = 5
 )
 }
 \arguments{
@@ -33,6 +35,12 @@ buttresses.}
 
 \item{slice_thickness}{Numeric value (default = 0.06) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{dtm}{The digital terrain model (default = NA), parameter of
+\code{\link{tree_height_pc}}.}
+
+\item{r}{Numeric value (default=5) r, parameter of
+\code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
 }
 \value{
 A list with in the first element a numeric containing the dab values

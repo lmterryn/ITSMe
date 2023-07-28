@@ -9,21 +9,21 @@ test_that("tree height calculation works", {
   # output is a numeric
   expect_equal(length(
     tree_height_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))),
-    1) &
+    2) &
     # with plot TRUE, output is a list of 4
     expect_equal(length(
       tree_height_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
-                     plot = TRUE)), 4) &
+                     plot = TRUE)), 5) &
     # with dtm, output is a numeric
     expect_equal(length(
       tree_height_pc(pc = read_tree_pc(
         path = "../point_clouds/pc_tree_uav.txt"),
-        dtm = read_tree_pc(path = "../point_clouds/dtm.txt"))), 1) &
+        dtm = read_tree_pc(path = "../point_clouds/dtm.txt"))), 2) &
     # with dtm and plot TRUE, output is a list of 4
     expect_equal(length(
       tree_height_pc(pc = read_tree_pc(
         path = "../point_clouds/pc_tree_uav.txt"),
-        dtm = read_tree_pc(path = "../point_clouds/dtm.txt"), plot = TRUE)), 4)
+        dtm = read_tree_pc(path = "../point_clouds/dtm.txt"), plot = TRUE)), 5)
 
 })
 

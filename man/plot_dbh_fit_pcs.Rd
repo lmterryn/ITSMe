@@ -9,6 +9,8 @@ plot_dbh_fit_pcs(
   extension = ".txt",
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
+  dtm = NA,
+  r = 5,
   OUT_path = "./"
 )
 }
@@ -26,6 +28,12 @@ height.}
 \item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height.}
+
+\item{dtm}{The digital terrain model (default = NA), parameter of
+\code{\link{tree_height_pc}}.}
+
+\item{r}{Numeric value (default=5) r, parameter of
+\code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
 
 \item{OUT_path}{A character with the path to the folder where the figures
 should be saved (default = current folder).}

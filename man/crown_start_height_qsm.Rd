@@ -4,7 +4,7 @@
 \alias{crown_start_height_qsm}
 \title{Crown start height TreeQSM}
 \usage{
-crown_start_height_qsm(treedata, cylinder, pc = NA)
+crown_start_height_qsm(treedata, cylinder, pc = NA, dtm = NA, r = 5)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
@@ -16,6 +16,15 @@ crown_start_height_qsm(treedata, cylinder, pc = NA)
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 cloud is available.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}. only
+relevant when a point cloud is provided.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 }
 \value{
 The crown start height.

@@ -13,6 +13,8 @@ classify_crown_pc(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  dtm = NA,
+  r = 5,
   plot = FALSE
 )
 }
@@ -49,6 +51,14 @@ buttresses. Only relevant when buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height. Only relevant when buttress == TRUE.}
 
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
+
 \item{plot}{Logical (default=FALSE), indicates if the classified tree is
 plotted.}
 }
@@ -64,7 +74,10 @@ Returns the crown points from a tree point cloud.
 \details{
 The classification is based on the increased distance between the minimum and
 maximum X (and Y) coordinates of the tree points within a horizontal slice
-when the first branch is reached with increasing height.
+when the first branch is reached with increasing height. When the bottom of
+the point cloud is incomplete or obstructed you can choose to add a digital
+terrain model as an input which is used to estimate lowest point of the point
+cloud in order to obtain slices at the correct height of the tree.
 }
 \examples{
 \dontrun{

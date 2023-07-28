@@ -16,7 +16,9 @@ plot_av_pcs(
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
-  maxbuttressheight = 7
+  maxbuttressheight = 7,
+  dtm = NA,
+  r = 5
 )
 }
 \arguments{
@@ -64,6 +66,12 @@ when crown == TRUE and buttress == FALSE.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 when crown == TRUE and buttress == FALSE.}
+
+\item{dtm}{The digital terrain model (default = NA), parameter of
+\code{\link{tree_height_pc}}.}
+
+\item{r}{Numeric value (default=5) r, parameter of
+\code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
 }
 \value{
 a numeric containing the volume values for each tree point cloud.

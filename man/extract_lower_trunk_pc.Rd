@@ -4,7 +4,7 @@
 \alias{extract_lower_trunk_pc}
 \title{Extract lower trunk point cloud}
 \usage{
-extract_lower_trunk_pc(pc, slice_thickness = 0.08)
+extract_lower_trunk_pc(pc, slice_thickness = 0.08, dtm = NA, r = 5)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -12,6 +12,14 @@ extract_lower_trunk_pc(pc, slice_thickness = 0.08)
 
 \item{slice_thickness}{Numeric value (default = 0.08) that determines the
 thickness of the slice used to determine the lower trunk points.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 }
 \value{
 Data.frame with the lower trunk point cloud (part of the trunk below
@@ -26,8 +34,11 @@ This function iteratively adds trunk points to the trunk point cloud starting
 from 0.15 m above the lowest point of the tree point cloud (everything below
 0.15 m is assumed to be trunk). For each slice as many crown/branch points
 are removed based on kmeans clustering and the distance of the clusters to
-the center of the previous slice. Support function used to determine the DBH
-from a tree point cloud with \code{\link{dbh_pc}}.
+the center of the previous slice. When the bottom of the point cloud is
+incomplete or obstructed you can choose to add a digital terrain model as an
+input which is used to estimate lowest point of the point cloud in order to
+obtain slices at the correct height of the tree. Support function used to
+determine the DBH from a tree point cloud with \code{\link{dbh_pc}}.
 }
 \examples{
 \dontrun{

@@ -6,7 +6,10 @@
 #' cloud (most accurate). In this case the diameter at breast height (dbh) or
 #' diameter above buttresses (dab) is calculated with \code{\link{dbh_pc}} or
 #' \code{\link{dab_pc}} respectively. If the tree point cloud is not available
-#' the dbh is based on the treeQSM with \code{\link{dbh_qsm}}.
+#' the dbh is based on the treeQSM with \code{\link{dbh_qsm}}. When the bottom
+#' of the point cloud is incomplete or obstructed you can choose to add a
+#' digital terrain model as an input which is used to estimate lowest point of
+#' the point cloud in order to obtain slices at the correct height of the tree.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -31,6 +34,12 @@
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The dbh or dab in meters.
 #' @export
@@ -44,15 +53,16 @@
 #' }
 dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdR2 = 0.001,
                 slice_thickness = 0.06, thresholdbuttress = 0.001,
-                maxbuttressheight = 7) {
+                maxbuttressheight = 7, dtm = NA, r = 5) {
   if (!is.data.frame(pc)) {
     return(dbh_qsm(treedata))
   } else {
     if (buttress) {
-      out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness)
+      out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
+                    dtm = dtm, r = r)
       return(out$dab)
     } else {
-      out <- dbh_pc(pc, thresholdR2, slice_thickness)
+      out <- dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r)
       return(out$dbh)
     }
   }
@@ -65,13 +75,23 @@ dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdR2 = 0.001,
 #' If the tree point cloud is available the tree_height calculation is based on
 #' the point cloud (most accurate) with \code{\link{tree_height_pc}}. If the
 #' tree point cloud is not available the tree height is based on the treeQSM
-#' with \code{\link{tree_height_qsm}}.
+#' with \code{\link{tree_height_qsm}}. When the bottom of the point cloud is
+#' incomplete or obstructed you can choose to add a digital terrain model as an
+#' input which is used to estimate lowest point of the point cloud in order to
+#' obtain slices at the correct height of the tree.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. If the point cloud is not available NA is used
 #'   as input (default=NA).
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The tree height in meters.
 #' @export
@@ -83,11 +103,12 @@ dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdR2 = 0.001,
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' h <- tree_height(treedata = qsm$treedata, pc = pc_tree)
 #' }
-tree_height <- function(treedata, pc = NA) {
+tree_height <- function(treedata, pc = NA, dtm = NA, r = 5) {
   if (!is.data.frame(pc)) {
     return(tree_height_qsm(treedata))
   } else {
-    return(tree_height_pc(pc))
+    h_list <- tree_height_pc(pc, dtm = dtm, r = r)
+    return(h_list$h)
   }
 }
 
@@ -220,6 +241,13 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
 #'   is available. Only relevant if normalisation equals "treeheight".
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The stem branch radius. Unitless with normalisation, in meters
 #'   without normalisation.  NaN when there are no stem branches.
@@ -261,7 +289,8 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' )
 #' }
 stem_branch_radius_qsm <- function(cylinder, treedata,
-                                   normalisation = "treeheight", pc = NA) {
+                                   normalisation = "treeheight", pc = NA,
+                                   dtm = NA, r = 5) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
     cylinder$BranchOrder == 1)
   if (length(ind_stem_cyl) > 0) {
@@ -278,7 +307,7 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
     ind_parents_b10 <- cylinder$parent[ind_b10]
     rad_parents_b10 <- cylinder$radius[ind_parents_b10]
     if (normalisation == "treeheight") {
-      tree_height <- tree_height(treedata, pc)
+      tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
       sbr <- mean(rad_b10) / tree_height
     } else if (normalisation == "parentcylinder") {
       sbr <- mean(rad_b10 / rad_parents_b10)
@@ -333,6 +362,13 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #'
 #' @return The stem branch length. Unitless with normalisation, in meters
@@ -383,18 +419,18 @@ stem_branch_length_qsm <- function(branch, treedata,
                                    buttress = FALSE, thresholdR2 = 0.001,
                                    slice_thickness = 0.06,
                                    thresholdbuttress = 0.001,
-                                   maxbuttressheight = 7) {
+                                   maxbuttressheight = 7, dtm = NA, r = 5) {
   ind_stem_branches <- which(branch$order == 1)
   if (length(ind_stem_branches) > 0) {
     branch_len <- branch$length[ind_stem_branches]
     if (normalisation == "dbh") {
       dbh <- dbh(
         treedata, pc, buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight
+        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
       )
       sbl <- mean(branch_len) / dbh
     } else if (normalisation == "treeheight") {
-      tree_height <- tree_height(treedata, pc)
+      tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
       sbl <- mean(branch_len) / tree_height
     } else {
       print("No normalisation")
@@ -445,6 +481,13 @@ stem_branch_length_qsm <- function(branch, treedata,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The stem branch distance. Unitless with normalisation, in meters
 #'   without normalisation. NaN when there are no stem branches.
@@ -490,7 +533,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
                                      thresholdR2 = 0.001,
                                      slice_thickness = 0.06,
                                      thresholdbuttress = 0.001,
-                                     maxbuttressheight = 7) {
+                                     maxbuttressheight = 7, dtm = NA, r = 5) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
     cylinder$BranchOrder == 1)
   cyl_heights <- cylinder$start[ind_stem_cyl, 3]
@@ -518,7 +561,7 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
     if (normalisation == "dbh") {
       dbh <- dbh(
         treedata, pc, buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight
+        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
       )
       sbd <- mean(average_distance) / dbh
     } else {
@@ -561,6 +604,13 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return DBH divided by the tree height.
 #'
@@ -592,12 +642,12 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
                                  thresholdR2 = 0.001, slice_thickness = 0.06,
                                  thresholdbuttress = 0.001,
-                                 maxbuttressheight = 7) {
+                                 maxbuttressheight = 7, dtm = NA, r = 5) {
   dbh <- dbh(
     treedata, pc, buttress, thresholdR2, slice_thickness,
-    thresholdbuttress, maxbuttressheight
+    thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
   )
-  tree_height <- tree_height(treedata, pc)
+  tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
   return(dbh / tree_height)
 }
 
@@ -631,6 +681,13 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return DBH divided by the tree volume (trunk plus branches) in meters-2.
 #'
@@ -662,10 +719,10 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
                                  thresholdR2 = 0.001, slice_thickness = 0.06,
                                  thresholdbuttress = 0.001,
-                                 maxbuttressheight = 7) {
+                                 maxbuttressheight = 7, dtm = NA, r = 5) {
   dbh <- dbh(
     treedata, pc, buttress, thresholdR2, slice_thickness,
-    thresholdbuttress, maxbuttressheight
+    thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
   )
   volume <- tree_volume_qsm(treedata) / 1000
   return(dbh / volume)
@@ -1004,6 +1061,13 @@ crownset_qsm <- function(cylinder) {
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The crown start height.
 #'
@@ -1033,10 +1097,11 @@ crownset_qsm <- function(cylinder) {
 #'   cylinder = qsm$cylinder, pc = pc_tree
 #' )
 #' }
-crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
+crown_start_height_qsm <- function(treedata, cylinder, pc = NA, dtm = NA,
+                                   r = 5) {
   crownset <- crownset_qsm(cylinder)
   if (length(crownset) > 0) {
-    tree_height <- tree_height(treedata, pc)
+    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
     crownset_parent0 <- crownset[cylinder$BranchOrder
                                  [cylinder$parent[crownset]] == 0]
     min_height <- min(cylinder$start[crownset_parent0, 3])
@@ -1064,6 +1129,13 @@ crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The crown height.
 #'
@@ -1090,9 +1162,9 @@ crown_start_height_qsm <- function(treedata, cylinder, pc = NA) {
 #'   pc = pc_tree
 #' )
 #' }
-crown_height_qsm <- function(treedata, cylinder, pc = NA) {
+crown_height_qsm <- function(treedata, cylinder, pc = NA, dtm = NA, r = 5) {
   crownset <- crownset_qsm(cylinder)
-  tree_height <- tree_height(treedata, pc)
+  tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
   if (length(crownset) > 0) {
     minz_crown <- min(cylinder$start[crownset, 3])
     maxz_crown <- max(cylinder$start[crownset, 3])
@@ -1361,6 +1433,13 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The ratio of the crown diameter and crown height.
 #'
@@ -1391,11 +1470,12 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
 #'   pc = pc_tree
 #' )
 #' }
-crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
+crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA,
+                                           dtm = NA, r = 5) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- max(radii) * 2
   ch <- crown_height_qsm(treedata, cylinder)
-  tree_height <- tree_height(treedata, pc)
+  tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
   height <- ch * tree_height
   return(diameter / height)
 }
@@ -1436,6 +1516,13 @@ crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA) {
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
+#'   relevant when a point cloud is provided.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return The ratio of the dbh and the minimum tree radius.
 #'
@@ -1475,12 +1562,12 @@ dbh_minradius_ratio_qsm <- function(treedata, cylinder, pc = NA,
                                     buttress = FALSE, thresholdR2 = 0.001,
                                     slice_thickness = 0.06,
                                     thresholdbuttress = 0.001,
-                                    maxbuttressheight = 7) {
+                                    maxbuttressheight = 7, dtm = NA, r = 5) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- min(radii) * 2
   dbh <- dbh(
     treedata, pc, buttress, thresholdR2, slice_thickness,
-    thresholdbuttress, maxbuttressheight
+    thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
   )
   return(dbh / diameter)
 }

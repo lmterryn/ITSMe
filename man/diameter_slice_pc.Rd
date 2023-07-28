@@ -4,7 +4,14 @@
 \alias{diameter_slice_pc}
 \title{Diameter at certain height point cloud}
 \usage{
-diameter_slice_pc(pc, slice_height = 0.1, slice_thickness = 0.06, plot = FALSE)
+diameter_slice_pc(
+  pc,
+  slice_height = 0.1,
+  slice_thickness = 0.06,
+  dtm = NA,
+  r = 5,
+  plot = FALSE
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -16,6 +23,14 @@ measured.}
 
 \item{slice_thickness}{Numeric value (default = 0.6) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimized circle
 fitting is plotted.}
@@ -37,8 +52,11 @@ optimal fit. The height and thickness of the slice can be specified using
 slice_height and slice_thickness parameters. Additionally, the functional
 diameter is calculated. For this the area of the concave hull with (concavity
 4) is determined on the slice. From this area the diameter is determined as
-the diameter of a circle with this area. This function is also a Support
-function used to determine the DBH from a tree point cloud with
+the diameter of a circle with this area. When the bottom of the point cloud
+is incomplete or obstructed you can choose to add a digital terrain model as
+an input which is used to estimate lowest point of the point cloud in order
+to obtain slices at the correct height of the tree. This function is also a
+Support function used to determine the DBH from a tree point cloud with
 \code{\link{dbh_pc}}.
 }
 \examples{

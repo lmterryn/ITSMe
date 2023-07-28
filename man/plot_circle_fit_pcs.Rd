@@ -9,6 +9,8 @@ plot_circle_fit_pcs(
   extension = ".txt",
   slice_height = 1.3,
   slice_thickness = 0.06,
+  dtm = NA,
+  r = 5,
   OUT_path = "./"
 )
 }
@@ -28,6 +30,12 @@ calculate the diameter of a stem slice.}
 thickness of the slice which is used to measure the diameter. Parameter of
 the \code{\link{diameter_slice_pc}} function used to calculate the diameter
 of a stem slice.}
+
+\item{dtm}{The digital terrain model (default = NA), parameter of
+\code{\link{tree_height_pc}}.}
+
+\item{r}{Numeric value (default=5) r, parameter of
+\code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
 
 \item{OUT_path}{A character with the path to the folder where the figures
 should be saved (default = current folder).}

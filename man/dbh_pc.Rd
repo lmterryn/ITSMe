@@ -4,7 +4,14 @@
 \alias{dbh_pc}
 \title{Diameter at breast height point cloud}
 \usage{
-dbh_pc(pc, thresholdR2 = 0.001, slice_thickness = 0.06, plot = FALSE)
+dbh_pc(
+  pc,
+  thresholdR2 = 0.001,
+  slice_thickness = 0.06,
+  dtm = NA,
+  r = 5,
+  plot = FALSE
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -20,6 +27,14 @@ clouds in multi-scan due to wind-effect).}
 
 \item{slice_thickness}{Numeric value (default = 0.06) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
@@ -45,7 +60,10 @@ this the area of the concave hull with (concavity 4) is determined on the
 slice. From this area the diameter is determined as the diameter of a circle
 with this area. In case there are branches or foliage at this height, the
 lower trunk is extracted using \code{\link{extract_lower_trunk_pc}}. Wether
-this is the case is determined using the thresholdR2 parameter.
+this is the case is determined using the thresholdR2 parameter. When the
+bottom of the point cloud is incomplete or obstructed you can choose to add a
+digital terrain model as an input which is used to estimate lowest point of
+the point cloud in order to obtain slices at the correct height of the tree.
 }
 \examples{
 \dontrun{

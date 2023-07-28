@@ -7,7 +7,7 @@
 plot_tree_height_pcs(
   PCs_path,
   extension = ".txt",
-  dtm = "NA",
+  dtm = NA,
   r = 5,
   OUT_path = "./"
 )

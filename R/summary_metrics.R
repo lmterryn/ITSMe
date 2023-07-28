@@ -124,11 +124,12 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     pc <- read_tree_pc(filepaths[i])
     pos <- tree_position_pc(pc)
     h_out <- tree_height_pc(pc, dtm, r, plot)
+    h <- h_out$h
     if (buttress) {
       dab_out <- tryCatch(
         {
           dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
-                 plot)
+                 dtm, r, plot)
         },
         error = function(cond){
           message(cond)
@@ -141,7 +142,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     } else {
       dbh_out <- tryCatch(
         {
-          dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, plot)
+          dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, dtm, r, plot)
         },
         error = function(cond){
           message(cond)
@@ -157,7 +158,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
         {
           classify_crown_pc(pc, thresholdbranch, minheight, buttress,
                             thresholdR2, slice_thickness, thresholdbuttress,
-                            maxbuttressheight, plot)
+                            maxbuttressheight, dtm, r, plot)
           },
         error = function(cond){
           message(paste(cond, "!crown classification not possible, will calculate tree area and volume", sep = ""))
@@ -167,7 +168,7 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
         )
       pc <- classify_out$crownpoints
     } else {
-      classify_out <- classify_out_empty <- setNames(data.frame(matrix(ncol = 2,
+      classify_out <- classify_out_empty <- stats::setNames(data.frame(matrix(ncol = 2,
                                                                        nrow = 0)),
                                                      c("crownpoints",
                                                        "trunkpoints"))
@@ -175,10 +176,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     pa_out <- projected_area_pc(pc, concavity, plot)
     av <- alpha_volume_pc(pc, alpha)
     if (plot) {
-      h <- h_out$h
       pa <- pa_out$pa
     } else {
-      h <- h_out
       pa <- pa_out
     }
     tree <- data.frame(
@@ -345,6 +344,9 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point clouds are available and
 #'   buttress == TRUE.
+#' @param dtm The digital terrain model from \code{\link{tree_height_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm from \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #' @param OUT_path A character with name of the output file (including the path
 #'   to the folder), where the summary csv file should be saved or logical
 #'   (default=FALSE) in this case no csv file is produced.
@@ -396,7 +398,8 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
                                 buttress = FALSE, thresholdR2 = 0.001,
                                 slice_thickness = 0.06,
                                 thresholdbuttress = 0.001,
-                                maxbuttressheight = 7, OUT_path = FALSE) {
+                                maxbuttressheight = 7, dtm = NA, r = 5,
+                                OUT_path = FALSE) {
   filenames <- list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
   unique_tree_ids <- c()
   tree_ids <- c()
@@ -451,9 +454,9 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
       Y_position <- position[2]
       dbh <- dbh(
         qsm$treedata, pc, buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight
+        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
       )
-      tree_height <- tree_height(qsm$treedata, pc)
+      tree_height <- tree_height(qsm$treedata, pc, dtm = dtm, r = r)
       tree_vol <- tree_volume_qsm(qsm$treedata)
       trunk_vol <- trunk_volume_qsm(qsm$treedata)
       branch_len <- total_branch_length_qsm(qsm$treedata)
@@ -462,42 +465,42 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
       sbcs <- stem_branch_cluster_size_qsm(qsm$cylinder)
       sbr <- stem_branch_radius_qsm(
         qsm$cylinder, qsm$treedata,
-        sbr_normalisation, pc
+        sbr_normalisation, pc, dtm = dtm, r = r
       )
       sbl <- stem_branch_length_qsm(
         qsm$branch, qsm$treedata, sbl_normalisation,
         pc, buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight
+        thresholdbuttress, maxbuttressheight, dtm, r
       )
       sbd <- stem_branch_distance_qsm(
         qsm$cylinder, qsm$treedata,
         sbd_normalisation, pc, buttress,
         thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight
+        thresholdbuttress, maxbuttressheight, dtm, r
       )
       dhr <- dbh_height_ratio_qsm(
         qsm$treedata, pc, buttress, thresholdR2,
         slice_thickness, thresholdbuttress,
-        maxbuttressheight
+        maxbuttressheight, dtm, r
       )
       dvr <- dbh_volume_ratio_qsm(
         qsm$treedata, pc, buttress, thresholdR2,
         slice_thickness, thresholdbuttress,
-        maxbuttressheight
-      )
+        maxbuttressheight, dtm, r)
       vb55 <- volume_below_55_qsm(qsm$cylinder, qsm$treedata)
       clvr <- cylinder_length_volume_ratio_qsm(qsm$treedata)
       sr <- shedding_ratio_qsm(qsm$branch, qsm$cylinder, qsm$treedata)
       bar <- branch_angle_ratio_qsm(qsm$branch)
       rvr <- relative_volume_ratio_qsm(qsm$cylinder, qsm$treedata)
-      csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder, pc)
-      ch <- crown_height_qsm(qsm$treedata, qsm$cylinder, pc)
+      csh <- crown_start_height_qsm(qsm$treedata, qsm$cylinder, pc, dtm, r)
+      ch <- crown_height_qsm(qsm$treedata, qsm$cylinder, pc, dtm, r)
       ce <- crown_evenness_qsm(qsm$cylinder)
-      cdhr <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder, pc)
+      cdhr <- crown_diameterheight_ratio_qsm(qsm$treedata, qsm$cylinder, pc,
+                                             dtm, r)
       dmr <- dbh_minradius_ratio_qsm(
         qsm$treedata, qsm$cylinder, pc, buttress,
         thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight
+        thresholdbuttress, maxbuttressheight, dtm, r
       )
       tree <- data.frame(
         "X_position" = X_position, "Y_position" = Y_position,

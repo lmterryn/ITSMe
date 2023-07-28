@@ -8,7 +8,9 @@ stem_branch_radius_qsm(
   cylinder,
   treedata,
   normalisation = "treeheight",
-  pc = NA
+  pc = NA,
+  dtm = NA,
+  r = 5
 )
 }
 \arguments{
@@ -29,6 +31,15 @@ is done. Default is no normalisation.}
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
 is available. Only relevant if normalisation equals "treeheight".}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}. only
+relevant when a point cloud is provided.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 }
 \value{
 The stem branch radius. Unitless with normalisation, in meters

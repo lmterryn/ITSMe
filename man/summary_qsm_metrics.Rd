@@ -18,6 +18,8 @@ summary_qsm_metrics(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  dtm = NA,
+  r = 5,
   OUT_path = FALSE
 )
 }
@@ -81,6 +83,11 @@ buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses. Only relevant if the tree point clouds are available and
 buttress == TRUE.}
+
+\item{dtm}{The digital terrain model from \code{\link{tree_height_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm from \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
 
 \item{OUT_path}{A character with name of the output file (including the path
 to the folder), where the summary csv file should be saved or logical

@@ -22,9 +22,11 @@ is provided.}
 plotted.}
 }
 \value{
-The tree height (numeric value). Also optionally (plot=TRUE) plots
-the tree point cloud and in this case returns a list with the
-tree height as first element and the plot as the second element.
+List with the tree height (numeric value) and the determined lowest
+point (lp, numeric value). Also optionally (plot=TRUE) plots the tree point
+cloud and in this case returns a list with the tree height as first
+element, the lowest point as the second element and the plots as third,
+fourth and fifth elements.
 }
 \description{
 Returns the tree height measured from a tree point cloud. If a digital

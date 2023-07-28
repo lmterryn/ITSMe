@@ -46,9 +46,11 @@ tree_position_pc <- function(pc) {
 #' @param plot Logical (default=FALSE), indicates if tree point cloud is
 #'   plotted.
 #'
-#' @return The tree height (numeric value). Also optionally (plot=TRUE) plots
-#'   the tree point cloud and in this case returns a list with the
-#'   tree height as first element and the plot as the second element.
+#' @return List with the tree height (numeric value) and the determined lowest
+#'   point (lp, numeric value). Also optionally (plot=TRUE) plots the tree point
+#'   cloud and in this case returns a list with the tree height as first
+#'   element, the lowest point as the second element and the plots as third,
+#'   fourth and fifth elements.
 #'
 #' @export
 #'
@@ -75,7 +77,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
   } else {
     z_min <- min(pc$Z)
     if (!is.data.frame(dtm)) {
-      h <- max(pc$Z) - min(pc$Z)
+      lowest_point <- min(pc$Z)
     } else {
       lowest_points <- pc[order(pc$Z, decreasing = FALSE), ][1:10, ]
       dtm_under_tree <- dtm[(dtm$X >= min(lowest_points$X) - r) &
@@ -85,8 +87,8 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
       dtm_under_tree <- dtm_under_tree[dtm_under_tree$Z <
         min(dtm_under_tree$Z) + 1.5, ]
       lowest_point <- stats::median(dtm_under_tree$Z)
-      h <- max(pc$Z) - lowest_point
     }
+    h <- max(pc$Z) - lowest_point
     if (plot) {
       pc_norm <- pc
       pc_norm$Z <- pc$Z - z_min
@@ -142,7 +144,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
             "lowest point height" = "green"
           ))
         s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-          min(pc$Z)) * 0.5 - 1.05
+          lowest_point) * 0.5 - 1.05
       } else {
         plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = "blue") +
           ggplot2::geom_point(size = 0.1, shape = ".") +
@@ -157,7 +159,7 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
             text = ggplot2::element_text(size = 12)
           )
         s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-          min(pc$Z)) * 0.48 - 1
+          lowest_point) * 0.48 - 1
       }
       plotTree <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
         nrow = 1, ncol = 3,
@@ -170,11 +172,11 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
       ))
       print(plotTree)
       return(list(
-        "h" = h, "plot" = plotTree, "plotXZ" = plotXZ,
+        "h" = h, "lp" = lowest_point, "plot" = plotTree, "plotXZ" = plotXZ,
         "plotYZ" = plotYZ
       ))
     } else {
-      return(h)
+      return(list("h" = h,"lp" = lowest_point))
     }
   }
 }
@@ -238,8 +240,11 @@ f <- function(c, x, y) {
 #' slice_height and slice_thickness parameters. Additionally, the functional
 #' diameter is calculated. For this the area of the concave hull with (concavity
 #' 4) is determined on the slice. From this area the diameter is determined as
-#' the diameter of a circle with this area. This function is also a Support
-#' function used to determine the DBH from a tree point cloud with
+#' the diameter of a circle with this area. When the bottom of the point cloud
+#' is incomplete or obstructed you can choose to add a digital terrain model as
+#' an input which is used to estimate lowest point of the point cloud in order
+#' to obtain slices at the correct height of the tree. This function is also a
+#' Support function used to determine the DBH from a tree point cloud with
 #' \code{\link{dbh_pc}}.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -249,6 +254,12 @@ f <- function(c, x, y) {
 #'   measured.
 #' @param slice_thickness Numeric value (default = 0.6) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimized circle
 #'   fitting is plotted.
 #'
@@ -271,10 +282,12 @@ f <- function(c, x, y) {
 #' center <- out$center
 #' }
 diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
-                              plot = FALSE) {
-  if (max(pc$Z) - min(pc$Z) > slice_height) {
-    pc_slice <- pc[(pc$Z > min(pc$Z) + slice_height - slice_thickness / 2) &
-      (pc$Z < min(pc$Z) + slice_height + slice_thickness / 2), ]
+                              dtm = NA, r = 5, plot = FALSE) {
+  h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+  lowest_point <- h_list$lp
+  if (max(pc$Z) - lowest_point > slice_height) {
+    pc_slice <- pc[(pc$Z > lowest_point + slice_height - slice_thickness / 2) &
+      (pc$Z < lowest_point + slice_height + slice_thickness / 2), ]
     xy_slice <- pc_slice[, c("X", "Y")]
     if (nrow(xy_slice) > 3) {
       XY_slice <- data.matrix(xy_slice)
@@ -434,13 +447,22 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
 #' from 0.15 m above the lowest point of the tree point cloud (everything below
 #' 0.15 m is assumed to be trunk). For each slice as many crown/branch points
 #' are removed based on kmeans clustering and the distance of the clusters to
-#' the center of the previous slice. Support function used to determine the DBH
-#' from a tree point cloud with \code{\link{dbh_pc}}.
+#' the center of the previous slice. When the bottom of the point cloud is
+#' incomplete or obstructed you can choose to add a digital terrain model as an
+#' input which is used to estimate lowest point of the point cloud in order to
+#' obtain slices at the correct height of the tree. Support function used to
+#' determine the DBH from a tree point cloud with \code{\link{dbh_pc}}.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
 #' @param slice_thickness Numeric value (default = 0.08) that determines the
 #'   thickness of the slice used to determine the lower trunk points.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return Data.frame with the lower trunk point cloud (part of the trunk below
 #'   1.5 m).
@@ -453,19 +475,21 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' trunk_pc <- extract_lower_trunk_pc(pc = pc_tree)
 #' }
-extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
+extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08, dtm = NA, r = 5) {
   initial_height <- 0.15
+  h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+  lowest_point <- h_list$lp
   dh <- slice_thickness
   diam <- diameter_slice_pc(
     pc = pc, slice_height = initial_height,
-    slice_thickness = slice_thickness
+    slice_thickness = slice_thickness, dtm = dtm, r = r
   )
   a <- 0.02
   d <- diam$diameter + a
   lh <- initial_height - slice_thickness / 2
   uh <- initial_height + slice_thickness / 2
   center_trunk <- c(diam$center$par[1], diam$center$par[2])
-  trunk_pc <- pc[pc$Z <= min(pc$Z) + uh, ]
+  trunk_pc <- pc[pc$Z <= lowest_point + uh, ]
   n <- 0
   restart <- FALSE
   while (lh < 1.5) {
@@ -475,7 +499,7 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
     n <- n + 1
     lh <- lh + slice_thickness
     uh <- uh + slice_thickness
-    pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z <= min(pc$Z) + uh) &
+    pc_slice <- pc[(pc$Z > lowest_point + lh) & (pc$Z <= lowest_point + uh) &
       (pc$X > center_trunk[1] - 0.75 * d) &
       (pc$X < center_trunk[1] + 0.75 * d) &
       (pc$Y > center_trunk[2] - 0.75 * d) &
@@ -507,7 +531,7 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
       diam <- diameter_slice_pc(
         pc = rbind(trunk_pc, trunk_slice),
         slice_height = lh,
-        slice_thickness = slice_thickness * 2
+        slice_thickness = slice_thickness * 2, dtm = dtm, r = r
       )
       if (!is.nan(diam$diameter) & diam$diameter < 2) {
         if (diam$R2 > 0.002 * diam$diameter) {
@@ -517,7 +541,7 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
           diam2 <- diameter_slice_pc(
             pc = rbind(trunk_pc, trunk_slice_b),
             slice_height = lh,
-            slice_thickness = slice_thickness * 2
+            slice_thickness = slice_thickness * 2, dtm = dtm, r = r
           )
           if (!is.nan(diam2$diameter)) {
             trunk_slice <- trunk_slice_b
@@ -547,7 +571,10 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
 #' slice. From this area the diameter is determined as the diameter of a circle
 #' with this area. In case there are branches or foliage at this height, the
 #' lower trunk is extracted using \code{\link{extract_lower_trunk_pc}}. Wether
-#' this is the case is determined using the thresholdR2 parameter.
+#' this is the case is determined using the thresholdR2 parameter. When the
+#' bottom of the point cloud is incomplete or obstructed you can choose to add a
+#' digital terrain model as an input which is used to estimate lowest point of
+#' the point cloud in order to obtain slices at the correct height of the tree.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -560,6 +587,12 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
 #'   clouds in multi-scan due to wind-effect).
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -579,25 +612,27 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08) {
 #' output <- dbh_pc(pc = pc_tree, plot = TRUE)
 #' dbh <- output$dbh
 #' }
-dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
-                   plot = FALSE) {
+dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
+                   r = 5, plot = FALSE) {
+  h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+  lowest_point <- h_list$lp
   out_015 <- diameter_slice_pc(
     pc = pc, slice_height = 0.15,
-    slice_thickness = slice_thickness + 0.02
+    slice_thickness = slice_thickness + 0.02, dtm = dtm, r = r
   )
   if (is.nan(out_015$diameter)) {
     out_015$diameter <- 2
   }
   out_130 <- diameter_slice_pc(
     pc = pc, slice_height = 1.3,
-    slice_thickness = slice_thickness
+    slice_thickness = slice_thickness, dtm = dtm, r = r
   )
   if (is.nan(out_130$diameter)) {
     trunk_pc <- tryCatch(
       {
         extract_lower_trunk_pc(
           pc = pc,
-          slice_thickness = slice_thickness + 0.02
+          slice_thickness = slice_thickness + 0.02, dtm = dtm, r = r
         )
       },
       error = function(cond) {
@@ -606,7 +641,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
     )
     out_130 <- diameter_slice_pc(
       pc = trunk_pc, slice_height = 1.3,
-      slice_thickness = slice_thickness
+      slice_thickness = slice_thickness, dtm = dtm, r = r
     )
   } else {
     if (out_015$diameter < out_130$diameter |
@@ -616,7 +651,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
         {
           extract_lower_trunk_pc(
             pc = pc,
-            slice_thickness = slice_thickness + 0.02
+            slice_thickness = slice_thickness + 0.02, dtm = dtm, r = r
           )
         },
         error = function(cond) {
@@ -625,14 +660,14 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
       )
       out_130 <- diameter_slice_pc(
         pc = trunk_pc, slice_height = 1.3,
-        slice_thickness = slice_thickness
+        slice_thickness = slice_thickness, dtm = dtm, r = r
       )
     }
   }
   if (plot) {
     if (is.nan(out_130$diameter)) {
-      pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.3 - slice_thickness / 2) &
-        (pc$Z < min(pc$Z) + 1.3 + slice_thickness / 2), ]
+      pc_dbh <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
+        (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
       X <- Y <- NULL
       plotDBH <- ggplot2::ggplot() +
         ggplot2::geom_point(
@@ -660,8 +695,8 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
         ) +
         ggplot2::theme(text = ggplot2::element_text(size = 12))
     } else {
-      pc_dbh <- pc[(pc$Z > min(pc$Z) + 1.3 - slice_thickness / 2) &
-        (pc$Z < min(pc$Z) + 1.3 + slice_thickness / 2), ]
+      pc_dbh <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
+        (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
       X <- Y <- x0 <- y0 <- r <- NULL
       data_circle <- data.frame(
         x0 = out_130$center[[1]][1],
@@ -754,7 +789,10 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #' buttresses is reached. When the "maxbuttressheight" is exceeded the iterative
 #' process is restarted with a "thresholdbuttress" increased with 0.0005. At the
 #' determined height above buttresses also the functional diameter is calculated
-#' using \code{\link{diameter_slice_pc}}.
+#' using \code{\link{diameter_slice_pc}}. When the bottom of the point cloud is
+#' incomplete or obstructed you can choose to add a digital terrain model as an
+#' input which is used to estimate lowest point of the point cloud in order to
+#' obtain slices at the correct height of the tree.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -773,6 +811,12 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #'   again at 1.3 m.
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #'
@@ -795,8 +839,10 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06,
 #' dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5)
 #' }
 dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
-                   slice_thickness = 0.06, plot = FALSE) {
+                   slice_thickness = 0.06, dtm = NA, r= 5, plot = FALSE) {
   slice_height <- 1.30
+  h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+  lowest_point <- h_list$lp
   residu <- 1
   R <- 0.5
   r_diff <- 1
@@ -808,7 +854,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
       (R > 2) | (r_diff > 1.2 | r_diff < 0.8)) {
       out <- diameter_slice_pc(
         pc = pc, slice_height = slice_height,
-        slice_thickness = slice_thickness, plot = FALSE
+        slice_thickness = slice_thickness, dtm = dtm, r = r, plot = FALSE
       )
       if (is.nan(out$diameter)) {
         dab <- R <- 0
@@ -845,10 +891,10 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
     x_c <- out$center[[1]][1]
     y_c <- out$center[[1]][2]
     data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
-    dbh_slice <- pc[(pc$Z > min(pc$Z) + 1.3 - slice_thickness / 2) &
-      (pc$Z < min(pc$Z) + 1.3 + slice_thickness / 2), ]
-    xy_dbh <- pc[(pc$Z > min(pc$Z) + slice_height - slice_thickness / 2) &
-      (pc$Z < min(pc$Z) + slice_height + slice_thickness / 2), ]
+    dbh_slice <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
+      (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
+    xy_dbh <- pc[(pc$Z > lowest_point + slice_height - slice_thickness / 2) &
+      (pc$Z < lowest_point + slice_height + slice_thickness / 2), ]
     if (slice_height != 1.30) {
       plotDAB <- ggplot2::ggplot() +
         ggplot2::geom_point(
@@ -986,7 +1032,10 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #'
 #' The classification is based on the increased distance between the minimum and
 #' maximum X (and Y) coordinates of the tree points within a horizontal slice
-#' when the first branch is reached with increasing height.
+#' when the first branch is reached with increasing height. When the bottom of
+#' the point cloud is incomplete or obstructed you can choose to add a digital
+#' terrain model as an input which is used to estimate lowest point of the point
+#' cloud in order to obtain slices at the correct height of the tree.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -1012,6 +1061,12 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #' @param maxbuttressheight Numeric value (default=7). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant when buttress == TRUE.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the classified tree is
 #'   plotted.
 #'
@@ -1036,15 +1091,19 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                               buttress = FALSE, thresholdR2 = 0.001,
                               slice_thickness = 0.06, thresholdbuttress = 0.001,
-                              maxbuttressheight = 7, plot = FALSE) {
+                              maxbuttressheight = 7, dtm = NA, r = 5,
+                              plot = FALSE) {
+  h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+  lowest_point <- h_list$lp
+  th <- h_list$h
   if (buttress) {
-    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness)
+    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
+                  dtm = dtm, r = r)
     dab <- out$dab
   } else {
-    out <- dbh_pc(pc, thresholdR2, slice_thickness)
+    out <- dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r)
     dab <- out$dbh
   }
-  th <- tree_height_pc(pc)
   if (!is.nan(dab)) {
     d <- thresholdbranch * dab + 0.1
     dh <- 0.25
@@ -1056,7 +1115,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       n <- n + 1
       lh <- lh + dh
       uh <- uh + dh
-      pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+      pc_slice <- pc[(pc$Z > lowest_point + lh) & (pc$Z < lowest_point + uh), ]
       if (nrow(pc_slice) == 0) {
         S_X <- S_Y <- 0
       } else {
@@ -1083,7 +1142,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
       while (((S_X > d) | (S_Y > d)) & (lh > dh) & (uh+dh < th)) {
         lh <- lh - dh / 10
         uh <- uh - dh / 10
-        pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+        pc_slice <- pc[(pc$Z > lowest_point + lh) &
+                         (pc$Z < lowest_point + uh), ]
         if (nrow(pc_slice) == 0) {
           S_X <- S_Y <- 0
         } else {
@@ -1114,11 +1174,11 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
     } else {
       lh <- lh - dh
       uh <- uh - dh
-      pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+      pc_slice <- pc[(pc$Z > lowest_point + lh) & (pc$Z < lowest_point + uh), ]
       k1 <- stats::kmeans(pc_slice, centers = 1, nstart = 10, iter.max = 100)
       pc_slice$C <- k1$cluster
       center_trunk <- k1$centers
-      trunk_pc <- pc[pc$Z < min(pc$Z) + uh, ]
+      trunk_pc <- pc[pc$Z < lowest_point + uh, ]
       crown_pc <- pc[FALSE, ]
       d <- thresholdbranch * dab
       S_X <- S_Y <- n <- stop <- 0
@@ -1133,7 +1193,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         n <- n + 1
         lh <- lh + dh
         uh <- uh + dh
-        pc_slice <- pc[(pc$Z > min(pc$Z) + lh) & (pc$Z < min(pc$Z) + uh), ]
+        pc_slice <- pc[(pc$Z > lowest_point + lh) &
+                         (pc$Z < lowest_point + uh), ]
         k10 <- stats::kmeans(pc_slice, centers = 10, nstart = 25, iter.max = 100)
         pc_slice$C <- k10$cluster
         distance_to_centers <- c()
@@ -1160,7 +1221,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           S_Y <- max(trunk_slice$Y) - min(trunk_slice$Y)
         }
       }
-      crown_pc <- rbind(crown_pc, pc[pc$Z > min(pc$Z) + lh, ])
+      crown_pc <- rbind(crown_pc, pc[pc$Z > lowest_point + lh, ])
     }
     if (plot) {
       if (nrow(crown_pc) == 0) {
@@ -1219,7 +1280,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             )
           )
         s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                                  min(pc$Z)) * 0.5 - 1.05
+                                                                  lowest_point) * 0.5 - 1.05
         plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
                                        nrow = 1, ncol = 3,
                                        common.legend = TRUE, heights = c(5, 5),
@@ -1294,7 +1355,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
               )
             )
           s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-            min(pc$Z)) * 0.5 - 1.05
+            lowest_point) * 0.5 - 1.05
           plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
             nrow = 1, ncol = 3,
             common.legend = TRUE, heights = c(5, 5),
@@ -1364,7 +1425,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
               )
             )
           s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-            min(pc$Z)) * 0.5 - 1.05
+            lowest_point) * 0.5 - 1.05
           plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
             nrow = 1, ncol = 3,
             common.legend = TRUE, heights = c(5, 5),
@@ -1442,7 +1503,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           )
         )
       s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-        min(pc$Z)) * 0.5 - 1.05
+        lowest_point) * 0.5 - 1.05
       plotCrown <- ggpubr::ggarrange(plotXZ, NULL, plotYZ,
         nrow = 1, ncol = 3,
         common.legend = TRUE, heights = c(5, 5),
@@ -1466,10 +1527,19 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
 #' Normalize a tree point cloud
 #'
 #' Normalizes a tree point cloud by subtracting from each column its respective
-#' the min value (e.g. all X-values - min(all X-values)).
+#' the min value (e.g. all X-values - min(all X-values)). When the bottom of the
+#' point cloud is incomplete or obstructed you can choose to add a digital
+#' terrain model as an input which is used to estimate lowest point of the point
+#' cloud in order to obtain the correct normalized height of the tree.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
+#' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
+#'   (default = NA). If the digital terrain model is in the same format as a
+#'   point cloud it can also be read with \code{\link{read_tree_pc}}.
+#' @param r Numeric value (default=5) r which determines the range taken for the
+#'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+#'   is provided.
 #'
 #' @return Normalized point cloud as a data.frame with columns X,Y,Z.
 #'
@@ -1479,10 +1549,12 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' pc_norm <- normalize_pc(pc)
 #' }
-normalize_pc <- function(pc) {
+normalize_pc <- function(pc, dtm = NA, r = 5) {
+  h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+  lowest_point <- h_list$lp
   pc$X <- pc$X - min(pc$X)
   pc$Y <- pc$Y - min(pc$Y)
-  pc$Z <- pc$Z - min(pc$Z)
+  pc$Z <- pc$Z - lowest_point
   return(pc)
 }
 

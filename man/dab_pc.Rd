@@ -9,6 +9,8 @@ dab_pc(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   slice_thickness = 0.06,
+  dtm = NA,
+  r = 5,
   plot = FALSE
 )
 }
@@ -33,6 +35,14 @@ again at 1.3 m.}
 
 \item{slice_thickness}{Numeric value (default = 0.06) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
@@ -61,7 +71,10 @@ with a new slice 6 mm higher than the previous one until a slice above the
 buttresses is reached. When the "maxbuttressheight" is exceeded the iterative
 process is restarted with a "thresholdbuttress" increased with 0.0005. At the
 determined height above buttresses also the functional diameter is calculated
-using \code{\link{diameter_slice_pc}}.
+using \code{\link{diameter_slice_pc}}. When the bottom of the point cloud is
+incomplete or obstructed you can choose to add a digital terrain model as an
+input which is used to estimate lowest point of the point cloud in order to
+obtain slices at the correct height of the tree.
 }
 \examples{
 \dontrun{

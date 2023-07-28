@@ -13,7 +13,9 @@ stem_branch_distance_qsm(
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
-  maxbuttressheight = 7
+  maxbuttressheight = 7,
+  dtm = NA,
+  r = 5
 )
 }
 \arguments{
@@ -53,6 +55,15 @@ buttresses. Only relevant if the tree point cloud is available and buttress
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 TRUE.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}. only
+relevant when a point cloud is provided.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 }
 \value{
 The stem branch distance. Unitless with normalisation, in meters

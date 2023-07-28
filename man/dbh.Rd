@@ -11,7 +11,9 @@ dbh(
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
-  maxbuttressheight = 7
+  maxbuttressheight = 7,
+  dtm = NA,
+  r = 5
 )
 }
 \arguments{
@@ -44,6 +46,14 @@ buttresses. Only relevant if the tree point cloud is available and buttress
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height. Only relevant if the tree point cloud is available and buttress ==
 TRUE.}
+
+\item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
+(default = NA). If the digital terrain model is in the same format as a
+point cloud it can also be read with \code{\link{read_tree_pc}}.}
+
+\item{r}{Numeric value (default=5) r which determines the range taken for the
+dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
+is provided.}
 }
 \value{
 The dbh or dab in meters.
@@ -56,7 +66,10 @@ If the tree point cloud is available the calculations are based on the point
 cloud (most accurate). In this case the diameter at breast height (dbh) or
 diameter above buttresses (dab) is calculated with \code{\link{dbh_pc}} or
 \code{\link{dab_pc}} respectively. If the tree point cloud is not available
-the dbh is based on the treeQSM with \code{\link{dbh_qsm}}.
+the dbh is based on the treeQSM with \code{\link{dbh_qsm}}. When the bottom
+of the point cloud is incomplete or obstructed you can choose to add a
+digital terrain model as an input which is used to estimate lowest point of
+the point cloud in order to obtain slices at the correct height of the tree.
 }
 \examples{
 \dontrun{
