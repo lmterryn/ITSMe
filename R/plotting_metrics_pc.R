@@ -684,7 +684,7 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
       )
     }
     rgl::rgl.snapshot(fig_name, fmt = "png")
-    rgl::rgl.close()
+    rgl::close3d()
     AVs <- append(AVs, out$av)
     gc()
   }
