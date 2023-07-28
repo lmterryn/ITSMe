@@ -315,6 +315,9 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
 #'   parameter of \code{\link{stem_branch_length_qsm}}.
 #' @param sbd_normalisation Character (default="no"). Normalisation parameter of
 #'   \code{\link{stem_branch_distance_qsm}}.
+#' @param cylindercutoff This is the cutoff radius in meters for which cylinders
+#'   are to be included in the total tree volume calculation. Default of 0
+#'   includes all cylinders.
 #' @param PCs_path A character with the path to the folder that contains the
 #'   tree point clouds. Default is NA when the point clouds are not available.
 #'   The point clouds are used to determine the DBH, tree height, projected
@@ -394,6 +397,7 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
                                 sbr_normalisation = "treeheight",
                                 sbl_normalisation = "treeheight",
                                 sbd_normalisation = "no",
+                                cylindercutoff = 0,
                                 PCs_path = NA, extension = ".txt",
                                 buttress = FALSE, thresholdR2 = 0.001,
                                 slice_thickness = 0.06,
@@ -457,7 +461,7 @@ summary_qsm_metrics <- function(QSMs_path, version = "2.4.1", multiple = FALSE,
         thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
       )
       tree_height <- tree_height(qsm$treedata, pc, dtm = dtm, r = r)
-      tree_vol <- tree_volume_qsm(qsm$treedata)
+      tree_vol <- tree_volume_qsm(qsm$treedata, qsm$cylinder, cylindercutoff)
       trunk_vol <- trunk_volume_qsm(qsm$treedata)
       branch_len <- total_branch_length_qsm(qsm$treedata)
       trunk_height <- trunk_height_qsm(qsm$treedata)

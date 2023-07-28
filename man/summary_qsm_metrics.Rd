@@ -11,6 +11,7 @@ summary_qsm_metrics(
   sbr_normalisation = "treeheight",
   sbl_normalisation = "treeheight",
   sbd_normalisation = "no",
+  cylindercutoff = 0,
   PCs_path = NA,
   extension = ".txt",
   buttress = FALSE,
@@ -47,6 +48,10 @@ parameter of \code{\link{stem_branch_length_qsm}}.}
 
 \item{sbd_normalisation}{Character (default="no"). Normalisation parameter of
 \code{\link{stem_branch_distance_qsm}}.}
+
+\item{cylindercutoff}{This is the cutoff radius in meters for which cylinders
+are to be included in the total tree volume calculation. Default of 0
+includes all cylinders.}
 
 \item{PCs_path}{A character with the path to the folder that contains the
 tree point clouds. Default is NA when the point clouds are not available.
