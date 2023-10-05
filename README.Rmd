@@ -14,12 +14,9 @@ knitr::opts_chunk$set(
 ```
 
 <p align="center">
-    <img src="man/figures/logo.png" height="200" >
+    <img src="man/figures/ITSMe_logo_RGB.jpg" height="200" >
 </p>
 
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/lmterryn/ITSMe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lmterryn/ITSMe/actions/workflows/R-CMD-check.yaml)
-<!-- badges: end -->
 
 ## Goal
 
