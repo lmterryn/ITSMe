@@ -11,7 +11,8 @@ dab_pc(
   slice_thickness = 0.06,
   dtm = NA,
   r = 5,
-  plot = FALSE
+  plot = FALSE,
+  plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -46,6 +47,11 @@ is provided.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
+
+\item{plotcolors}{list of five colors for plotting. Only relevant when plot
+= TRUE. The stem points above buttresses, stem points at breast height,
+fitted circle, the concave hull and the estimated center are colored by the
+first, second, third, fourth and fifth element of this list respectively.}
 }
 \value{
 List with the diameter of the stem above buttresses, the residuals on

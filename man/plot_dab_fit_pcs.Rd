@@ -12,7 +12,8 @@ plot_dab_fit_pcs(
   maxbuttressheight = 7,
   slice_thickness = 0.06,
   dtm = NA,
-  r = 5
+  r = 5,
+  plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -41,6 +42,11 @@ thickness of the slice which is used to measure the diameter.}
 
 \item{r}{Numeric value (default=5) r, parameter of
 \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
+
+\item{plotcolors}{list of three colors for plotting. Only relevant when plot
+= TRUE. The stem points above buttresses, stem points at breast height,
+fitted circle, the concave hull and the estimated center are colored by the
+first, second, third, fourth and fifth element of this list respectively.}
 }
 \value{
 A list with in the first element a numeric containing the dab values

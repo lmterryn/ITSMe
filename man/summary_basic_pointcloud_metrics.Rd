@@ -20,7 +20,8 @@ summary_basic_pointcloud_metrics(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   OUT_path = FALSE,
-  plot = FALSE
+  plot = FALSE,
+  plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -81,6 +82,11 @@ to the folder), where the summary csv file should be saved or logical
 \item{plot}{Logical (default=FALSE), indicates if summary figure for each
 tree point cloud is plotted. If an OUT_path is provided, the figures are
 saved in the OUT_path.}
+
+\item{plotcolors}{list of five colors for plotting. Only relevant when plot
+= TRUE. The stem points above buttresses, stem points at breast height,
+fitted circle, the concave hull and the estimated center are colored by the
+first, second, third, fourth and fifth element of this list respectively.}
 }
 \value{
 The summary of the basic structural metrics for multiple tree point

@@ -16,7 +16,8 @@ plot_crown_classification_pcs(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   dtm = NA,
-  r = 5
+  r = 5,
+  plotcolors = c("#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -62,6 +63,10 @@ when buttress == TRUE.}
 
 \item{r}{Numeric value (default=5) r, parameter of
 \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
+
+\item{plotcolors}{list of two colors for plotting. Only relevant when plot =
+TRUE. The crown and trunk are colored by the first and second element of
+this list respectively.}
 }
 \value{
 Returns a list with the plots and individual plots saved in the

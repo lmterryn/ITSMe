@@ -17,6 +17,9 @@
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #' @param OUT_path A character with the path to the folder where the figures
 #'   should be saved (default = current folder).
+#' @param plotcolors list of three colors for plotting. Only relevant when plot
+#'   = TRUE. The tree points, the lowest point height and the DTM points are
+#'   colored by the first, second and third element of this list respectively.
 #'
 #' @return A list with in the first element a numeric containing the tree height
 #'   values for each tree point cloud. In the second element there is the list
@@ -41,7 +44,8 @@
 #' )
 #' }
 plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
-                                 r = 5, OUT_path = "./") {
+                                 r = 5, OUT_path = "./",
+                                 plotcolors = c("#000000","#08aa7c","#fac87f")) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -55,7 +59,7 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- tree_height_pc(pc, dtm, r, TRUE)
+    out <- tree_height_pc(pc, dtm, r, TRUE, plotcolors)
     filename <- paste(OUT_path, "tree_height_",
       strsplit(file_names[i], extension)[[1]], ".jpeg",
       sep = ""
@@ -97,6 +101,10 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #' @param OUT_path A character with the path to the folder where the figures
 #'   should be saved (default = current folder).
+#' @param plotcolors list of three colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points, fitted circle, the concave hull and the estimated
+#'   center are colored by the first, second and third and fourth element of
+#'   this list respectively.
 #'
 #' @return A list with in the first element a numeric containing the diameter
 #'   values for each tree point cloud, the second element the residuals on the
@@ -124,7 +132,9 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
 #' }
 plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
                                 slice_height = 1.3, slice_thickness = 0.06,
-                                dtm = NA, r = 5, OUT_path = "./") {
+                                dtm = NA, r = 5, OUT_path = "./",
+                                plotcolors = c("#000000", "#1c027a","#08aa7c",
+                                               "#fac87f")) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -141,7 +151,7 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- diameter_slice_pc(pc, slice_height, slice_thickness, dtm = dtm,
-                             r = r, plot = TRUE)
+                             r = r, plot = TRUE, plotcolors)
     filename <- paste(OUT_path, "circle_",
       strsplit(file_names[i], extension)[[1]], "_",
       as.character(slice_height), "_",
@@ -183,6 +193,10 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
 #' @param OUT_path A character with the path to the folder where the figures
 #'   should be saved (default = current folder).
+#' @param plotcolors list of three colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points, fitted circle, the concave hull and the estimated
+#'   center are colored by the first, second and third and fourth element of
+#'   this list respectively.
 #'
 #' @return A list with in the first element a numeric containing the dbh values
 #'   for each tree point cloud, the second element the residuals on the circle
@@ -203,7 +217,9 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #' }
 plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
                              slice_thickness = 0.06, dtm = NA, r = 5,
-                             OUT_path = "./") {
+                             OUT_path = "./",
+                             plotcolors = c("#000000", "#1c027a","#08aa7c",
+                                            "#fac87f")) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -221,7 +237,8 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
     pc <- read_tree_pc(file_paths[i])
     out <- tryCatch(
       {
-        dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r, plot = TRUE)
+        dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r, plot = TRUE,
+               plotcolors)
         },
       error = function(cond){
         message(cond)
@@ -275,6 +292,10 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
+#' @param plotcolors list of three colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points above buttresses, stem points at breast height,
+#'   fitted circle, the concave hull and the estimated center are colored by the
+#'   first, second, third, fourth and fifth element of this list respectively.
 #'
 #' @return A list with in the first element a numeric containing the dab values
 #'   for each tree point cloud, the second element the residuals on the circle
@@ -303,7 +324,9 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #' }
 plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                              thresholdbuttress = 0.001, maxbuttressheight = 7,
-                             slice_thickness = 0.06, dtm = NA, r = 5) {
+                             slice_thickness = 0.06, dtm = NA, r = 5,
+                             plotcolors = c("#000000", "#808080", "#1c027a",
+                                            "#08aa7c","#fac87f")) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -321,7 +344,7 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
     out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
-                  dtm = dtm, r = r, plot = TRUE)
+                  dtm = dtm, r = r, plot = TRUE, plotcolors)
     filename <- paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
       "_", as.character(thresholdbuttress), "_",
       as.character(maxbuttressheight), ".jpeg",
@@ -385,6 +408,9 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
+#' @param plotcolors list of two colors for plotting. Only relevant when plot =
+#'   TRUE. The crown and trunk are colored by the first and second element of
+#'   this list respectively.
 #'
 #' @return Returns a list with the plots and individual plots saved in the
 #'   output folder.
@@ -425,7 +451,8 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
                                           slice_thickness = 0.06,
                                           thresholdbuttress = 0.001,
                                           maxbuttressheight = 7,
-                                          dtm = NA, r = 5) {
+                                          dtm = NA, r = 5,
+                                          plotcolors = c("#08aa7c","#fac87f")) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -441,7 +468,7 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
     out <- classify_crown_pc(
       pc, thresholdbranch, minheight, buttress,
       thresholdR2, slice_thickness, thresholdbuttress,
-      maxbuttressheight, dtm = dtm, r = r , plot = TRUE
+      maxbuttressheight, dtm = dtm, r = r , plot = TRUE, plotcolors
     )
     filename <- paste(OUT_path, "crown_",
       strsplit(file_names[i], extension)[[1]], "_",
@@ -515,6 +542,9 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
+#' @param plotcolors list of two colors for plotting. Only relevant when plot =
+#'   TRUE. The stem points and the concave hull are colored by the first and
+#'   second element of this list respectively.
 #'
 #' @return A list with in the first element a numeric containing the projected
 #'   area values for each tree point cloud. In the second element there is the
@@ -545,7 +575,8 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         concavity = 2, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
                         slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7, dtm = NA, r = 5) {
+                        maxbuttressheight = 7, dtm = NA, r = 5,
+                        plotcolors = c("#000000","#08aa7c")) {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -565,7 +596,8 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
         thresholdR2, slice_thickness,
         thresholdbuttress, maxbuttressheight, dtm = dtm, r = r, FALSE
       )
-      out <- projected_area_pc(crown_pc$crownpoints, concavity, TRUE)
+      out <- projected_area_pc(crown_pc$crownpoints, concavity, TRUE,
+                               plotcolors)
       plot_area <- out$plot +
         ggplot2::ggtitle(bquote(PCA == .(round(out$pa, 2)) ~ m^2))
       filename <- paste(OUT_path, "pca_", strsplit(
@@ -576,7 +608,7 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
       sep = ""
       )
     } else {
-      out <- projected_area_pc(pc, concavity, TRUE)
+      out <- projected_area_pc(pc, concavity, TRUE, plotcolors)
       plot_area <- out$plot
       filename <- paste(OUT_path, "pa_",
         strsplit(file_names[i], extension)[[1]], "_", as.character(concavity),
@@ -648,6 +680,7 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
 #'   \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
+#' @param plotcolor color for plotting 3D shape. Only relevant when plot = TRUE.
 #'
 #' @return a numeric containing the volume values for each tree point cloud.
 #'   Figures are saved in the output folder.
@@ -677,7 +710,8 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
                         alpha = 1, crown = FALSE, thresholdbranch = 1.5,
                         minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
                         slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7, dtm = NA, r = 5) {
+                        maxbuttressheight = 7, dtm = NA, r = 5,
+                        plotcolor = "#fac87f") {
   file_paths <- list.files(PCs_path,
     pattern = paste("*", extension, sep = ""),
     full.names = TRUE
@@ -703,7 +737,7 @@ plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
         sep = ""
       )
     } else {
-      out <- alpha_volume_pc(pc, alpha, TRUE)
+      out <- alpha_volume_pc(pc, alpha, TRUE, plotcolor)
       fig_name <- paste(OUT_path, "av_",
         strsplit(file_names[i], extension)[[1]], "_", as.character(alpha),
         ".png",

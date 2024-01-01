@@ -18,7 +18,8 @@ plot_av_pcs(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   dtm = NA,
-  r = 5
+  r = 5,
+  plotcolor = "#fac87f"
 )
 }
 \arguments{
@@ -72,6 +73,8 @@ when crown == TRUE and buttress == FALSE.}
 
 \item{r}{Numeric value (default=5) r, parameter of
 \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
+
+\item{plotcolor}{color for plotting 3D shape. Only relevant when plot = TRUE.}
 }
 \value{
 a numeric containing the volume values for each tree point cloud.

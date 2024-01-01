@@ -15,7 +15,8 @@ classify_crown_pc(
   maxbuttressheight = 7,
   dtm = NA,
   r = 5,
-  plot = FALSE
+  plot = FALSE,
+  plotcolors = c("#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -61,12 +62,18 @@ is provided.}
 
 \item{plot}{Logical (default=FALSE), indicates if the classified tree is
 plotted.}
+
+\item{plotcolors}{list of two colors for plotting. Only relevant when plot =
+TRUE. The crown and trunk are colored by the first and second element of
+this list respectively.}
 }
 \value{
-Data.frame with the crown point cloud (part of the tree above the
-first branch). Also optionally (plot=TRUE) plots the crown vs non-crown
-points and in this case returns a list with the crown point cloud as first
-element and the plot as the second element.
+List with data.frame with the crown point cloud (part of the tree
+above the first branch) in crownpoints and data.frame with the trunk point
+cloud in trunkpoints. Also optionally (plot=TRUE) plots the crown vs
+non-crown points and in this case returns a list with the crown point cloud
+as first element, trunk point clouds as a second element and the plots as
+the third to fifth elements.
 }
 \description{
 Returns the crown points from a tree point cloud.

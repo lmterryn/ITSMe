@@ -11,7 +11,8 @@ plot_circle_fit_pcs(
   slice_thickness = 0.06,
   dtm = NA,
   r = 5,
-  OUT_path = "./"
+  OUT_path = "./",
+  plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -39,6 +40,11 @@ of a stem slice.}
 
 \item{OUT_path}{A character with the path to the folder where the figures
 should be saved (default = current folder).}
+
+\item{plotcolors}{list of three colors for plotting. Only relevant when plot
+= TRUE. The stem points, fitted circle, the concave hull and the estimated
+center are colored by the first, second and third and fourth element of
+this list respectively.}
 }
 \value{
 A list with in the first element a numeric containing the diameter

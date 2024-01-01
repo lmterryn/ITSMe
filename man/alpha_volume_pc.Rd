@@ -4,7 +4,7 @@
 \alias{alpha_volume_pc}
 \title{Alpha-shape Volume point cloud}
 \usage{
-alpha_volume_pc(pc, alpha = 1, plot = FALSE)
+alpha_volume_pc(pc, alpha = 1, plot = FALSE, plotcolor = "#fac87f")
 }
 \arguments{
 \item{pc}{The point cloud as a data.frame with columns X,Y,Z (e.g. output of
@@ -15,6 +15,8 @@ alpha-shape of the point cloud based on
 \code{\link[alphashape3d]{ashape3d}}.}
 
 \item{plot}{Logical (default=FALSE), indicates if the alpha-shape is plotted.}
+
+\item{plotcolor}{color for plotting 3D shape. Only relevant when plot = TRUE.}
 }
 \value{
 The volume of the point cloud (numeric value) as the volume of the 3D

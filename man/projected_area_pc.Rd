@@ -4,7 +4,12 @@
 \alias{projected_area_pc}
 \title{Projected area point cloud}
 \usage{
-projected_area_pc(pc, concavity = 2, plot = FALSE)
+projected_area_pc(
+  pc,
+  concavity = 2,
+  plot = FALSE,
+  plotcolors = c("#000000", "#08aa7c")
+)
 }
 \arguments{
 \item{pc}{The point cloud as a data.frame with columns X,Y,Z (e.g. output of
@@ -15,6 +20,10 @@ concave hull based on \code{\link[concaveman]{concaveman}}.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
+
+\item{plotcolors}{list of two colors for plotting. Only relevant when plot =
+TRUE. The stem points and the concave hull are colored by the first and
+second element of this list respectively.}
 }
 \value{
 The projected area (numeric value) as the area of the concave hull

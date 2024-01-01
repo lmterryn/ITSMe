@@ -54,7 +54,10 @@
 #' @param plot Logical (default=FALSE), indicates if summary figure for each
 #'   tree point cloud is plotted. If an OUT_path is provided, the figures are
 #'   saved in the OUT_path.
-#'
+#' @param plotcolors list of five colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points above buttresses, stem points at breast height,
+#'   fitted circle, the concave hull and the estimated center are colored by the
+#'   first, second, third, fourth and fifth element of this list respectively.
 #'
 #' @return The summary of the basic structural metrics for multiple tree point
 #'   clouds as a data.frame. Includes the tree height, diameter at breast
@@ -87,7 +90,12 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                              slice_thickness = 0.06,
                                              thresholdbuttress = 0.001,
                                              maxbuttressheight = 7,
-                                             OUT_path = FALSE, plot = FALSE) {
+                                             OUT_path = FALSE, plot = FALSE,
+                                             plotcolors = c("#000000",
+                                                            "#808080",
+                                                            "#1c027a",
+                                                            "#08aa7c",
+                                                            "#fac87f")) {
   trees <- data.frame(
     "tree_id" = character(), "X_position" = double(),
     "Y_position" = double(), "tree_height_m" = double(),
@@ -123,13 +131,13 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     print(paste("processing ", filenames[i]))
     pc <- read_tree_pc(filepaths[i])
     pos <- tree_position_pc(pc)
-    h_out <- tree_height_pc(pc, dtm, r, plot)
+    h_out <- tree_height_pc(pc, dtm, r, plot, plotcolors = plotcolors[c(1,4:5)])
     h <- h_out$h
     if (buttress) {
       dab_out <- tryCatch(
         {
           dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
-                 dtm, r, plot)
+                 dtm, r, plot, plotcolors)
         },
         error = function(cond){
           message(cond)
@@ -142,7 +150,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
     } else {
       dbh_out <- tryCatch(
         {
-          dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, dtm, r, plot)
+          dbh_out <- dbh_pc(pc, thresholdR2, slice_thickness, dtm, r, plot,
+                            plotcolors = plotcolors[c(1,3:5)])
         },
         error = function(cond){
           message(cond)
@@ -158,7 +167,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
         {
           classify_crown_pc(pc, thresholdbranch, minheight, buttress,
                             thresholdR2, slice_thickness, thresholdbuttress,
-                            maxbuttressheight, dtm, r, plot)
+                            maxbuttressheight, dtm, r, plot,
+                            plotcolors = plotcolors[c(4:5)])
           },
         error = function(cond){
           message(paste(cond, "!crown classification not possible, will calculate tree area and volume", sep = ""))
@@ -173,7 +183,8 @@ summary_basic_pointcloud_metrics <- function(PCs_path, extension = ".txt",
                                                      c("crownpoints",
                                                        "trunkpoints"))
     }
-    pa_out <- projected_area_pc(pc, concavity, plot)
+    pa_out <- projected_area_pc(pc, concavity, plot,
+                                plotcolors = plotcolors[c(1,4)])
     av <- alpha_volume_pc(pc, alpha)
     if (plot) {
       pa <- pa_out$pa

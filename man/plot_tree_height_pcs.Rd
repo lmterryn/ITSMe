@@ -9,7 +9,8 @@ plot_tree_height_pcs(
   extension = ".txt",
   dtm = NA,
   r = 5,
-  OUT_path = "./"
+  OUT_path = "./",
+  plotcolors = c("#000000", "#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -27,6 +28,10 @@ cloud files (default=".txt"). Can be ".txt", ".ply" or ".las".}
 
 \item{OUT_path}{A character with the path to the folder where the figures
 should be saved (default = current folder).}
+
+\item{plotcolors}{list of three colors for plotting. Only relevant when plot
+= TRUE. The tree points, the lowest point height and the DTM points are
+colored by the first, second and third element of this list respectively.}
 }
 \value{
 A list with in the first element a numeric containing the tree height

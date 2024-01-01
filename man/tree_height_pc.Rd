@@ -4,7 +4,13 @@
 \alias{tree_height_pc}
 \title{Tree height point cloud}
 \usage{
-tree_height_pc(pc, dtm = NA, r = 5, plot = FALSE)
+tree_height_pc(
+  pc,
+  dtm = NA,
+  r = 5,
+  plot = FALSE,
+  plotcolors = c("#000000", "#08aa7c", "#fac87f")
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -20,6 +26,10 @@ is provided.}
 
 \item{plot}{Logical (default=FALSE), indicates if tree point cloud is
 plotted.}
+
+\item{plotcolors}{list of three colors for plotting. Only relevant when plot
+= TRUE. The tree points, the lowest point height and the DTM points are
+colored by the first, second and third element of this list respectively.}
 }
 \value{
 List with the tree height (numeric value) and the determined lowest

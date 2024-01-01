@@ -18,7 +18,8 @@ plot_pa_pcs(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   dtm = NA,
-  r = 5
+  r = 5,
+  plotcolors = c("#000000", "#08aa7c")
 )
 }
 \arguments{
@@ -73,6 +74,10 @@ when crown == TRUE and buttress == FALSE.}
 
 \item{r}{Numeric value (default=5) r, parameter of
 \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.}
+
+\item{plotcolors}{list of two colors for plotting. Only relevant when plot =
+TRUE. The stem points and the concave hull are colored by the first and
+second element of this list respectively.}
 }
 \value{
 A list with in the first element a numeric containing the projected

@@ -45,6 +45,9 @@ tree_position_pc <- function(pc) {
 #'   is provided.
 #' @param plot Logical (default=FALSE), indicates if tree point cloud is
 #'   plotted.
+#' @param plotcolors list of three colors for plotting. Only relevant when plot
+#'   = TRUE. The tree points, the lowest point height and the DTM points are
+#'   colored by the first, second and third element of this list respectively.
 #'
 #' @return List with the tree height (numeric value) and the determined lowest
 #'   point (lp, numeric value). Also optionally (plot=TRUE) plots the tree point
@@ -64,7 +67,8 @@ tree_position_pc <- function(pc) {
 #' # Calculate the tree height based on the point cloud and dtm
 #' tree_height <- tree_height_pc(pc = pc_tree, dtm = dtm, r = 1)
 #' }
-tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
+tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE,
+                           plotcolors = c("#000000","#08aa7c","#fac87f")) {
   if(nrow(pc) == 0){
     if(plot){
       empty_plot <- ggplot2::ggplot()
@@ -93,7 +97,8 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
       pc_norm <- pc
       pc_norm$Z <- pc$Z - z_min
       X <- Y <- Z <- NULL
-      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = "blue") +
+      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z),
+                                col = plotcolors[1]) +
         ggplot2::geom_point(size = 0.1, shape = ".") +
         ggplot2::coord_fixed(ratio = 1) +
         ggplot2::theme(
@@ -121,11 +126,11 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
           )
         plotXZ <- plotXZ + ggplot2::geom_point(
           data = dtm_under_tree_norm,
-          ggplot2::aes(X, Z), col = "red",
+          ggplot2::aes(X, Z), col = plotcolors[3],
           size = 0.5
         ) +
           ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min),
-            col = "green"
+            col = plotcolors[2]
           )
         plotYZ <- plotYZ + ggplot2::geom_point(
           data = dtm_under_tree_norm,
@@ -139,14 +144,15 @@ tree_height_pc <- function(pc, dtm = NA, r = 5, plot = FALSE) {
             col = "lowest point height"
           )) +
           ggplot2::scale_color_manual(values = c(
-            "tree points" = "black",
-            "dtm points" = "red",
-            "lowest point height" = "green"
+            "tree points" = plotcolors[1],
+            "dtm points" = plotcolors[3],
+            "lowest point height" = plotcolors[2]
           ))
         s <- (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
           lowest_point) * 0.5 - 1.05
       } else {
-        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = "blue") +
+        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z),
+                                  col = plotcolors[1]) +
           ggplot2::geom_point(size = 0.1, shape = ".") +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
@@ -262,6 +268,10 @@ f <- function(c, x, y) {
 #'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimized circle
 #'   fitting is plotted.
+#' @param plotcolors list of four colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points, fitted circle, the concave hull and the estimated
+#'   center are colored by the first, second, third and fourth element of
+#'   this list respectively.
 #'
 #' @return A list with the diameter at a specified height (numeric value), the
 #'   residual between circle fit and the points, the center of the circle fit,
@@ -282,7 +292,9 @@ f <- function(c, x, y) {
 #' center <- out$center
 #' }
 diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
-                              dtm = NA, r = 5, plot = FALSE) {
+                              dtm = NA, r = 5, plot = FALSE,
+                              plotcolors = c("#000000","#1c027a","#08aa7c",
+                                             "#fac87f")) {
   h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
   lowest_point <- h_list$lp
   if (max(pc$Z) - lowest_point > slice_height) {
@@ -372,8 +384,8 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
         ggplot2::scale_color_manual(
           name = "",
           values = c(
-            "points stem slice" = "black",
-            "concave hull" = "green"
+            "points stem slice" = plotcolors[1],
+            "concave hull" = plotcolors[3]
           ),
           guide = ggplot2::guide_legend(
             override.aes =
@@ -403,10 +415,10 @@ diameter_slice_pc <- function(pc, slice_height = 0.1, slice_thickness = 0.06,
           ggplot2::scale_color_manual(
             name = "",
             values = c(
-              "points stem slice" = "black",
-              "concave hull" = "green",
-              "estimated center" = "red",
-              "fitted circle" = "blue"
+              "points stem slice" = plotcolors[1],
+              "concave hull" = plotcolors[3],
+              "estimated center" = plotcolors[4],
+              "fitted circle" = plotcolors[2]
             ),
             guide = ggplot2::guide_legend(
               override.aes =
@@ -595,6 +607,10 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08, dtm = NA, r = 5) 
 #'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
+#' @param plotcolors list of four colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points, fitted circle, the concave hull and the estimated
+#'   center are colored by the first, second and third and fourth element of
+#'   this list respectively.
 #'
 #' @return List with the diameter of the stem at breast height, the residuals on
 #'   the fitting, and the functional diameter at breast height. Also optionally
@@ -613,7 +629,8 @@ extract_lower_trunk_pc <- function(pc, slice_thickness = 0.08, dtm = NA, r = 5) 
 #' dbh <- output$dbh
 #' }
 dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
-                   r = 5, plot = FALSE) {
+                   r = 5, plot = FALSE,
+                   plotcolors = c("#000000", "#1c027a","#08aa7c","#fac87f")) {
   h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
   lowest_point <- h_list$lp
   out_015 <- diameter_slice_pc(
@@ -683,7 +700,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
         )) +
         ggplot2::scale_color_manual(
           name = "",
-          values = c("points stem slice" = "black"),
+          values = c("points stem slice" = plotcolors[1]),
           guide = ggplot2::guide_legend(
             override.aes =
               list(
@@ -712,7 +729,7 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
         ggplot2::geom_sf(
           data = sf::st_geometry(out_130$hull),
           ggplot2::aes(color = "concave hull"),
-          size = 1, fill = NA
+          linewidth = 1, fill = NA
         ) +
         ggplot2::geom_point(
           data = data_circle,
@@ -742,10 +759,10 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
         ggplot2::scale_color_manual(
           name = "",
           values = c(
-            "points stem slice" = "black",
-            "concave hull" = "green",
-            "estimated center" = "red",
-            "fitted circle" = "blue"
+            "points stem slice" = plotcolors[1],
+            "concave hull" = plotcolors[3],
+            "estimated center" = plotcolors[4],
+            "fitted circle" = plotcolors[2]
           ),
           guide = ggplot2::guide_legend(
             override.aes =
@@ -819,6 +836,10 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
 #'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
+#' @param plotcolors list of five colors for plotting. Only relevant when plot
+#'   = TRUE. The stem points above buttresses, stem points at breast height,
+#'   fitted circle, the concave hull and the estimated center are colored by the
+#'   first, second, third, fourth and fifth element of this list respectively.
 #'
 #' @return List with the diameter of the stem above buttresses, the residuals on
 #'   the fitting, and the functional diameter at breast height. Also optionally
@@ -839,7 +860,9 @@ dbh_pc <- function(pc, thresholdR2 = 0.001, slice_thickness = 0.06, dtm = NA,
 #' dab <- dab_pc(pc = pc_tree, thresholdbuttress = 0.002, maxbuttressheight = 5)
 #' }
 dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
-                   slice_thickness = 0.06, dtm = NA, r= 5, plot = FALSE) {
+                   slice_thickness = 0.06, dtm = NA, r= 5, plot = FALSE,
+                   plotcolors = c("#000000", "#808080", "#1c027a","#08aa7c",
+                                  "#fac87f")) {
   slice_height <- 1.30
   h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
   lowest_point <- h_list$lp
@@ -910,7 +933,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ggplot2::geom_sf(
           data = sf::st_geometry(out$hull),
           ggplot2::aes(color = "concave hull"),
-          size = 1, fill = NA
+          linewidth = 1, fill = NA
         ) +
         ggplot2::geom_point(
           data = data_circle,
@@ -943,11 +966,11 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ggplot2::scale_color_manual(
           name = "",
           values = c(
-            "points above buttresses" = "black",
-            "points at breast height" = "grey",
-            "concave hull" = "green",
-            "estimated center" = "red",
-            "fitted circle" = "blue"
+            "points above buttresses" = plotcolors[1],
+            "points at breast height" = plotcolors[2],
+            "concave hull" = plotcolors[4],
+            "estimated center" = plotcolors[5],
+            "fitted circle" = plotcolors[3]
           ),
           guide = ggplot2::guide_legend(
             override.aes =
@@ -969,7 +992,7 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ggplot2::geom_sf(
           data = sf::st_geometry(out$hull),
           ggplot2::aes(color = "concave hull"),
-          size = 1, fill = NA
+          linewidth = 1, fill = NA
         ) +
         ggplot2::geom_point(
           data = data_circle,
@@ -999,10 +1022,10 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
         ggplot2::scale_color_manual(
           name = "",
           values = c(
-            "points at breast height" = "black",
-            "concave hull" = "green",
-            "estimated center" = "red",
-            "fitted circle" = "blue"
+            "points at breast height" = plotcolors[1],
+            "concave hull" = plotcolors[4],
+            "estimated center" = plotcolors[5],
+            "fitted circle" = plotcolors[3]
           ),
           guide = ggplot2::guide_legend(
             override.aes =
@@ -1069,11 +1092,16 @@ dab_pc <- function(pc, thresholdbuttress = 0.001, maxbuttressheight = 7,
 #'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the classified tree is
 #'   plotted.
+#' @param plotcolors list of two colors for plotting. Only relevant when plot =
+#'   TRUE. The crown and trunk are colored by the first and second element of
+#'   this list respectively.
 #'
-#' @return Data.frame with the crown point cloud (part of the tree above the
-#'   first branch). Also optionally (plot=TRUE) plots the crown vs non-crown
-#'   points and in this case returns a list with the crown point cloud as first
-#'   element and the plot as the second element.
+#' @return List with data.frame with the crown point cloud (part of the tree
+#'   above the first branch) in crownpoints and data.frame with the trunk point
+#'   cloud in trunkpoints. Also optionally (plot=TRUE) plots the crown vs
+#'   non-crown points and in this case returns a list with the crown point cloud
+#'   as first element, trunk point clouds as a second element and the plots as
+#'   the third to fifth elements.
 #'
 #' @export
 #'
@@ -1092,7 +1120,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
                               buttress = FALSE, thresholdR2 = 0.001,
                               slice_thickness = 0.06, thresholdbuttress = 0.001,
                               maxbuttressheight = 7, dtm = NA, r = 5,
-                              plot = FALSE) {
+                              plot = FALSE, plotcolors = c("#08aa7c","#fac87f")) {
   h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
   lowest_point <- h_list$lp
   th <- h_list$h
@@ -1243,7 +1271,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           ggplot2::scale_color_manual(
             name = "class",
             values = c(
-              "trunk" = "brown"
+              "trunk" = plotcolors[2]
             ),
             guide = ggplot2::guide_legend(
               override.aes = list(
@@ -1270,7 +1298,7 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
           ggplot2::scale_color_manual(
             name = "class",
             values = c(
-              "trunk" = "brown"
+              "trunk" = plotcolors[2]
             ),
             guide = ggplot2::guide_legend(
               override.aes = list(
@@ -1316,8 +1344,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             ggplot2::scale_color_manual(
               name = "class",
               values = c(
-                "crown" = "green",
-                "trunk" = "brown"
+                "crown" = plotcolors[1],
+                "trunk" = plotcolors[2]
               ),
               guide = ggplot2::guide_legend(
                 override.aes = list(
@@ -1344,8 +1372,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             ggplot2::scale_color_manual(
               name = "class",
               values = c(
-                "crown" = "green",
-                "trunk" = "brown"
+                "crown" = plotcolors[1],
+                "trunk" = plotcolors[2]
               ),
               guide = ggplot2::guide_legend(
                 override.aes = list(
@@ -1387,8 +1415,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             ggplot2::scale_color_manual(
               name = "class",
               values = c(
-                "crown" = "green",
-                "trunk" = "brown"
+                "crown" = plotcolors[1],
+                "trunk" = plotcolors[2]
               ),
               guide = ggplot2::guide_legend(
                 override.aes = list(
@@ -1414,8 +1442,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
             ggplot2::scale_color_manual(
               name = "class",
               values = c(
-                "crown" = "green",
-                "trunk" = "brown"
+                "crown" = plotcolors[1],
+                "trunk" = plotcolors[2]
               ),
               guide = ggplot2::guide_legend(
                 override.aes = list(
@@ -1465,8 +1493,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         ggplot2::scale_color_manual(
           name = "class",
           values = c(
-            "crown" = "green",
-            "trunk" = "brown"
+            "crown" = plotcolors[1],
+            "trunk" = plotcolors[2]
           ),
           guide = ggplot2::guide_legend(
             override.aes = list(
@@ -1492,8 +1520,8 @@ classify_crown_pc <- function(pc, thresholdbranch = 1.5, minheight = 1,
         ggplot2::scale_color_manual(
           name = "class",
           values = c(
-            "crown" = "green",
-            "trunk" = "brown"
+            "crown" = plotcolors[1],
+            "trunk" = plotcolors[2]
           ),
           guide = ggplot2::guide_legend(
             override.aes = list(
@@ -1572,6 +1600,9 @@ normalize_pc <- function(pc, dtm = NA, r = 5) {
 #'   concave hull based on \code{\link[concaveman]{concaveman}}.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
+#' @param plotcolors list of two colors for plotting. Only relevant when plot =
+#'   TRUE. The stem points and the concave hull are colored by the first and
+#'   second element of this list respectively.
 #'
 #' @return The projected area (numeric value) as the area of the concave hull
 #'   computed from the points of point cloud. Also optionally (plot=TRUE) plots
@@ -1596,7 +1627,8 @@ normalize_pc <- function(pc, dtm = NA, r = 5) {
 #' )
 #' pca <- projected_crown_area_pc(pc = crown_pc$crownpoints)
 #' }
-projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
+projected_area_pc <- function(pc, concavity = 2, plot = FALSE,
+                              plotcolors = c("#000000","#08aa7c")) {
   points <- sf::st_as_sf(unique(pc[1:2]), coords = c("X", "Y"))
   hull <- concaveman::concaveman(points, concavity)
   pa <- sf::st_area(hull)
@@ -1611,14 +1643,14 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
       ggplot2::geom_sf(
         data = sf::st_geometry(hull),
         ggplot2::aes(color = "concave hull"),
-        show.legend = "line", size = 1, fill = NA
+        show.legend = "line", linewidth = 1, fill = NA
       ) +
       ggplot2::ggtitle(bquote(PA == .(round(pa, 2)) ~ m^2)) +
       ggplot2::scale_color_manual(
         name = "",
         values = c(
-          "concave hull" = "red",
-          "points" = "black"
+          "concave hull" = plotcolors[2],
+          "points" = plotcolors[1]
         ),
         guide = ggplot2::guide_legend(
           override.aes =
@@ -1651,6 +1683,7 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
 #'   alpha-shape of the point cloud based on
 #'   \code{\link[alphashape3d]{ashape3d}}.
 #' @param plot Logical (default=FALSE), indicates if the alpha-shape is plotted.
+#' @param plotcolor color for plotting 3D shape. Only relevant when plot = TRUE.
 #'
 #' @return The volume of the point cloud (numeric value) as the volume of the 3D
 #'   alpha-shape computed from the points of point cloud. Also optionally
@@ -1677,7 +1710,8 @@ projected_area_pc <- function(pc, concavity = 2, plot = FALSE) {
 #' )
 #' vol_crown <- volume_crown_pc(pc = crown_pc$crownpoints, alpha = 2)
 #' }
-alpha_volume_pc <- function(pc, alpha = 1, plot = FALSE) {
+alpha_volume_pc <- function(pc, alpha = 1, plot = FALSE,
+                            plotcolor = "#fac87f") {
   pc_norm <- normalize_pc(pc)
   xyz <- data.matrix(unique(pc_norm[1:3]))
   ashape3d.obj <- alphashape3d::ashape3d(xyz, alpha = alpha, pert = TRUE)
@@ -1690,7 +1724,7 @@ alpha_volume_pc <- function(pc, alpha = 1, plot = FALSE) {
       graphics::plot.new()
       graphics::title(main = bquote(AV == .(round(vol, 2)) ~ m^3), line = 2)
     })
-    plot(ashape3d.obj)
+    plot(ashape3d.obj, color = plotcolor)
     return(list("av" = vol, "ashape3d" = ashape3d.obj))
   } else {
     return(vol)
