@@ -76,23 +76,26 @@ total_cyl_length_qsm <- function(treedata) {
 #' tot_vol <- tree_volume_qsm(treedata = qsm$treedata, cylinder = qsm$cylinder,
 #'                            cylindercutoff = 0.25)
 #' }
-tree_volume_qsm <- function(treedata, cylinder = NA, cylindercutoff = 0) {
-  if (cylindercutoff > 0 & length(cylinder)>1) {
-    trunk_vol <- trunk_volume_qsm(treedata)
-    cylinder_ind <- which(cylinder$BranchOrder > 0 &
-                            cylinder$radius > cylindercutoff)
-    branch_vol <- sum((cylinder$radius[cylinder_ind])^2 * pi *
-                        (cylinder$length[cylinder_ind]))*1000
-    volume <- trunk_vol + branch_vol
-  } else {
-      if (length(treedata) > 83) {
-      volume <- treedata$MixTotalVolume[1]
+tree_volume_qsm <-
+  function(treedata,
+           cylinder = NA,
+           cylindercutoff = 0) {
+    if (cylindercutoff > 0 & length(cylinder) > 1) {
+      trunk_vol <- trunk_volume_qsm(treedata)
+      cylinder_ind <- which(cylinder$BranchOrder > 0 &
+                              cylinder$radius > cylindercutoff)
+      branch_vol <- sum((cylinder$radius[cylinder_ind]) ^ 2 * pi *
+                          (cylinder$length[cylinder_ind])) * 1000
+      volume <- trunk_vol + branch_vol
     } else {
-      volume <- treedata$TotalVolume[1]
+      if (length(treedata) > 83) {
+        volume <- treedata$MixTotalVolume[1]
+      } else {
+        volume <- treedata$TotalVolume[1]
+      }
     }
+    return(volume)
   }
-  return(volume)
-}
 
 #' Total trunk volume TreeQSM
 #'

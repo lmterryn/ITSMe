@@ -9,6 +9,7 @@ plot_circle_fit_pcs(
   extension = ".txt",
   slice_height = 1.3,
   slice_thickness = 0.06,
+  concavity = 4,
   dtm = NA,
   r = 5,
   OUT_path = "./",
@@ -31,6 +32,10 @@ calculate the diameter of a stem slice.}
 thickness of the slice which is used to measure the diameter. Parameter of
 the \code{\link{diameter_slice_pc}} function used to calculate the diameter
 of a stem slice.}
+
+\item{concavity}{Numeric value (default=2) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
 
 \item{dtm}{The digital terrain model (default = NA), parameter of
 \code{\link{tree_height_pc}}.}

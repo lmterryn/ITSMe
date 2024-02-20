@@ -8,6 +8,7 @@ diameter_slice_pc(
   pc,
   slice_height = 0.1,
   slice_thickness = 0.06,
+  concavity = 4,
   dtm = NA,
   r = 5,
   plot = FALSE,
@@ -25,6 +26,10 @@ measured.}
 \item{slice_thickness}{Numeric value (default = 0.6) that determines the
 thickness of the slice which is used to measure the diameter.}
 
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
+
 \item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
 (default = NA). If the digital terrain model is in the same format as a
 point cloud it can also be read with \code{\link{read_tree_pc}}.}
@@ -36,10 +41,10 @@ is provided.}
 \item{plot}{Logical (default=FALSE), indicates if the optimized circle
 fitting is plotted.}
 
-\item{plotcolors}{list of four colors for plotting. Only relevant when plot
-= TRUE. The stem points, fitted circle, the concave hull and the estimated
-center are colored by the first, second, third and fourth element of
-this list respectively.}
+\item{plotcolors}{list of four colors for plotting. Only relevant when plot =
+TRUE. The stem points, fitted circle, the concave hull and the estimated
+center are colored by the first, second, third and fourth element of this
+list respectively.}
 }
 \value{
 A list with the diameter at a specified height (numeric value), the

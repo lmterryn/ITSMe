@@ -33,26 +33,34 @@
 #' pc_las <- read_tree_pc(PC_path = "path/to/point_cloud.las", 0.2)
 #' }
 read_tree_pc <- function(path, samplefactor = 1) {
-  extension <- utils::tail(strsplit(path, split = ".", fixed = T)[[1]], 1)
+  extension <-
+    utils::tail(strsplit(path, split = ".", fixed = T)[[1]], 1)
   if (extension == "txt") {
     txt <- data.table::fread(path)
     pc <- data.frame(txt[, 1:3])
     colnames(pc) <- c("X", "Y", "Z")
-  } else if (extension %in% c("las","laz")) {
+  } else if (extension %in% c("las", "laz")) {
     las <- lidR::readTLSLAS(path)
-    pc <- data.frame("X" = las$X, "Y" = las$Y, "Z" = las$Z)
+    pc <- data.frame("X" = las$X,
+                     "Y" = las$Y,
+                     "Z" = las$Z)
   } else if (extension == "ply") {
     ply <- Rvcg::vcgPlyRead(path, updateNormals = TRUE, clean = TRUE)
-    pc <- data.frame("X" = ply$vb[1, ], "Y" = ply$vb[2, ], "Z" = ply$vb[3, ])
+    pc <-
+      data.frame("X" = ply$vb[1,],
+                 "Y" = ply$vb[2,],
+                 "Z" = ply$vb[3,])
   } else {
     print("This extension is not recognized. Try txt, las/laz or ply format")
     pc <- c()
   }
   if (samplefactor != 1) {
-    pc <- pc[sample(nrow(pc),
+    pc <- pc[sample(
+      nrow(pc),
       size = floor(nrow(pc) * samplefactor),
-      replace = FALSE, prob = NULL
-    ), ]
+      replace = FALSE,
+      prob = NULL
+    ),]
   }
   return(pc)
 }

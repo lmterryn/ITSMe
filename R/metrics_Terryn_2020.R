@@ -34,6 +34,10 @@
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}. Only relevant if the tree point cloud
+#'   is available.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}.
@@ -51,22 +55,46 @@
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' DBH <- dbh(treedata = qsm$treedata, pc = pc_tree, buttress = TRUE)
 #' }
-dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdR2 = 0.001,
-                slice_thickness = 0.06, thresholdbuttress = 0.001,
-                maxbuttressheight = 7, dtm = NA, r = 5) {
-  if (!is.data.frame(pc)) {
-    return(dbh_qsm(treedata))
-  } else {
-    if (buttress) {
-      out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
-                    dtm = dtm, r = r)
-      return(out$dab)
+dbh <-
+  function(treedata,
+           pc = NA,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity = 4,
+           dtm = NA,
+           r = 5) {
+    if (!is.data.frame(pc)) {
+      return(dbh_qsm(treedata))
     } else {
-      out <- dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r)
-      return(out$dbh)
+      if (buttress) {
+        out <-
+          dab_pc(
+            pc,
+            thresholdbuttress,
+            maxbuttressheight,
+            slice_thickness,
+            concavity = concavity,
+            dtm = dtm,
+            r = r
+          )
+        return(out$dab)
+      } else {
+        out <-
+          dbh_pc(
+            pc,
+            thresholdR2,
+            slice_thickness,
+            concavity = concavity,
+            dtm = dtm,
+            r = r
+          )
+        return(out$dbh)
+      }
     }
   }
-}
 
 #' Tree height
 #'
@@ -103,7 +131,10 @@ dbh <- function(treedata, pc = NA, buttress = FALSE, thresholdR2 = 0.001,
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' h <- tree_height(treedata = qsm$treedata, pc = pc_tree)
 #' }
-tree_height <- function(treedata, pc = NA, dtm = NA, r = 5) {
+tree_height <- function(treedata,
+                        pc = NA,
+                        dtm = NA,
+                        r = 5) {
   if (!is.data.frame(pc)) {
     return(tree_height_qsm(treedata))
   } else {
@@ -187,7 +218,7 @@ stem_branch_angle_qsm <- function(branch) {
 #' }
 stem_branch_cluster_size_qsm <- function(cylinder) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-    cylinder$BranchOrder == 1)
+                          cylinder$BranchOrder == 1)
   if (length(ind_stem_cyl) > 0) {
     cyl_heights <- cylinder$start[ind_stem_cyl, 3]
     cyl_heights <- cyl_heights[order(cyl_heights)]
@@ -197,7 +228,7 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
     cluster <- c()
     for (i in 1:length(cyl_heights)) {
       ind_in_interval <- which(cyl_heights > start_heights[i] &
-        cyl_heights < end_heights[i])
+                                 cyl_heights < end_heights[i])
       num_clusters <- 0
       for (j in 1:length(ind_in_interval)) {
         if (label[ind_in_interval[j]] == 1) {
@@ -288,15 +319,20 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #'   pc = pc_tree
 #' )
 #' }
-stem_branch_radius_qsm <- function(cylinder, treedata,
-                                   normalisation = "treeheight", pc = NA,
-                                   dtm = NA, r = 5) {
+stem_branch_radius_qsm <- function(cylinder,
+                                   treedata,
+                                   normalisation = "treeheight",
+                                   pc = NA,
+                                   dtm = NA,
+                                   r = 5) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-    cylinder$BranchOrder == 1)
+                          cylinder$BranchOrder == 1)
   if (length(ind_stem_cyl) > 0) {
     branch_rad <- cylinder$radius[ind_stem_cyl]
-    branch_ind_sorted <- ind_stem_cyl[order(branch_rad, decreasing = TRUE)]
-    branch_rad_sorted <- branch_rad[order(branch_rad, decreasing = TRUE)]
+    branch_ind_sorted <-
+      ind_stem_cyl[order(branch_rad, decreasing = TRUE)]
+    branch_rad_sorted <-
+      branch_rad[order(branch_rad, decreasing = TRUE)]
     if (length(branch_ind_sorted) < 10) {
       ind_b10 <- branch_ind_sorted
       rad_b10 <- branch_rad_sorted
@@ -362,6 +398,10 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}. only relevant when a point cloud is
+#'   provided.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
@@ -414,19 +454,33 @@ stem_branch_radius_qsm <- function(cylinder, treedata,
 #'   normalisation = "treeheight", pc = pc_tree
 #' )
 #' }
-stem_branch_length_qsm <- function(branch, treedata,
-                                   normalisation = "treeheight", pc = NA,
-                                   buttress = FALSE, thresholdR2 = 0.001,
+stem_branch_length_qsm <- function(branch,
+                                   treedata,
+                                   normalisation = "treeheight",
+                                   pc = NA,
+                                   buttress = FALSE,
+                                   thresholdR2 = 0.001,
                                    slice_thickness = 0.06,
                                    thresholdbuttress = 0.001,
-                                   maxbuttressheight = 7, dtm = NA, r = 5) {
+                                   maxbuttressheight = 7,
+                                   concavity = 4,
+                                   dtm = NA,
+                                   r = 5) {
   ind_stem_branches <- which(branch$order == 1)
   if (length(ind_stem_branches) > 0) {
     branch_len <- branch$length[ind_stem_branches]
     if (normalisation == "dbh") {
       dbh <- dbh(
-        treedata, pc, buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
+        treedata,
+        pc,
+        buttress,
+        thresholdR2,
+        slice_thickness,
+        thresholdbuttress,
+        maxbuttressheight,
+        concavity = concavity,
+        dtm = dtm,
+        r = r
       )
       sbl <- mean(branch_len) / dbh
     } else if (normalisation == "treeheight") {
@@ -481,6 +535,10 @@ stem_branch_length_qsm <- function(branch, treedata,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}. only relevant when a point cloud is
+#'   provided.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
@@ -528,51 +586,66 @@ stem_branch_length_qsm <- function(branch, treedata,
 #'   normalisation = "no"
 #' )
 #' }
-stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
-                                     pc = NA, buttress = FALSE,
-                                     thresholdR2 = 0.001,
-                                     slice_thickness = 0.06,
-                                     thresholdbuttress = 0.001,
-                                     maxbuttressheight = 7, dtm = NA, r = 5) {
-  ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-    cylinder$BranchOrder == 1)
-  cyl_heights <- cylinder$start[ind_stem_cyl, 3]
-  cyl_heights <- cyl_heights[order(cyl_heights)]
-  if (length(ind_stem_cyl) > 0) {
-    up_heights <- cyl_heights[2:length(cyl_heights)]
-    lo_heights <- cyl_heights[1:length(cyl_heights) - 1]
-    height_dif <- up_heights - lo_heights
-    start_heights <- cyl_heights - 0.5
-    end_heights <- cyl_heights + 0.5
-    average_distance <- c()
-    for (i in 1:length(cyl_heights)) {
-      ind_in_interval <- which(cyl_heights > start_heights[i] &
-        cyl_heights < end_heights[i])
-      if (length(ind_in_interval) == 1) {
-        average_distance <- append(average_distance, 0.5)
-      } else {
-        distance <- c()
-        for (j in 1:length(ind_in_interval) - 1) {
-          distance <- append(distance, height_dif[ind_in_interval[j]])
+stem_branch_distance_qsm <-
+  function(cylinder,
+           treedata,
+           normalisation = "no",
+           pc = NA,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity = 4,
+           dtm = NA,
+           r = 5) {
+    ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
+                            cylinder$BranchOrder == 1)
+    cyl_heights <- cylinder$start[ind_stem_cyl, 3]
+    cyl_heights <- cyl_heights[order(cyl_heights)]
+    if (length(ind_stem_cyl) > 0) {
+      up_heights <- cyl_heights[2:length(cyl_heights)]
+      lo_heights <- cyl_heights[1:length(cyl_heights) - 1]
+      height_dif <- up_heights - lo_heights
+      start_heights <- cyl_heights - 0.5
+      end_heights <- cyl_heights + 0.5
+      average_distance <- c()
+      for (i in 1:length(cyl_heights)) {
+        ind_in_interval <- which(cyl_heights > start_heights[i] &
+                                   cyl_heights < end_heights[i])
+        if (length(ind_in_interval) == 1) {
+          average_distance <- append(average_distance, 0.5)
+        } else {
+          distance <- c()
+          for (j in 1:length(ind_in_interval) - 1) {
+            distance <- append(distance, height_dif[ind_in_interval[j]])
+          }
+          average_distance <- append(average_distance, mean(distance))
         }
-        average_distance <- append(average_distance, mean(distance))
       }
-    }
-    if (normalisation == "dbh") {
-      dbh <- dbh(
-        treedata, pc, buttress, thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
-      )
-      sbd <- mean(average_distance) / dbh
+      if (normalisation == "dbh") {
+        dbh <- dbh(
+          treedata,
+          pc,
+          buttress,
+          thresholdR2,
+          slice_thickness,
+          thresholdbuttress,
+          maxbuttressheight,
+          concavity = concavity,
+          dtm = dtm,
+          r = r
+        )
+        sbd <- mean(average_distance) / dbh
+      } else {
+        # print("No normalisation")
+        sbd <- mean(average_distance)
+      }
     } else {
-      # print("No normalisation")
-      sbd <- mean(average_distance)
+      sbd <- NaN
     }
-  } else {
-    sbd <- NaN
+    return(sbd)
   }
-  return(sbd)
-}
 
 #' DBH-tree height ratio TreeQSM
 #'
@@ -604,6 +677,10 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}. only relevant when a point cloud is
+#'   provided.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
@@ -639,17 +716,32 @@ stem_branch_distance_qsm <- function(cylinder, treedata, normalisation = "no",
 #'   buttress = TRUE
 #' )
 #' }
-dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
-                                 thresholdR2 = 0.001, slice_thickness = 0.06,
-                                 thresholdbuttress = 0.001,
-                                 maxbuttressheight = 7, dtm = NA, r = 5) {
-  dbh <- dbh(
-    treedata, pc, buttress, thresholdR2, slice_thickness,
-    thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
-  )
-  tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
-  return(dbh / tree_height)
-}
+dbh_height_ratio_qsm <-
+  function(treedata,
+           pc = NA,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity = 4,
+           dtm = NA,
+           r = 5) {
+    dbh <- dbh(
+      treedata,
+      pc,
+      buttress,
+      thresholdR2,
+      slice_thickness,
+      thresholdbuttress,
+      maxbuttressheight,
+      concavity = concavity,
+      dtm = dtm,
+      r = r
+    )
+    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
+    return(dbh / tree_height)
+  }
 
 #' DBH-tree volume ratio TreeQSM
 #'
@@ -681,6 +773,10 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}. only relevant when a point cloud is
+#'   provided.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
@@ -716,17 +812,32 @@ dbh_height_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
 #'   buttress = TRUE
 #' )
 #' }
-dbh_volume_ratio_qsm <- function(treedata, pc = NA, buttress = FALSE,
-                                 thresholdR2 = 0.001, slice_thickness = 0.06,
-                                 thresholdbuttress = 0.001,
-                                 maxbuttressheight = 7, dtm = NA, r = 5) {
-  dbh <- dbh(
-    treedata, pc, buttress, thresholdR2, slice_thickness,
-    thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
-  )
-  volume <- tree_volume_qsm(treedata) / 1000
-  return(dbh / volume)
-}
+dbh_volume_ratio_qsm <-
+  function(treedata,
+           pc = NA,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity = 4,
+           dtm = NA,
+           r = 5) {
+    dbh <- dbh(
+      treedata,
+      pc,
+      buttress,
+      thresholdR2,
+      slice_thickness,
+      thresholdbuttress,
+      maxbuttressheight,
+      concavity = concavity,
+      dtm = dtm,
+      r = r
+    )
+    volume <- tree_volume_qsm(treedata) / 1000
+    return(dbh / volume)
+  }
 
 #' Volume below 55 TreeQSM
 #'
@@ -767,9 +878,9 @@ volume_below_55_qsm <- function(cylinder, treedata) {
   volume_branches <- total_branch_volume_qsm(treedata) / 1000
   height_at_55 <- tree_height * 0.55 + min(cylinder$start[, 3])
   ind_branch_cyl_u55 <- which(cylinder$start[, 3] < height_at_55 &
-    cylinder$BranchOrder != 0)
+                                cylinder$BranchOrder != 0)
   vol_branch_cyl_u55 <- cylinder$length[ind_branch_cyl_u55] * pi %*%
-    cylinder$radius[ind_branch_cyl_u55]**2
+    cylinder$radius[ind_branch_cyl_u55] ** 2
   vb55 <- sum(vol_branch_cyl_u55) / volume_branches
   return(vb55)
 }
@@ -849,12 +960,14 @@ cylinder_length_volume_ratio_qsm <- function(treedata) {
 #' }
 shedding_ratio_qsm <- function(branch, cylinder, treedata) {
   ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
-    cylinder$BranchOrder == 1)
+                          cylinder$BranchOrder == 1)
   height_33 <- treedata$TreeHeight[1] / 3 + min(cylinder$start[, 3])
   if (length(ind_stem_cyl) > 0) {
-    ind_stem_cyl_u3rd <- which(cylinder$PositionInBranch == 1 &
-      cylinder$BranchOrder == 1 &
-      cylinder$start[, 3] < height_33)
+    ind_stem_cyl_u3rd <- which(
+      cylinder$PositionInBranch == 1 &
+        cylinder$BranchOrder == 1 &
+        cylinder$start[, 3] < height_33
+    )
     if (length(ind_stem_cyl_u3rd) == 0) {
       sr <- 0
     } else {
@@ -961,9 +1074,10 @@ relative_volume_ratio_qsm <- function(cylinder, treedata) {
     interval_start <- min_z_coo + i * interval
     interval_end <- interval_start + interval
     ind_cyl_in_interval <- which(cyl_z_coo >= interval_start &
-      cyl_z_coo < interval_end)
-    vol_cyl_in_interval <- sum(cylinder$length[ind_cyl_in_interval] * pi %*%
-      cylinder$radius[ind_cyl_in_interval]**2)
+                                   cyl_z_coo < interval_end)
+    vol_cyl_in_interval <-
+      sum(cylinder$length[ind_cyl_in_interval] * pi %*%
+            cylinder$radius[ind_cyl_in_interval] ** 2)
     vol_dist <- append(vol_dist, vol_cyl_in_interval)
   }
   rel_vol_dist <- vol_dist
@@ -1030,16 +1144,21 @@ crownset_qsm <- function(cylinder) {
     }
     # STEP 3
     crownset_parent0 <- crownset[cylinder$BranchOrder
-    [cylinder$parent[crownset]] == 0]
+                                 [cylinder$parent[crownset]] == 0]
     min_height <- min(cylinder$start[crownset_parent0, 3])
-    crownset <- unique(append(crownset, which(cylinder$start[, 3] > min_height &
-      cylinder$BranchOrder > 0)))
+    crownset <-
+      unique(append(
+        crownset,
+        which(cylinder$start[, 3] > min_height &
+                cylinder$BranchOrder > 0)
+      ))
     # STEP 4
     init_length <- 0
     while (length(crownset) > init_length) {
       init_length <- length(crownset)
       c <- children[crownset]
-      crownset <- unique(append(crownset, unlist(c, recursive = FALSE)))
+      crownset <-
+        unique(append(crownset, unlist(c, recursive = FALSE)))
     }
   }
   return(crownset)
@@ -1097,20 +1216,24 @@ crownset_qsm <- function(cylinder) {
 #'   cylinder = qsm$cylinder, pc = pc_tree
 #' )
 #' }
-crown_start_height_qsm <- function(treedata, cylinder, pc = NA, dtm = NA,
-                                   r = 5) {
-  crownset <- crownset_qsm(cylinder)
-  if (length(crownset) > 0) {
-    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
-    crownset_parent0 <- crownset[cylinder$BranchOrder
-                                 [cylinder$parent[crownset]] == 0]
-    min_height <- min(cylinder$start[crownset_parent0, 3])
-    sh <- (min_height - min(cylinder$start[, 3])) / tree_height
-  } else {
-    sh <- NaN
+crown_start_height_qsm <-
+  function(treedata,
+           cylinder,
+           pc = NA,
+           dtm = NA,
+           r = 5) {
+    crownset <- crownset_qsm(cylinder)
+    if (length(crownset) > 0) {
+      tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
+      crownset_parent0 <- crownset[cylinder$BranchOrder
+                                   [cylinder$parent[crownset]] == 0]
+      min_height <- min(cylinder$start[crownset_parent0, 3])
+      sh <- (min_height - min(cylinder$start[, 3])) / tree_height
+    } else {
+      sh <- NaN
+    }
+    return(sh)
   }
-  return(sh)
-}
 
 #' Crown height TreeQSM
 #'
@@ -1162,20 +1285,26 @@ crown_start_height_qsm <- function(treedata, cylinder, pc = NA, dtm = NA,
 #'   pc = pc_tree
 #' )
 #' }
-crown_height_qsm <- function(treedata, cylinder, pc = NA, dtm = NA, r = 5) {
-  crownset <- crownset_qsm(cylinder)
-  tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
-  if (length(crownset) > 0) {
-    minz_crown <- min(cylinder$start[crownset, 3])
-    maxz_crown <- max(cylinder$start[crownset, 3])
-    x <- which(cylinder$start[, 3] == maxz_crown)
-    maxz_crown <- maxz_crown + cylinder$length[x] * cylinder$axis[x, 3]
-    ch <- (maxz_crown - minz_crown) / tree_height
-  } else {
-    ch <- NaN
+crown_height_qsm <-
+  function(treedata,
+           cylinder,
+           pc = NA,
+           dtm = NA,
+           r = 5) {
+    crownset <- crownset_qsm(cylinder)
+    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
+    if (length(crownset) > 0) {
+      minz_crown <- min(cylinder$start[crownset, 3])
+      maxz_crown <- max(cylinder$start[crownset, 3])
+      x <- which(cylinder$start[, 3] == maxz_crown)
+      maxz_crown <-
+        maxz_crown + cylinder$length[x] * cylinder$axis[x, 3]
+      ch <- (maxz_crown - minz_crown) / tree_height
+    } else {
+      ch <- NaN
+    }
+    return(ch)
   }
-  return(ch)
-}
 
 #' Crown evenness TreeQSM
 #'
@@ -1212,31 +1341,36 @@ crown_evenness_qsm <- function(cylinder) {
   crownset <- crownset_qsm(cylinder)
   if (length(crownset) > 0) {
     bins <- c(
-      0 * 2 * pi / 8 - pi, 1 * 2 * pi / 8 - pi, 2 * 2 * pi / 8 - pi,
-      3 * 2 * pi / 8 - pi, 4 * 2 * pi / 8 - pi, 5 * 2 * pi / 8 - pi,
-      6 * 2 * pi / 8 - pi, 7 * 2 * pi / 8 - pi, 2 * pi / 1 - pi
+      0 * 2 * pi / 8 - pi,
+      1 * 2 * pi / 8 - pi,
+      2 * 2 * pi / 8 - pi,
+      3 * 2 * pi / 8 - pi,
+      4 * 2 * pi / 8 - pi,
+      5 * 2 * pi / 8 - pi,
+      6 * 2 * pi / 8 - pi,
+      7 * 2 * pi / 8 - pi,
+      2 * pi / 1 - pi
     )
     crownset_bo1 <- crownset[cylinder$BranchOrder[crownset] == 1]
-    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[
-      cylinder$parent[crownset_bo1]
-    ] == 0]
+    crownset_bo1_po0 <- crownset_bo1[cylinder$BranchOrder[cylinder$parent[crownset_bo1]] == 0]
     center_z <- min(cylinder$start[crownset_bo1_po0, 3])
-    center <- crownset_bo1_po0[cylinder$start[crownset_bo1_po0, 3] == center_z]
+    center <-
+      crownset_bo1_po0[cylinder$start[crownset_bo1_po0, 3] == center_z]
     center_x <- cylinder$start[center, 1]
     center_y <- cylinder$start[center, 2]
-    R <- sqrt(((cylinder$start[crownset, 1] - center_x)^2 +
-      (cylinder$start[crownset, 2] - center_y)^2))
-    theta <- atan2(
-      (cylinder$start[crownset, 2] - center_y),
-      (cylinder$start[crownset, 1] - center_x)
-    )
+    R <- sqrt(((cylinder$start[crownset, 1] - center_x) ^ 2 +
+                 (cylinder$start[crownset, 2] - center_y) ^ 2
+    ))
+    theta <- atan2((cylinder$start[crownset, 2] - center_y),
+                   (cylinder$start[crownset, 1] - center_x))
     minimums <- c()
     Ind_Bin <- c()
     for (i in 2:length(bins)) {
       ind_bin <- (theta < bins[i] & theta >= bins[(i - 1)])
       Ind_Bin <- append(Ind_Bin, list(ind_bin))
       if (sum(ind_bin) > 0) {
-        minimums <- append(minimums, min(cylinder$start[crownset[ind_bin], 3]))
+        minimums <-
+          append(minimums, min(cylinder$start[crownset[ind_bin], 3]))
       }
     }
     if (length(minimums) == length(bins) - 1) {
@@ -1296,13 +1430,16 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
   sx <- cylinder$start[, 1]
   sy <- cylinder$start[, 2]
   sz <- cylinder$start[, 3]
-  cx <- cylinder$length * cylinder$axis[, 1] / 2 + cylinder$start[, 1]
-  cy <- cylinder$length * cylinder$axis[, 2] / 2 + cylinder$start[, 2]
-  cz <- cylinder$length * cylinder$axis[, 3] / 2 + cylinder$start[, 3]
+  cx <-
+    cylinder$length * cylinder$axis[, 1] / 2 + cylinder$start[, 1]
+  cy <-
+    cylinder$length * cylinder$axis[, 2] / 2 + cylinder$start[, 2]
+  cz <-
+    cylinder$length * cylinder$axis[, 3] / 2 + cylinder$start[, 3]
   ex <- cylinder$length * cylinder$axis[, 1] + cylinder$start[, 1]
   ey <- cylinder$length * cylinder$axis[, 2] + cylinder$start[, 2]
   ez <- cylinder$length * cylinder$axis[, 3] + cylinder$start[, 3]
-  vol <- cylinder$length * cylinder$radius^2 * pi
+  vol <- cylinder$length * cylinder$radius ^ 2 * pi
   height <- max(ez) - min(sz)
   bins <- c()
   for (i in 1:length(ez)) {
@@ -1334,12 +1471,12 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
     bin2_cx <- bin3_cx <- bin1_cx
     bin2_cy <- bin3_cy <- bin1_cy
   }
-  de_bin1 <- sqrt((ex[bin1] - bin1_cx)^2 + (ey[bin1] - bin1_cy)^2)
-  de_bin2 <- sqrt((ex[bin2] - bin2_cx)^2 + (ey[bin2] - bin2_cy)^2)
-  de_bin3 <- sqrt((ex[bin3] - bin3_cx)^2 + (ey[bin3] - bin3_cy)^2)
-  ds_bin1 <- sqrt((sx[bin1] - bin1_cx)^2 + (sy[bin1] - bin1_cy)^2)
-  ds_bin2 <- sqrt((sx[bin2] - bin2_cx)^2 + (sy[bin2] - bin2_cy)^2)
-  ds_bin3 <- sqrt((sx[bin3] - bin3_cx)^2 + (sy[bin3] - bin3_cy)^2)
+  de_bin1 <- sqrt((ex[bin1] - bin1_cx) ^ 2 + (ey[bin1] - bin1_cy) ^ 2)
+  de_bin2 <- sqrt((ex[bin2] - bin2_cx) ^ 2 + (ey[bin2] - bin2_cy) ^ 2)
+  de_bin3 <- sqrt((ex[bin3] - bin3_cx) ^ 2 + (ey[bin3] - bin3_cy) ^ 2)
+  ds_bin1 <- sqrt((sx[bin1] - bin1_cx) ^ 2 + (sy[bin1] - bin1_cy) ^ 2)
+  ds_bin2 <- sqrt((sx[bin2] - bin2_cx) ^ 2 + (sy[bin2] - bin2_cy) ^ 2)
+  ds_bin3 <- sqrt((sx[bin3] - bin3_cx) ^ 2 + (sy[bin3] - bin3_cy) ^ 2)
   if (sum(!(bin1 %in% stem)) == 0) {
     if (max(de_bin1) <= dbh / 2) {
       r1 <- dbh
@@ -1356,9 +1493,11 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
     while (ratio > 0.9) {
       p <- p - 0.01
       v1 <- sum(vol[bin1_branch[de_bin1_branch <= p]])
-      v2 <- sum((p - ds_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]) /
-        (d_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]) *
-        vol[bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]])
+      v2 <-
+        sum((p - ds_bin1_branch[de_bin1_branch > p &
+                                  ds_bin1_branch <= p]) /
+              (d_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]) *
+              vol[bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]])
       vol_p <- v1 + v2
       ratio <- vol_p / sum(vol[bin1_branch])
     }
@@ -1380,9 +1519,11 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
     while (ratio > 0.9) {
       p <- p - 0.01
       v1 <- sum(vol[bin2_branch[de_bin2_branch <= p]])
-      v2 <- sum((p - ds_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]) /
-        (d_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]) *
-        vol[bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]])
+      v2 <-
+        sum((p - ds_bin2_branch[de_bin2_branch > p &
+                                  ds_bin2_branch <= p]) /
+              (d_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]) *
+              vol[bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]])
       vol_p <- v1 + v2
       ratio <- vol_p / sum(vol[bin2_branch])
     }
@@ -1404,9 +1545,11 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
     while (ratio > 0.9) {
       p <- p - 0.01
       v1 <- sum(vol[bin3_branch[de_bin3_branch <= p]])
-      v2 <- sum((p - ds_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]) /
-        (d_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]) *
-        vol[bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]])
+      v2 <-
+        sum((p - ds_bin3_branch[de_bin3_branch > p &
+                                  ds_bin3_branch <= p]) /
+              (d_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]) *
+              vol[bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]])
       vol_p <- v1 + v2
       ratio <- vol_p / sum(vol[bin3_branch])
     }
@@ -1470,15 +1613,19 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
 #'   pc = pc_tree
 #' )
 #' }
-crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA,
-                                           dtm = NA, r = 5) {
-  radii <- vertical_bin_radii_qsm(treedata, cylinder)
-  diameter <- max(radii) * 2
-  ch <- crown_height_qsm(treedata, cylinder)
-  tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
-  height <- ch * tree_height
-  return(diameter / height)
-}
+crown_diameterheight_ratio_qsm <-
+  function(treedata,
+           cylinder,
+           pc = NA,
+           dtm = NA,
+           r = 5) {
+    radii <- vertical_bin_radii_qsm(treedata, cylinder)
+    diameter <- max(radii) * 2
+    ch <- crown_height_qsm(treedata, cylinder)
+    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
+    height <- ch * tree_height
+    return(diameter / height)
+  }
 
 #' DBH minimum tree radius ratio TreeQSM
 #'
@@ -1516,6 +1663,10 @@ crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA,
 #'   \code{\link{dab_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}. only relevant when a point cloud is
+#'   provided.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
@@ -1558,16 +1709,30 @@ crown_diameterheight_ratio_qsm <- function(treedata, cylinder, pc = NA,
 #'   buttress = TRUE
 #' )
 #' }
-dbh_minradius_ratio_qsm <- function(treedata, cylinder, pc = NA,
-                                    buttress = FALSE, thresholdR2 = 0.001,
+dbh_minradius_ratio_qsm <- function(treedata,
+                                    cylinder,
+                                    pc = NA,
+                                    buttress = FALSE,
+                                    thresholdR2 = 0.001,
                                     slice_thickness = 0.06,
                                     thresholdbuttress = 0.001,
-                                    maxbuttressheight = 7, dtm = NA, r = 5) {
+                                    maxbuttressheight = 7,
+                                    concavity = 4,
+                                    dtm = NA,
+                                    r = 5) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- min(radii) * 2
   dbh <- dbh(
-    treedata, pc, buttress, thresholdR2, slice_thickness,
-    thresholdbuttress, maxbuttressheight, dtm = dtm, r = r
+    treedata,
+    pc,
+    buttress,
+    thresholdR2,
+    slice_thickness,
+    thresholdbuttress,
+    maxbuttressheight,
+    concavity = concavity,
+    dtm = dtm,
+    r = r
   )
   return(dbh / diameter)
 }

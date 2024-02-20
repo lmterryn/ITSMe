@@ -19,6 +19,7 @@ summary_basic_pointcloud_metrics(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  concavity_fdiameter = 4,
   OUT_path = FALSE,
   plot = FALSE,
   plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")
@@ -75,6 +76,12 @@ buttresses. Only relevant when buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses. Only relevant when buttress == TRUE.}
 
+\item{concavity_fdiameter}{Numeric value (default=4) concavity for the
+computation of the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}. This concavity value is used in the
+functions \code{\link{diameter_slice_pc}}, \code{\link{dbh_pc}},
+\code{\link{dab_pc}}, and \code{\link{classify_crown_pc}}.}
+
 \item{OUT_path}{A character with name of the output file (including the path
 to the folder), where the summary csv file should be saved or logical
 (default=FALSE) in this case no csv file is produced.}
@@ -83,8 +90,8 @@ to the folder), where the summary csv file should be saved or logical
 tree point cloud is plotted. If an OUT_path is provided, the figures are
 saved in the OUT_path.}
 
-\item{plotcolors}{list of five colors for plotting. Only relevant when plot
-= TRUE. The stem points above buttresses, stem points at breast height,
+\item{plotcolors}{list of five colors for plotting. Only relevant when plot =
+TRUE. The stem points above buttresses, stem points at breast height,
 fitted circle, the concave hull and the estimated center are colored by the
 first, second, third, fourth and fifth element of this list respectively.}
 }

@@ -11,6 +11,7 @@ plot_dab_fit_pcs(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   slice_thickness = 0.06,
+  concavity = 4,
   dtm = NA,
   r = 5,
   plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")
@@ -36,6 +37,10 @@ buttresses.}
 
 \item{slice_thickness}{Numeric value (default = 0.06) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
 
 \item{dtm}{The digital terrain model (default = NA), parameter of
 \code{\link{tree_height_pc}}.}

@@ -43,36 +43,47 @@
 #'   OUT_path = "path/to/figure/folder/"
 #' )
 #' }
-plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
-                                 r = 5, OUT_path = "./",
-                                 plotcolors = c("#000000","#08aa7c","#fac87f")) {
-  file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
-  file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
-  Hs <- c()
-  Plots <- list()
-  for (i in 1:length(file_names)) {
-    print(paste("processing ", file_names[i]))
-    pc <- read_tree_pc(file_paths[i])
-    out <- tree_height_pc(pc, dtm, r, TRUE, plotcolors)
-    filename <- paste(OUT_path, "tree_height_",
-      strsplit(file_names[i], extension)[[1]], ".jpeg",
-      sep = ""
-    )
-    ggplot2::ggsave(filename,
-      plot = out$plot, bg = "white", width = 60,
-      height = 36, units = "cm"
-    )
-    Hs <- append(Hs, out$h)
-    Plots <- append(Plots, out$plot)
+plot_tree_height_pcs <-
+  function(PCs_path,
+           extension = ".txt",
+           dtm = NA,
+           r = 5,
+           OUT_path = "./",
+           plotcolors = c("#000000", "#08aa7c", "#fac87f")) {
+    file_paths <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = TRUE)
+    file_names <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = FALSE)
+    Hs <- c()
+    Plots <- list()
+    for (i in 1:length(file_names)) {
+      print(paste("processing ", file_names[i]))
+      pc <- read_tree_pc(file_paths[i])
+      out <- tree_height_pc(pc, dtm, r, TRUE, plotcolors)
+      filename <- paste(OUT_path,
+                        "tree_height_",
+                        strsplit(file_names[i], extension)[[1]],
+                        ".jpeg",
+                        sep = "")
+      ggplot2::ggsave(
+        filename,
+        plot = out$plot,
+        bg = "white",
+        width = 60,
+        height = 36,
+        units = "cm"
+      )
+      Hs <- append(Hs, out$h)
+      Plots <- append(Plots, out$plot)
+    }
+    return(list(
+      "File" = file_names,
+      "Heights" = Hs,
+      "Plots" = Plots
+    ))
   }
-  return(list("File" = file_names,"Heights" = Hs, "Plots" = Plots))
-}
 
 #' Calculate and save figures of \code{\link{diameter_slice_pc}} function
 #'
@@ -95,6 +106,9 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
 #'   thickness of the slice which is used to measure the diameter. Parameter of
 #'   the \code{\link{diameter_slice_pc}} function used to calculate the diameter
 #'   of a stem slice.
+#' @param concavity Numeric value (default=2) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}.
 #' @param dtm The digital terrain model (default = NA), parameter of
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
@@ -130,19 +144,22 @@ plot_tree_height_pcs <- function(PCs_path, extension = ".txt", dtm = NA,
 #'   OUT_path = "path/to/figure/folder/"
 #' )
 #' }
-plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
-                                slice_height = 1.3, slice_thickness = 0.06,
-                                dtm = NA, r = 5, OUT_path = "./",
-                                plotcolors = c("#000000", "#1c027a","#08aa7c",
+plot_circle_fit_pcs <- function(PCs_path,
+                                extension = ".txt",
+                                slice_height = 1.3,
+                                slice_thickness = 0.06,
+                                concavity = 4,
+                                dtm = NA,
+                                r = 5,
+                                OUT_path = "./",
+                                plotcolors = c("#000000", "#1c027a", "#08aa7c",
                                                "#fac87f")) {
   file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
+                           pattern = paste("*", extension, sep = ""),
+                           full.names = TRUE)
   file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
+                           pattern = paste("*", extension, sep = ""),
+                           full.names = FALSE)
   Ds <- c()
   Rs <- c()
   fDs <- c()
@@ -150,12 +167,27 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
   for (i in 1:length(file_names)) {
     print(paste("processing ", file_names[i]))
     pc <- read_tree_pc(file_paths[i])
-    out <- diameter_slice_pc(pc, slice_height, slice_thickness, dtm = dtm,
-                             r = r, plot = TRUE, plotcolors)
-    filename <- paste(OUT_path, "circle_",
-      strsplit(file_names[i], extension)[[1]], "_",
-      as.character(slice_height), "_",
-      as.character(slice_thickness), "_", ".jpeg",
+    out <-
+      diameter_slice_pc(
+        pc,
+        slice_height,
+        slice_thickness,
+        concavity = concavity,
+        dtm = dtm,
+        r = r,
+        plot = TRUE,
+        plotcolors
+      )
+    filename <- paste(
+      OUT_path,
+      "circle_",
+      strsplit(file_names[i], extension)[[1]],
+      "_",
+      as.character(slice_height),
+      "_",
+      as.character(slice_thickness),
+      "_",
+      ".jpeg",
       sep = ""
     )
     ggplot2::ggsave(filename, plot = out$plot)
@@ -164,8 +196,13 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
     fDs <- append(fDs, out$fdiameter)
     Plots <- append(Plots, list(out$plot))
   }
-  return(list("File" = file_names, "Diams" = Ds, "R2s" = Rs, "fDiams" = fDs,
-              "Plots" = Plots))
+  return(list(
+    "File" = file_names,
+    "Diams" = Ds,
+    "R2s" = Rs,
+    "fDiams" = fDs,
+    "Plots" = Plots
+  ))
 }
 
 #' Calculate and save figures of \code{\link{dbh_pc}} function
@@ -187,6 +224,9 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}.
 #' @param dtm The digital terrain model (default = NA), parameter of
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
@@ -215,53 +255,82 @@ plot_circle_fit_pcs <- function(PCs_path, extension = ".txt",
 #'   OUT_path = "path/to/figure/folder/"
 #' )
 #' }
-plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
-                             slice_thickness = 0.06, dtm = NA, r = 5,
-                             OUT_path = "./",
-                             plotcolors = c("#000000", "#1c027a","#08aa7c",
-                                            "#fac87f")) {
-  file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
-  file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
-  DBHs <- c()
-  Rs <- c()
-  fDBHs <- c()
-  Plots <- list()
-  for (i in 1:length(file_names)) {
-    print(paste("processing ", file_names[i]))
-    pc <- read_tree_pc(file_paths[i])
-    out <- tryCatch(
-      {
-        dbh_pc(pc, thresholdR2, slice_thickness, dtm = dtm, r = r, plot = TRUE,
-               plotcolors)
-        },
-      error = function(cond){
+plot_dbh_fit_pcs <-
+  function(PCs_path,
+           extension = ".txt",
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           concavity = 4,
+           dtm = NA,
+           r = 5,
+           OUT_path = "./",
+           plotcolors = c("#000000", "#1c027a", "#08aa7c",
+                          "#fac87f")) {
+    file_paths <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = TRUE)
+    file_names <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = FALSE)
+    DBHs <- c()
+    Rs <- c()
+    fDBHs <- c()
+    Plots <- list()
+    for (i in 1:length(file_names)) {
+      print(paste("processing ", file_names[i]))
+      pc <- read_tree_pc(file_paths[i])
+      out <- tryCatch({
+        dbh_pc(
+          pc,
+          thresholdR2,
+          slice_thickness,
+          concavity = concavity,
+          dtm = dtm,
+          r = r,
+          plot = TRUE,
+          plotcolors
+        )
+      },
+      error = function(cond) {
         message(cond)
-        return(list("dbh" = NaN, "R2" = NaN, "fdbh" = NaN,
-                    "plot" = ggplot2::ggplot()))
-      }
-    )
-    filename <- paste(OUT_path, "dbh_",
-      strsplit(file_names[i], extension)[[1]], "_",
-      as.character(thresholdR2), "_",
-      as.character(slice_thickness), ".jpeg",
-      sep = ""
-    )
-    ggplot2::ggsave(filename, plot = out$plot, width =  15, height = 10,
-                    units = "cm")
-    DBHs <- append(DBHs, out$dbh)
-    Rs <- append(Rs, out$R2)
-    fDBHs <- append(fDBHs, out$fdbh)
-    Plots <- append(Plots, list(out$plot))
+        return(list(
+          "dbh" = NaN,
+          "R2" = NaN,
+          "fdbh" = NaN,
+          "plot" = ggplot2::ggplot()
+        ))
+      })
+      filename <- paste(
+        OUT_path,
+        "dbh_",
+        strsplit(file_names[i], extension)[[1]],
+        "_",
+        as.character(thresholdR2),
+        "_",
+        as.character(slice_thickness),
+        ".jpeg",
+        sep = ""
+      )
+      ggplot2::ggsave(
+        filename,
+        plot = out$plot,
+        width =  15,
+        height = 10,
+        units = "cm"
+      )
+      DBHs <- append(DBHs, out$dbh)
+      Rs <- append(Rs, out$R2)
+      fDBHs <- append(fDBHs, out$fdbh)
+      Plots <- append(Plots, list(out$plot))
+    }
+    return(list(
+      "File" = file_names,
+      "DBHs" = DBHs,
+      "R2s" = Rs,
+      "fDBHs" = fDBHs,
+      "Plots" = Plots
+    ))
   }
-  return(list("File" = file_names, "DBHs" = DBHs, "R2s" = Rs, "fDBHs" = fDBHs,
-              "Plots" = Plots))
-}
 
 #' Calculate and save figures of \code{\link{dab_pc}} function
 #'
@@ -288,6 +357,9 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #'   buttresses.
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}.
 #' @param dtm The digital terrain model (default = NA), parameter of
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
@@ -322,44 +394,80 @@ plot_dbh_fit_pcs <- function(PCs_path, extension = ".txt", thresholdR2 = 0.001,
 #'   maxbuttressheight = 5
 #' )
 #' }
-plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
-                             thresholdbuttress = 0.001, maxbuttressheight = 7,
-                             slice_thickness = 0.06, dtm = NA, r = 5,
-                             plotcolors = c("#000000", "#808080", "#1c027a",
-                                            "#08aa7c","#fac87f")) {
-  file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
-  file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
-  DABs <- c()
-  Rs <- c()
-  fDABs <- c()
-  Hs <- c()
-  Plots <- list()
-  for (i in 1:length(file_names)) {
-    print(paste("processing ", file_names[i]))
-    pc <- read_tree_pc(file_paths[i])
-    out <- dab_pc(pc, thresholdbuttress, maxbuttressheight, slice_thickness,
-                  dtm = dtm, r = r, plot = TRUE, plotcolors)
-    filename <- paste(OUT_path, "dab_", strsplit(file_names[i], extension)[[1]],
-      "_", as.character(thresholdbuttress), "_",
-      as.character(maxbuttressheight), ".jpeg",
-      sep = ""
+plot_dab_fit_pcs <-
+  function(PCs_path,
+           extension = ".txt",
+           OUT_path = "./",
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           slice_thickness = 0.06,
+           concavity = 4,
+           dtm = NA,
+           r = 5,
+           plotcolors = c("#000000", "#808080", "#1c027a",
+                          "#08aa7c", "#fac87f")) {
+    file_paths <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = TRUE)
+    file_names <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = FALSE)
+    DABs <- c()
+    Rs <- c()
+    fDABs <- c()
+    Hs <- c()
+    Plots <- list()
+    for (i in 1:length(file_names)) {
+      print(paste("processing ", file_names[i]))
+      pc <- read_tree_pc(file_paths[i])
+      out <-
+        dab_pc(
+          pc,
+          thresholdbuttress,
+          maxbuttressheight,
+          slice_thickness,
+          concavity = concavity,
+          dtm = dtm,
+          r = r,
+          plot = TRUE,
+          plotcolors
+        )
+      filename <-
+        paste(
+          OUT_path,
+          "dab_",
+          strsplit(file_names[i], extension)[[1]],
+          "_",
+          as.character(thresholdbuttress),
+          "_",
+          as.character(maxbuttressheight),
+          ".jpeg",
+          sep = ""
+        )
+      ggplot2::ggsave(
+        filename,
+        plot = out$plot,
+        width =  15,
+        height = 10,
+        units = "cm"
+      )
+      DABs <- append(DABs, out$dab)
+      Rs <- append(Rs, out$R2)
+      fDABs <- append(fDABs, out$fdab)
+      Hs <- append(Hs, out$h)
+      Plots <- append(Plots, list(out$plot))
+    }
+    return(
+      list(
+        "File" = file_names,
+        "DABs" = DABs,
+        "R2s" = Rs,
+        "fDABs" = fDABs,
+        "Hs" = Hs,
+        "Plots" = Plots
+      )
     )
-    ggplot2::ggsave(filename, plot = out$plot, width =  15, height = 10, units = "cm")
-    DABs <- append(DABs, out$dab)
-    Rs <- append(Rs, out$R2)
-    fDABs <- append(fDABs, out$fdab)
-    Hs <- append(Hs, out$h)
-    Plots <- append(Plots, list(out$plot))
   }
-  return(list("File" = file_names, "DABs" = DABs, "R2s" = Rs, "fDABs" = fDABs,
-              "Hs" = Hs, "Plots" = Plots))
-}
 
 #' Save figures of \code{\link{classify_crown_pc}} function
 #'
@@ -404,6 +512,9 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when buttress == TRUE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}}.
 #' @param dtm The digital terrain model (default = NA), parameter of
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
@@ -443,48 +554,69 @@ plot_dab_fit_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   maxbuttressheight = 5
 #' )
 #' }
-plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
-                                          OUT_path = "./",
-                                          thresholdbranch = 1.5,
-                                          minheight = 1, buttress = FALSE,
-                                          thresholdR2 = 0.001,
-                                          slice_thickness = 0.06,
-                                          thresholdbuttress = 0.001,
-                                          maxbuttressheight = 7,
-                                          dtm = NA, r = 5,
-                                          plotcolors = c("#08aa7c","#fac87f")) {
-  file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
-  file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
-  Plots <- list()
-  for (i in 1:length(file_names)) {
-    print(paste("processing ", file_names[i]))
-    pc <- read_tree_pc(file_paths[i])
-    out <- classify_crown_pc(
-      pc, thresholdbranch, minheight, buttress,
-      thresholdR2, slice_thickness, thresholdbuttress,
-      maxbuttressheight, dtm = dtm, r = r , plot = TRUE, plotcolors
-    )
-    filename <- paste(OUT_path, "crown_",
-      strsplit(file_names[i], extension)[[1]], "_",
-      as.character(thresholdbranch), "_",
-      as.character(minheight),
-      ".jpeg",
-      sep = ""
-    )
-    ggplot2::ggsave(filename,
-      plot = out$plot, bg = "white", width = 60,
-      height = 36, units = "cm"
-    )
-    Plots <- append(Plots, list(out$plot))
+plot_crown_classification_pcs <-
+  function(PCs_path,
+           extension = ".txt",
+           OUT_path = "./",
+           thresholdbranch = 1.5,
+           minheight = 1,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity = 4,
+           dtm = NA,
+           r = 5,
+           plotcolors = c("#08aa7c", "#fac87f")) {
+    file_paths <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = TRUE)
+    file_names <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = FALSE)
+    Plots <- list()
+    for (i in 1:length(file_names)) {
+      print(paste("processing ", file_names[i]))
+      pc <- read_tree_pc(file_paths[i])
+      out <- classify_crown_pc(
+        pc,
+        thresholdbranch,
+        minheight,
+        buttress,
+        thresholdR2,
+        slice_thickness,
+        thresholdbuttress,
+        maxbuttressheight,
+        concavity = concavity,
+        dtm = dtm,
+        r = r ,
+        plot = TRUE,
+        plotcolors
+      )
+      filename <- paste(
+        OUT_path,
+        "crown_",
+        strsplit(file_names[i], extension)[[1]],
+        "_",
+        as.character(thresholdbranch),
+        "_",
+        as.character(minheight),
+        ".jpeg",
+        sep = ""
+      )
+      ggplot2::ggsave(
+        filename,
+        plot = out$plot,
+        bg = "white",
+        width = 60,
+        height = 36,
+        units = "cm"
+      )
+      Plots <- append(Plots, list(out$plot))
+    }
+    return(list("File" = file_names, "Plots" = Plots))
   }
-  return(list("File" = file_names, "Plots" = Plots))
-}
 
 #' Calculate and save figures of \code{\link{projected_area_pc}} function
 #'
@@ -538,6 +670,10 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when crown == TRUE and buttress == FALSE.
+#' @param concavity_classify Numeric value (default=4) concavity for the
+#'   computation of the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}} which is used in
+#'   \code{\link{classify_crown_pc}}.
 #' @param dtm The digital terrain model (default = NA), parameter of
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
@@ -571,60 +707,94 @@ plot_crown_classification_pcs <- function(PCs_path, extension = ".txt",
 #'   crown = TRUE, minheight = 4, buttress = TRUE
 #' )
 #' }
-plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
-                        concavity = 2, crown = FALSE, thresholdbranch = 1.5,
-                        minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
-                        slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7, dtm = NA, r = 5,
-                        plotcolors = c("#000000","#08aa7c")) {
-  file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
-  file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
-  PAs <- c()
-  Plots <- list()
-  for (i in 1:length(file_names)) {
-    print(paste("processing ", file_names[i]))
-    pc <- read_tree_pc(file_paths[i])
-    if (crown) {
-      crown_pc <- classify_crown_pc(
-        pc, thresholdbranch, minheight, buttress,
-        thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r, FALSE
+plot_pa_pcs <-
+  function(PCs_path,
+           extension = ".txt",
+           OUT_path = "./",
+           concavity = 2,
+           crown = FALSE,
+           thresholdbranch = 1.5,
+           minheight = 1,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity_classify = 4,
+           dtm = NA,
+           r = 5,
+           plotcolors = c("#000000", "#08aa7c")) {
+    file_paths <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = TRUE)
+    file_names <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = FALSE)
+    PAs <- c()
+    Plots <- list()
+    for (i in 1:length(file_names)) {
+      print(paste("processing ", file_names[i]))
+      pc <- read_tree_pc(file_paths[i])
+      if (crown) {
+        crown_pc <- classify_crown_pc(
+          pc,
+          thresholdbranch,
+          minheight,
+          buttress,
+          thresholdR2,
+          slice_thickness,
+          thresholdbuttress,
+          maxbuttressheight,
+          concavity_classify,
+          dtm = dtm,
+          r = r,
+          FALSE
+        )
+        out <-
+          projected_area_pc(crown_pc$crownpoints, concavity, TRUE,
+                            plotcolors)
+        plot_area <- out$plot +
+          ggplot2::ggtitle(bquote(PCA == .(round(out$pa, 2)) ~ m ^ 2))
+        filename <- paste(
+          OUT_path,
+          "pca_",
+          strsplit(file_names[i],
+                   extension)[[1]],
+          "_",
+          as.character(concavity),
+          ".jpeg",
+          sep = ""
+        )
+      } else {
+        out <- projected_area_pc(pc, concavity, TRUE, plotcolors)
+        plot_area <- out$plot
+        filename <- paste(
+          OUT_path,
+          "pa_",
+          strsplit(file_names[i], extension)[[1]],
+          "_",
+          as.character(concavity),
+          ".jpeg",
+          sep = ""
+        )
+      }
+      ggplot2::ggsave(
+        filename,
+        plot = plot_area,
+        bg = "white",
+        width = 60,
+        height = 36,
+        units = "cm"
       )
-      out <- projected_area_pc(crown_pc$crownpoints, concavity, TRUE,
-                               plotcolors)
-      plot_area <- out$plot +
-        ggplot2::ggtitle(bquote(PCA == .(round(out$pa, 2)) ~ m^2))
-      filename <- paste(OUT_path, "pca_", strsplit(
-        file_names[i],
-        extension
-      )[[1]],
-      "_", as.character(concavity), ".jpeg",
-      sep = ""
-      )
-    } else {
-      out <- projected_area_pc(pc, concavity, TRUE, plotcolors)
-      plot_area <- out$plot
-      filename <- paste(OUT_path, "pa_",
-        strsplit(file_names[i], extension)[[1]], "_", as.character(concavity),
-        ".jpeg",
-        sep = ""
-      )
+      PAs <- append(PAs, out$pa)
+      Plots <- append(Plots, list(plot))
     }
-    ggplot2::ggsave(filename,
-      plot = plot_area, bg = "white", width = 60,
-      height = 36, units = "cm"
-    )
-    PAs <- append(PAs, out$pa)
-    Plots <- append(Plots, list(plot))
+    return(list(
+      "File" = file_names,
+      "PAs" = PAs,
+      "Plots" = Plots
+    ))
   }
-  return(list("File" = file_names, "PAs" = PAs, "Plots" = Plots))
-}
 
 #' Calculate and save figures of \code{\link{alpha_volume_pc}} function
 #'
@@ -676,6 +846,10 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 #'   when crown == TRUE and buttress == FALSE.
+#' @param concavity Numeric value (default=4) concavity for the computation of
+#'   the functional diameter using a concave hull based on
+#'   \code{\link[concaveman]{concaveman}} which is used in
+#'   \code{\link{classify_crown_pc}}.
 #' @param dtm The digital terrain model (default = NA), parameter of
 #'   \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r, parameter of
@@ -706,48 +880,74 @@ plot_pa_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
 #'   crown = TRUE, minheight = 4, buttress = TRUE
 #' )
 #' }
-plot_av_pcs <- function(PCs_path, extension = ".txt", OUT_path = "./",
-                        alpha = 1, crown = FALSE, thresholdbranch = 1.5,
-                        minheight = 1, buttress = FALSE, thresholdR2 = 0.001,
-                        slice_thickness = 0.06, thresholdbuttress = 0.001,
-                        maxbuttressheight = 7, dtm = NA, r = 5,
-                        plotcolor = "#fac87f") {
-  file_paths <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = TRUE
-  )
-  file_names <- list.files(PCs_path,
-    pattern = paste("*", extension, sep = ""),
-    full.names = FALSE
-  )
-  AVs <- c()
-  for (i in 1:length(file_names)) {
-    print(paste("processing ", file_names[i]))
-    pc <- read_tree_pc(file_paths[i])
-    if (crown) {
-      crown_pc <- classify_crown_pc(
-        pc, thresholdbranch, minheight, buttress,
-        thresholdR2, slice_thickness,
-        thresholdbuttress, maxbuttressheight, dtm = dtm, r = r, plot = FALSE
-      )
-      out <- alpha_volume_pc(crown_pc$crownpoints, alpha, TRUE)
-      fig_name <- paste(OUT_path, "cv_",
-        strsplit(file_names[i], extension)[[1]], "_", as.character(alpha),
-        ".png",
-        sep = ""
-      )
-    } else {
-      out <- alpha_volume_pc(pc, alpha, TRUE, plotcolor)
-      fig_name <- paste(OUT_path, "av_",
-        strsplit(file_names[i], extension)[[1]], "_", as.character(alpha),
-        ".png",
-        sep = ""
-      )
+plot_av_pcs <-
+  function(PCs_path,
+           extension = ".txt",
+           OUT_path = "./",
+           alpha = 1,
+           crown = FALSE,
+           thresholdbranch = 1.5,
+           minheight = 1,
+           buttress = FALSE,
+           thresholdR2 = 0.001,
+           slice_thickness = 0.06,
+           thresholdbuttress = 0.001,
+           maxbuttressheight = 7,
+           concavity = 4,
+           dtm = NA,
+           r = 5,
+           plotcolor = "#fac87f") {
+    file_paths <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = TRUE)
+    file_names <- list.files(PCs_path,
+                             pattern = paste("*", extension, sep = ""),
+                             full.names = FALSE)
+    AVs <- c()
+    for (i in 1:length(file_names)) {
+      print(paste("processing ", file_names[i]))
+      pc <- read_tree_pc(file_paths[i])
+      if (crown) {
+        crown_pc <- classify_crown_pc(
+          pc,
+          thresholdbranch,
+          minheight,
+          buttress,
+          thresholdR2,
+          slice_thickness,
+          thresholdbuttress,
+          maxbuttressheight,
+          concavity,
+          dtm = dtm,
+          r = r,
+          plot = FALSE
+        )
+        out <- alpha_volume_pc(crown_pc$crownpoints, alpha, TRUE)
+        fig_name <- paste(
+          OUT_path,
+          "cv_",
+          strsplit(file_names[i], extension)[[1]],
+          "_",
+          as.character(alpha),
+          ".png",
+          sep = ""
+        )
+      } else {
+        out <- alpha_volume_pc(pc, alpha, TRUE, plotcolor)
+        fig_name <- paste(
+          OUT_path,
+          "av_",
+          strsplit(file_names[i], extension)[[1]],
+          "_",
+          as.character(alpha),
+          ".png",
+          sep = ""
+        )
+      }
+      rgl::rgl.snapshot(fig_name, fmt = "png")
+      rgl::close3d()
+      AVs <- append(AVs, out$av)
+      gc()
     }
-    rgl::rgl.snapshot(fig_name, fmt = "png")
-    rgl::close3d()
-    AVs <- append(AVs, out$av)
-    gc()
+    return(list("File" = file_names, "AVs" = AVs))
   }
-  return(list("File" = file_names, "AVs" = AVs))
-}

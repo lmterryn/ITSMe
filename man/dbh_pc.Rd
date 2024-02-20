@@ -8,6 +8,7 @@ dbh_pc(
   pc,
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
+  concavity = 4,
   dtm = NA,
   r = 5,
   plot = FALSE,
@@ -28,6 +29,10 @@ clouds in multi-scan due to wind-effect).}
 
 \item{slice_thickness}{Numeric value (default = 0.06) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
 
 \item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
 (default = NA). If the digital terrain model is in the same format as a

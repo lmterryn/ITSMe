@@ -19,6 +19,7 @@ summary_qsm_metrics(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  concavity = 4,
   dtm = NA,
   r = 5,
   OUT_path = FALSE
@@ -88,6 +89,15 @@ buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses. Only relevant if the tree point clouds are available and
 buttress == TRUE.}
+
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}. This concavity value is used in the
+functions \code{\link{dbh}}, \code{\link{stem_branch_length_qsm}},
+\code{\link{stem_branch_distance_qsm}}, \code{\link{dbh_height_ratio_qsm}},
+\code{\link{dbh_volume_ratio_qsm}}, and
+\code{\link{dbh_minradius_ratio_qsm}}. Only relevant if the tree point
+cloud is available.}
 
 \item{dtm}{The digital terrain model from \code{\link{tree_height_pc}}.}
 

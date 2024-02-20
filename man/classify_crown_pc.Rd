@@ -13,6 +13,7 @@ classify_crown_pc(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  concavity = 4,
   dtm = NA,
   r = 5,
   plot = FALSE,
@@ -51,6 +52,10 @@ buttresses. Only relevant when buttress == TRUE.}
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter at breast
 height. Only relevant when buttress == TRUE.}
+
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
 
 \item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
 (default = NA). If the digital terrain model is in the same format as a

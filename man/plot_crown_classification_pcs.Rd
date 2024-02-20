@@ -15,6 +15,7 @@ plot_crown_classification_pcs(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  concavity = 4,
   dtm = NA,
   r = 5,
   plotcolors = c("#08aa7c", "#fac87f")
@@ -57,6 +58,10 @@ when buttress == TRUE.}
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses which is used in \code{\link{classify_crown_pc}}. Only relevant
 when buttress == TRUE.}
+
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
 
 \item{dtm}{The digital terrain model (default = NA), parameter of
 \code{\link{tree_height_pc}}.}

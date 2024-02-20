@@ -4,7 +4,13 @@
 \alias{extract_lower_trunk_pc}
 \title{Extract lower trunk point cloud}
 \usage{
-extract_lower_trunk_pc(pc, slice_thickness = 0.08, dtm = NA, r = 5)
+extract_lower_trunk_pc(
+  pc,
+  slice_thickness = 0.08,
+  concavity = 4,
+  dtm = NA,
+  r = 5
+)
 }
 \arguments{
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
@@ -12,6 +18,10 @@ extract_lower_trunk_pc(pc, slice_thickness = 0.08, dtm = NA, r = 5)
 
 \item{slice_thickness}{Numeric value (default = 0.08) that determines the
 thickness of the slice used to determine the lower trunk points.}
+
+\item{concavity}{Numeric value (default=4) concavity for the computation of
+the functional diameter using a concave hull based on
+\code{\link[concaveman]{concaveman}}.}
 
 \item{dtm}{The digital terrain model as a data.frame with columns X,Y,Z
 (default = NA). If the digital terrain model is in the same format as a
