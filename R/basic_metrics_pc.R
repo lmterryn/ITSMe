@@ -17,7 +17,7 @@
 #' pos <- tree_position_pc(pc = pc_tree)
 #' }
 tree_position_pc <- function(pc) {
-  lowest_points <- pc[order(pc$Z, decreasing = FALSE),][1:100,]
+  lowest_points <- pc[order(pc$Z, decreasing = FALSE), ][1:100, ]
   return(c(
     mean(lowest_points$X),
     mean(lowest_points$Y),
@@ -93,13 +93,13 @@ tree_height_pc <- function(pc,
     if (!is.data.frame(dtm)) {
       lowest_point <- min(pc$Z)
     } else {
-      lowest_points <- pc[order(pc$Z, decreasing = FALSE),][1:10,]
+      lowest_points <- pc[order(pc$Z, decreasing = FALSE), ][1:10, ]
       dtm_under_tree <- dtm[(dtm$X >= min(lowest_points$X) - r) &
                               (dtm$X <= max(lowest_points$X) + r) &
                               (dtm$Y >= min(lowest_points$Y) - r) &
-                              (dtm$Y <= max(lowest_points$Y) + r),]
+                              (dtm$Y <= max(lowest_points$Y) + r), ]
       dtm_under_tree <- dtm_under_tree[dtm_under_tree$Z <
-                                         min(dtm_under_tree$Z) + 1.5,]
+                                         min(dtm_under_tree$Z) + 1.5, ]
       lowest_point <- stats::median(dtm_under_tree$Z)
     }
     h <- max(pc$Z) - lowest_point
@@ -107,8 +107,7 @@ tree_height_pc <- function(pc,
       pc_norm <- pc
       pc_norm$Z <- pc$Z - z_min
       X <- Y <- Z <- NULL
-      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z),
-                                col = plotcolors[1]) +
+      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = plotcolors[1]) +
         ggplot2::geom_point(size = 0.1, shape = ".") +
         ggplot2::coord_fixed(ratio = 1) +
         ggplot2::theme(
@@ -120,8 +119,7 @@ tree_height_pc <- function(pc,
       if (is.data.frame(dtm)) {
         dtm_under_tree_norm <- dtm_under_tree
         dtm_under_tree_norm$Z <- dtm_under_tree$Z - z_min
-        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z,
-                                                        col = "tree points")) +
+        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z, col = "tree points")) +
           ggplot2::geom_point(size = 0.1, shape = ".") +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
@@ -139,14 +137,11 @@ tree_height_pc <- function(pc,
           col = plotcolors[3],
           size = 0.5
         ) +
-          ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min),
-                              col = plotcolors[2])
+          ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min), col = plotcolors[2])
         plotYZ <- plotYZ + ggplot2::geom_point(data = dtm_under_tree_norm,
-                                               ggplot2::aes(Y, Z,
-                                                            col = "dtm points"),
+                                               ggplot2::aes(Y, Z, col = "dtm points"),
                                                size = 0.5) +
-          ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min,
-                                           col = "lowest point height")) +
+          ggplot2::geom_hline(ggplot2::aes(yintercept = lowest_point - z_min, col = "lowest point height")) +
           ggplot2::scale_color_manual(
             values = c(
               "tree points" = plotcolors[1],
@@ -158,8 +153,7 @@ tree_height_pc <- function(pc,
           (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
                                                                lowest_point) * 0.5 - 1.05
       } else {
-        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z),
-                                  col = plotcolors[1]) +
+        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = plotcolors[1]) +
           ggplot2::geom_point(size = 0.1, shape = ".") +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
@@ -188,8 +182,7 @@ tree_height_pc <- function(pc,
       plotTree <-
         ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(paste(
           "H = ", as.character(round(h, 2)), " m", sep = ""
-        ),
-        size = 12))
+        ), size = 12))
       print(plotTree)
       return(
         list(
@@ -279,6 +272,8 @@ f <- function(c, x, y) {
 #'   measured.
 #' @param slice_thickness Numeric value (default = 0.6) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param concavity Numeric value (default=4) concavity for the computation of
 #'   the functional diameter using a concave hull based on
 #'   \code{\link[concaveman]{concaveman}}.
@@ -317,18 +312,18 @@ diameter_slice_pc <-
   function(pc,
            slice_height = 0.1,
            slice_thickness = 0.06,
+           functional = TRUE,
            concavity = 4,
            dtm = NA,
            r = 5,
            plot = FALSE,
-           plotcolors = c("#000000", "#1c027a", "#08aa7c",
-                          "#fac87f")) {
+           plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")) {
     h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
     lowest_point <- h_list$lp
     if (max(pc$Z) - lowest_point > slice_height) {
       pc_slice <-
         pc[(pc$Z > lowest_point + slice_height - slice_thickness / 2) &
-             (pc$Z < lowest_point + slice_height + slice_thickness / 2),]
+             (pc$Z < lowest_point + slice_height + slice_thickness / 2), ]
       xy_slice <- pc_slice[, c("X", "Y")]
       if (nrow(xy_slice) > 3) {
         XY_slice <- data.matrix(xy_slice)
@@ -338,7 +333,7 @@ diameter_slice_pc <-
         knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
         remove <- which(knn_dist[, k - 1] > 0.05)
         if (length(remove) != 0) {
-          xy_slice <- xy_slice[-remove,]
+          xy_slice <- xy_slice[-remove, ]
         }
         x_slice <- xy_slice$X
         y_slice <- xy_slice$Y
@@ -352,8 +347,7 @@ diameter_slice_pc <-
             y = y_slice,
             method = "L-BFGS-B"
           )
-        },
-        error = function(cond) {
+        }, error = function(cond) {
           message(cond)
           return(NaN)
         })
@@ -364,11 +358,16 @@ diameter_slice_pc <-
           R <- mean(Ri) # radius (DBH/2)
           residu <- sum((Ri - R) ** 2) / length(Ri) # average residual
           diam <- 2 * R
-          points <-
-            sf::st_as_sf(unique(xy_slice), coords = c("X", "Y"))
-          hull <- concaveman::concaveman(points, concavity)
-          pa <- sf::st_area(hull)
-          fdiam <- sqrt(pa / pi) * 2
+          if (functional) {
+            points <-
+              sf::st_as_sf(unique(xy_slice), coords = c("X", "Y"))
+            hull <- concaveman::concaveman(points, concavity)
+            pa <- sf::st_area(hull)
+            fdiam <- sqrt(pa / pi) * 2
+          } else {
+            hull <- NaN
+            fdiam <- NaN
+          }
         } else {
           return(list(
             "diameter" = NaN,
@@ -399,49 +398,78 @@ diameter_slice_pc <-
             data = xy_slice,
             ggplot2::aes(X, Y, color = "points stem slice"),
             size = 1
-          ) +
-          # ggplot2::coord_fixed(ratio = 1) +
-          ggplot2::geom_sf(
-            data = sf::st_geometry(hull),
-            ggplot2::aes(color = "concave hull"),
-            size = 1,
-            fill = NA
-          ) +
-          ggplot2::ggtitle(paste("diameter at ",
-                                 as.character(round(
-                                   slice_height, 2
-                                 )),
-                                 " m",
-                                 sep = "")) +
-          ggplot2::labs(
-            caption = paste(
-              "diameter = ",
-              as.character(round(diam, 2)),
-              " m \n",
-              "R2 = ",
-              as.character(round(residu * 100, 2)),
-              " cm",
-              "\n",
-              "fdiameter =",
-              as.character(round(fdiam, 2)),
-              " m",
-              sep = ""
-            )
-          ) +
-          ggplot2::theme(text = ggplot2::element_text(size = 12)) +
-          ggplot2::scale_color_manual(
-            name = "",
-            values = c(
-              "points stem slice" = plotcolors[1],
-              "concave hull" = plotcolors[3]
-            ),
-            guide = ggplot2::guide_legend(override.aes =
-                                            list(
-                                              linetype = c(1, 0),
-                                              shape = c(NA, 16),
-                                              size = c(1, 2)
-                                            ))
           )
+        # ggplot2::coord_fixed(ratio = 1) +
+        if (functional) {
+          plotDIAM <- plotDIAM +
+            ggplot2::geom_sf(
+              data = sf::st_geometry(hull),
+              ggplot2::aes(color = "concave hull"),
+              size = 1,
+              fill = NA
+            ) +
+            ggplot2::ggtitle(paste("diameter at ", as.character(round(
+              slice_height, 2
+            )), " m", sep = "")) +
+            ggplot2::labs(
+              caption = paste(
+                "diameter = ",
+                as.character(round(diam, 2)),
+                " m \n",
+                "R2 = ",
+                as.character(round(residu * 100, 2)),
+                " cm",
+                "\n",
+                "fdiameter =",
+                as.character(round(fdiam, 2)),
+                " m",
+                sep = ""
+              )
+            ) +
+            ggplot2::theme(text = ggplot2::element_text(size = 12)) +
+            ggplot2::scale_color_manual(
+              name = "",
+              values = c(
+                "points stem slice" = plotcolors[1],
+                "concave hull" = plotcolors[3]
+              ),
+              guide = ggplot2::guide_legend(override.aes =
+                                              list(
+                                                linetype = c(1, 0),
+                                                shape = c(NA, 16),
+                                                size = c(1, 2)
+                                              ))
+            )
+        } else {
+          plotDIAM <- plotDIAM +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::ggtitle(paste("diameter at ", as.character(round(
+              slice_height, 2
+            )), " m", sep = "")) +
+            ggplot2::labs(
+              caption = paste(
+                "diameter = ",
+                as.character(round(diam, 2)),
+                " m \n",
+                "R2 = ",
+                as.character(round(residu * 100, 2)),
+                " cm",
+                "\n",
+                sep = ""
+              )
+            ) +
+            ggplot2::theme(text = ggplot2::element_text(size = 12)) +
+            ggplot2::scale_color_manual(
+              name = "",
+              values = c("points stem slice" = plotcolors[1]),
+              guide = ggplot2::guide_legend(override.aes =
+                                              list(
+                                                linetype = c(0),
+                                                shape = c(16),
+                                                size = c(2)
+                                              ))
+            )
+        }
         if (!is.nan(R)) {
           data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
           plotDIAM <- plotDIAM +
@@ -460,23 +488,43 @@ diameter_slice_pc <-
               ),
               inherit.aes = FALSE,
               show.legend = TRUE
-            ) +
-            ggplot2::scale_color_manual(
-              name = "",
-              values = c(
-                "points stem slice" = plotcolors[1],
-                "concave hull" = plotcolors[3],
-                "estimated center" = plotcolors[4],
-                "fitted circle" = plotcolors[2]
-              ),
-              guide = ggplot2::guide_legend(override.aes =
-                                              list(
-                                                linetype = c(1, 0, 1, 0),
-                                                shape = c(NA, 16, NA, 16),
-                                                size = c(1, 2, 1, 2)
-                                              ))
-            ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12))
+            )
+          if (functional) {
+            plotDIAM <- plotDIAM +
+              ggplot2::scale_color_manual(
+                name = "",
+                values = c(
+                  "points stem slice" = plotcolors[1],
+                  "concave hull" = plotcolors[3],
+                  "estimated center" = plotcolors[4],
+                  "fitted circle" = plotcolors[2]
+                ),
+                guide = ggplot2::guide_legend(override.aes =
+                                                list(
+                                                  linetype = c(1, 0, 1, 0),
+                                                  shape = c(NA, 16, NA, 16),
+                                                  size = c(1, 2, 1, 2)
+                                                ))
+              ) +
+              ggplot2::theme(text = ggplot2::element_text(size = 12))
+          } else {
+            plotDIAM <- plotDIAM +
+              ggplot2::scale_color_manual(
+                name = "",
+                values = c(
+                  "points stem slice" = plotcolors[1],
+                  "estimated center" = plotcolors[4],
+                  "fitted circle" = plotcolors[2]
+                ),
+                guide = ggplot2::guide_legend(override.aes =
+                                                list(
+                                                  linetype = c(0, 1, 0),
+                                                  shape = c(16, NA, 16),
+                                                  size = c(2, 1, 2)
+                                                ))
+              ) +
+              ggplot2::theme(text = ggplot2::element_text(size = 12))
+          }
         }
         print(plotDIAM)
         return(
@@ -574,7 +622,7 @@ extract_lower_trunk_pc <-
     lh <- initial_height - slice_thickness / 2
     uh <- initial_height + slice_thickness / 2
     center_trunk <- c(diam$center$par[1], diam$center$par[2])
-    trunk_pc <- pc[pc$Z <= lowest_point + uh,]
+    trunk_pc <- pc[pc$Z <= lowest_point + uh, ]
     n <- 0
     restart <- FALSE
     while (lh < 1.5) {
@@ -585,11 +633,12 @@ extract_lower_trunk_pc <-
       lh <- lh + slice_thickness
       uh <- uh + slice_thickness
       pc_slice <-
-        pc[(pc$Z > lowest_point + lh) & (pc$Z <= lowest_point + uh) &
+        pc[(pc$Z > lowest_point + lh) &
+             (pc$Z <= lowest_point + uh) &
              (pc$X > center_trunk[1] - 0.75 * d) &
              (pc$X < center_trunk[1] + 0.75 * d) &
              (pc$Y > center_trunk[2] - 0.75 * d) &
-             (pc$Y < center_trunk[2] + 0.75 * d),]
+             (pc$Y < center_trunk[2] + 0.75 * d), ]
       k10 <- tryCatch({
         stats::kmeans(
           pc_slice,
@@ -597,8 +646,7 @@ extract_lower_trunk_pc <-
           nstart = 25,
           iter.max = 100
         )
-      },
-      error = function(cond) {
+      }, error = function(cond) {
         return(list())
       })
       if (length(k10) > 0) {
@@ -632,7 +680,7 @@ extract_lower_trunk_pc <-
                          (trunk_slice$Y - diam$center[[1]][2]) ^ 2
             ))
             trunk_slice_b <-
-              trunk_slice[R < diam$diameter / 2 * 1.1 + a,]
+              trunk_slice[R < diam$diameter / 2 * 1.1 + a, ]
             diam2 <- diameter_slice_pc(
               pc = rbind(trunk_pc, trunk_slice_b),
               slice_height = lh,
@@ -685,6 +733,8 @@ extract_lower_trunk_pc <-
 #'   clouds in multi-scan due to wind-effect).
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param concavity Numeric value (default=4) concavity for the computation of
 #'   the functional diameter using a concave hull based on
 #'   \code{\link[concaveman]{concaveman}}.
@@ -720,6 +770,7 @@ extract_lower_trunk_pc <-
 dbh_pc <- function(pc,
                    thresholdR2 = 0.001,
                    slice_thickness = 0.06,
+                   functional = TRUE,
                    concavity = 4,
                    dtm = NA,
                    r = 5,
@@ -731,6 +782,7 @@ dbh_pc <- function(pc,
     pc = pc,
     slice_height = 0.15,
     slice_thickness = slice_thickness + 0.02,
+    functional = functional,
     concavity = concavity,
     dtm = dtm,
     r = r
@@ -742,6 +794,7 @@ dbh_pc <- function(pc,
     pc = pc,
     slice_height = 1.3,
     slice_thickness = slice_thickness,
+    functional = functional,
     concavity = concavity,
     dtm = dtm,
     r = r
@@ -754,14 +807,14 @@ dbh_pc <- function(pc,
         dtm = dtm,
         r = r
       )
-    },
-    error = function(cond) {
+    }, error = function(cond) {
       return(pc)
     })
     out_130 <- diameter_slice_pc(
       pc = trunk_pc,
       slice_height = 1.3,
       slice_thickness = slice_thickness,
+      functional = functional,
       concavity = concavity,
       dtm = dtm,
       r = r
@@ -777,14 +830,14 @@ dbh_pc <- function(pc,
           dtm = dtm,
           r = r
         )
-      },
-      error = function(cond) {
+      }, error = function(cond) {
         return(pc)
       })
       out_130 <- diameter_slice_pc(
         pc = trunk_pc,
         slice_height = 1.3,
         slice_thickness = slice_thickness,
+        functional = functional,
         concavity = concavity,
         dtm = dtm,
         r = r
@@ -794,7 +847,7 @@ dbh_pc <- function(pc,
   if (plot) {
     if (is.nan(out_130$diameter)) {
       pc_dbh <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
-                     (pc$Z < lowest_point + 1.3 + slice_thickness / 2),]
+                     (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
       X <- Y <- NULL
       plotDBH <- ggplot2::ggplot() +
         ggplot2::geom_point(
@@ -804,9 +857,7 @@ dbh_pc <- function(pc,
         ) +
         ggplot2::coord_fixed(ratio = 1) +
         ggplot2::ggtitle("DBH") +
-        ggplot2::labs(caption = paste("DBH = NaN", "\n", "R2 = NaN", "\n",
-                                      "fDBH = NaN",
-                                      sep = "")) +
+        ggplot2::labs(caption = paste("DBH = NaN", "\n", "R2 = NaN", "\n", "fDBH = NaN", sep = "")) +
         ggplot2::scale_color_manual(
           name = "",
           values = c("points stem slice" = plotcolors[1]),
@@ -820,7 +871,7 @@ dbh_pc <- function(pc,
         ggplot2::theme(text = ggplot2::element_text(size = 12))
     } else {
       pc_dbh <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
-                     (pc$Z < lowest_point + 1.3 + slice_thickness / 2),]
+                     (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
       X <- Y <- x0 <- y0 <- r <- NULL
       data_circle <- data.frame(
         x0 = out_130$center[[1]][1],
@@ -832,62 +883,113 @@ dbh_pc <- function(pc,
           data = pc_dbh,
           ggplot2::aes(X, Y, color = "points stem slice"),
           size = 1
-        ) +
-        ggplot2::geom_sf(
-          data = sf::st_geometry(out_130$hull),
-          ggplot2::aes(color = "concave hull"),
-          linewidth = 1,
-          fill = NA
-        ) +
-        ggplot2::geom_point(
-          data = data_circle,
-          ggplot2::aes(x0, y0, color = "estimated center"),
-          size = 1
-        ) +
-        ggforce::geom_circle(
-          data = data_circle,
-          ggplot2::aes(
-            x0 = x0,
-            y0 = y0,
-            r = r,
-            color = "fitted circle"
-          ),
-          inherit.aes = FALSE,
-          show.legend = TRUE,
-          size = 1
-        ) +
-        ggplot2::ggtitle("DBH") +
-        ggplot2::labs(
-          caption = paste(
-            "DBH = ",
-            as.character(round(out_130$diameter, 2)),
-            " m \n",
-            "R2 = ",
-            as.character(round(out_130$R2 * 100, 2)),
-            " cm",
-            "\n",
-            "fDBH =",
-            as.character(round(out_130$fdiameter, 2)),
-            " m",
-            sep = ""
-          )
-        ) +
-        ggplot2::scale_color_manual(
-          name = "",
-          values = c(
-            "points stem slice" = plotcolors[1],
-            "concave hull" = plotcolors[3],
-            "estimated center" = plotcolors[4],
-            "fitted circle" = plotcolors[2]
-          ),
-          guide = ggplot2::guide_legend(override.aes =
-                                          list(
-                                            linetype = c(1, 0, 1, 0),
-                                            shape = c(NA, 16, NA, 16),
-                                            size = c(1, 2, 1, 2)
-                                          ))
-        ) +
-        ggplot2::theme(text = ggplot2::element_text(size = 12))
+        )
+      if (functional) {
+        plotDBH <- plotDBH +
+          ggplot2::geom_sf(
+            data = sf::st_geometry(out_130$hull),
+            ggplot2::aes(color = "concave hull"),
+            linewidth = 1,
+            fill = NA
+          ) +
+          ggplot2::geom_point(
+            data = data_circle,
+            ggplot2::aes(x0, y0, color = "estimated center"),
+            size = 1
+          ) +
+          ggforce::geom_circle(
+            data = data_circle,
+            ggplot2::aes(
+              x0 = x0,
+              y0 = y0,
+              r = r,
+              color = "fitted circle"
+            ),
+            inherit.aes = FALSE,
+            show.legend = TRUE,
+            size = 1
+          ) +
+          ggplot2::ggtitle("DBH") +
+          ggplot2::labs(
+            caption = paste(
+              "DBH = ",
+              as.character(round(out_130$diameter, 2)),
+              " m \n",
+              "R2 = ",
+              as.character(round(out_130$R2 * 100, 2)),
+              " cm",
+              "\n",
+              "fDBH =",
+              as.character(round(out_130$fdiameter, 2)),
+              " m",
+              sep = ""
+            )
+          ) +
+          ggplot2::scale_color_manual(
+            name = "",
+            values = c(
+              "points stem slice" = plotcolors[1],
+              "concave hull" = plotcolors[3],
+              "estimated center" = plotcolors[4],
+              "fitted circle" = plotcolors[2]
+            ),
+            guide = ggplot2::guide_legend(override.aes =
+                                            list(
+                                              linetype = c(1, 0, 1, 0),
+                                              shape = c(NA, 16, NA, 16),
+                                              size = c(1, 2, 1, 2)
+                                            ))
+          ) +
+          ggplot2::theme(text = ggplot2::element_text(size = 12))
+      } else {
+        plotDBH <- plotDBH +
+          ggplot2::coord_fixed(ratio = 1) +
+          ggplot2::geom_point(
+            data = data_circle,
+            ggplot2::aes(x0, y0, color = "estimated center"),
+            size = 1
+          ) +
+          ggforce::geom_circle(
+            data = data_circle,
+            ggplot2::aes(
+              x0 = x0,
+              y0 = y0,
+              r = r,
+              color = "fitted circle"
+            ),
+            inherit.aes = FALSE,
+            show.legend = TRUE,
+            size = 1
+          ) +
+          ggplot2::ggtitle("DBH") +
+          ggplot2::labs(
+            caption = paste(
+              "DBH = ",
+              as.character(round(out_130$diameter, 2)),
+              " m \n",
+              "R2 = ",
+              as.character(round(out_130$R2 * 100, 2)),
+              " cm",
+              "\n",
+              sep = ""
+            )
+          ) +
+          ggplot2::scale_color_manual(
+            name = "",
+            values = c(
+              "points stem slice" = plotcolors[1],
+              "estimated center" = plotcolors[4],
+              "fitted circle" = plotcolors[2]
+            ),
+            guide = ggplot2::guide_legend(override.aes =
+                                            list(
+                                              linetype = c(0, 1, 0),
+                                              shape = c(16, NA, 16),
+                                              size = c(2, 1, 2)
+                                            ))
+          ) +
+          ggplot2::theme(text = ggplot2::element_text(size = 12))
+      }
     }
     print(plotDBH)
     return(
@@ -947,6 +1049,8 @@ dbh_pc <- function(pc,
 #'   again at 1.3 m.
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param concavity Numeric value (default=4) concavity for the computation of
 #'   the functional diameter using a concave hull based on
 #'   \code{\link[concaveman]{concaveman}}.
@@ -986,12 +1090,12 @@ dab_pc <-
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            slice_thickness = 0.06,
+           functional = TRUE,
            concavity = 4,
            dtm = NA,
            r = 5,
            plot = FALSE,
-           plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c",
-                          "#fac87f")) {
+           plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")) {
     slice_height <- 1.30
     h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
     lowest_point <- h_list$lp
@@ -1008,6 +1112,7 @@ dab_pc <-
           pc = pc,
           slice_height = slice_height,
           slice_thickness = slice_thickness,
+          functional = functional,
           concavity = concavity,
           dtm = dtm,
           r = r,
@@ -1050,10 +1155,10 @@ dab_pc <-
       data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
       dbh_slice <-
         pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
-             (pc$Z < lowest_point + 1.3 + slice_thickness / 2),]
+             (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
       xy_dbh <-
         pc[(pc$Z > lowest_point + slice_height - slice_thickness / 2) &
-             (pc$Z < lowest_point + slice_height + slice_thickness / 2),]
+             (pc$Z < lowest_point + slice_height + slice_thickness / 2), ]
       if (slice_height != 1.30) {
         plotDAB <- ggplot2::ggplot() +
           ggplot2::geom_point(
@@ -1065,129 +1170,232 @@ dab_pc <-
             data = dbh_slice,
             ggplot2::aes(X, Y, color = "points at breast height"),
             size = 1
-          ) +
-          ggplot2::geom_sf(
-            data = sf::st_geometry(out$hull),
-            ggplot2::aes(color = "concave hull"),
-            linewidth = 1,
-            fill = NA
-          ) +
-          ggplot2::geom_point(
-            data = data_circle,
-            ggplot2::aes(x0, y0, color = "estimated center"),
-            size = 1
-          ) +
-          ggforce::geom_circle(
-            data = data_circle,
-            ggplot2::aes(
-              x0 = x0,
-              y0 = y0,
-              r = r,
-              color = "fitted circle"
-            ),
-            inherit.aes = FALSE,
-            show.legend = TRUE,
-            size = 1
-          ) +
-          ggplot2::ggtitle(paste("DAB at ",
-                                 as.character(round(
-                                   slice_height, 2
-                                 )), " m",
-                                 sep = "")) +
-          ggplot2::labs(
-            caption = paste(
-              "DAB = ",
-              as.character(round(out$diameter, 2)),
-              " m \n",
-              "R2 = ",
-              as.character(round(out$R2 * 100, 2)),
-              " cm",
-              "\n",
-              "fDAB =",
-              as.character(round(out$fdiameter, 2)),
-              " m",
-              sep = ""
-            )
-          ) +
-          ggplot2::scale_color_manual(
-            name = "",
-            values = c(
-              "points above buttresses" = plotcolors[1],
-              "points at breast height" = plotcolors[2],
-              "concave hull" = plotcolors[4],
-              "estimated center" = plotcolors[5],
-              "fitted circle" = plotcolors[3]
-            ),
-            guide = ggplot2::guide_legend(override.aes =
-                                            list(
-                                              linetype = c(1, 0, 1, 0, 0),
-                                              shape = c(NA, 16, NA, 16, 16),
-                                              size = c(1, 2, 1, 2, 2)
-                                            ))
-          ) +
-          ggplot2::theme(text = ggplot2::element_text(size = 12))
+          )
+        if (functional) {
+          plotDAB <- plotDAB +
+            ggplot2::geom_sf(
+              data = sf::st_geometry(out$hull),
+              ggplot2::aes(color = "concave hull"),
+              linewidth = 1,
+              fill = NA
+            ) +
+            ggplot2::geom_point(
+              data = data_circle,
+              ggplot2::aes(x0, y0, color = "estimated center"),
+              size = 1
+            ) +
+            ggforce::geom_circle(
+              data = data_circle,
+              ggplot2::aes(
+                x0 = x0,
+                y0 = y0,
+                r = r,
+                color = "fitted circle"
+              ),
+              inherit.aes = FALSE,
+              show.legend = TRUE,
+              size = 1
+            ) +
+            ggplot2::ggtitle(paste("DAB at ", as.character(round(
+              slice_height, 2
+            )), " m", sep = "")) +
+            ggplot2::labs(
+              caption = paste(
+                "DAB = ",
+                as.character(round(out$diameter, 2)),
+                " m \n",
+                "R2 = ",
+                as.character(round(out$R2 * 100, 2)),
+                " cm",
+                "\n",
+                "fDAB =",
+                as.character(round(out$fdiameter, 2)),
+                " m",
+                sep = ""
+              )
+            ) +
+            ggplot2::scale_color_manual(
+              name = "",
+              values = c(
+                "points above buttresses" = plotcolors[1],
+                "points at breast height" = plotcolors[2],
+                "concave hull" = plotcolors[4],
+                "estimated center" = plotcolors[5],
+                "fitted circle" = plotcolors[3]
+              ),
+              guide = ggplot2::guide_legend(override.aes =
+                                              list(
+                                                linetype = c(1, 0, 1, 0, 0),
+                                                shape = c(NA, 16, NA, 16, 16),
+                                                size = c(1, 2, 1, 2, 2)
+                                              ))
+            ) +
+            ggplot2::theme(text = ggplot2::element_text(size = 12))
+        } else {
+          plotDAB <- plotDAB +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::geom_point(
+              data = data_circle,
+              ggplot2::aes(x0, y0, color = "estimated center"),
+              size = 1
+            ) +
+            ggforce::geom_circle(
+              data = data_circle,
+              ggplot2::aes(
+                x0 = x0,
+                y0 = y0,
+                r = r,
+                color = "fitted circle"
+              ),
+              inherit.aes = FALSE,
+              show.legend = TRUE,
+              size = 1
+            ) +
+            ggplot2::ggtitle(paste("DAB at ", as.character(round(
+              slice_height, 2
+            )), " m", sep = "")) +
+            ggplot2::labs(
+              caption = paste(
+                "DAB = ",
+                as.character(round(out$diameter, 2)),
+                " m \n",
+                "R2 = ",
+                as.character(round(out$R2 * 100, 2)),
+                " cm",
+                "\n",
+                sep = ""
+              )
+            ) +
+            ggplot2::scale_color_manual(
+              name = "",
+              values = c(
+                "points above buttresses" = plotcolors[1],
+                "points at breast height" = plotcolors[2],
+                "estimated center" = plotcolors[5],
+                "fitted circle" = plotcolors[3]
+              ),
+              guide = ggplot2::guide_legend(override.aes =
+                                              list(
+                                                linetype = c(0, 1, 0, 0),
+                                                shape = c(16, NA, 16, 16),
+                                                size = c(2, 1, 2, 2)
+                                              ))
+            ) +
+            ggplot2::theme(text = ggplot2::element_text(size = 12))
+        }
       } else {
         plotDAB <- ggplot2::ggplot() +
           ggplot2::geom_point(
             data = xy_dbh,
             ggplot2::aes(X, Y, color = "points at breast height"),
             size = 1
-          ) +
-          ggplot2::geom_sf(
-            data = sf::st_geometry(out$hull),
-            ggplot2::aes(color = "concave hull"),
-            linewidth = 1,
-            fill = NA
-          ) +
-          ggplot2::geom_point(
-            data = data_circle,
-            ggplot2::aes(x0, y0, color = "estimated center"),
-            size = 1
-          ) +
-          ggforce::geom_circle(
-            data = data_circle,
-            ggplot2::aes(
-              x0 = x0,
-              y0 = y0,
-              r = r,
-              color = "fitted circle"
-            ),
-            inherit.aes = FALSE,
-            show.legend = TRUE,
-            size = 1
-          ) +
-          ggplot2::ggtitle("DBH") +
-          ggplot2::labs(
-            caption = paste(
-              "DBH = ",
-              as.character(round(out$diameter, 2)),
-              " m \n",
-              "R2 = ",
-              as.character(round(out$R2 * 100, 2)),
-              " cm",
-              "\n",
-              "fDBH =",
-              as.character(round(out$fdiameter, 2)),
-              " m",
-              sep = ""
-            )
-          ) +
-          ggplot2::scale_color_manual(
-            name = "",
-            values = c(
-              "points at breast height" = plotcolors[1],
-              "concave hull" = plotcolors[4],
-              "estimated center" = plotcolors[5],
-              "fitted circle" = plotcolors[3]
-            ),
-            guide = ggplot2::guide_legend(override.aes =
-                                            list(
-                                              linetype = c(1, 0, 1, 0),
-                                              shape = c(NA, 16, NA, 16),
-                                              size = c(1, 2, 1, 2)
-                                            ))
-          ) +
-          ggplot2::theme(text = ggplot2::element_text(size = 12))
+          )
+        if (functional) {
+          plotDAB <- plotDAB +
+            ggplot2::geom_sf(
+              data = sf::st_geometry(out$hull),
+              ggplot2::aes(color = "concave hull"),
+              linewidth = 1,
+              fill = NA
+            ) +
+            ggplot2::geom_point(
+              data = data_circle,
+              ggplot2::aes(x0, y0, color = "estimated center"),
+              size = 1
+            ) +
+            ggforce::geom_circle(
+              data = data_circle,
+              ggplot2::aes(
+                x0 = x0,
+                y0 = y0,
+                r = r,
+                color = "fitted circle"
+              ),
+              inherit.aes = FALSE,
+              show.legend = TRUE,
+              size = 1
+            ) +
+            ggplot2::ggtitle("DBH") +
+            ggplot2::labs(
+              caption = paste(
+                "DBH = ",
+                as.character(round(out$diameter, 2)),
+                " m \n",
+                "R2 = ",
+                as.character(round(out$R2 * 100, 2)),
+                " cm",
+                "\n",
+                "fDBH =",
+                as.character(round(out$fdiameter, 2)),
+                " m",
+                sep = ""
+              )
+            ) +
+            ggplot2::scale_color_manual(
+              name = "",
+              values = c(
+                "points at breast height" = plotcolors[1],
+                "concave hull" = plotcolors[4],
+                "estimated center" = plotcolors[5],
+                "fitted circle" = plotcolors[3]
+              ),
+              guide = ggplot2::guide_legend(override.aes =
+                                              list(
+                                                linetype = c(1, 0, 1, 0),
+                                                shape = c(NA, 16, NA, 16),
+                                                size = c(1, 2, 1, 2)
+                                              ))
+            ) +
+            ggplot2::theme(text = ggplot2::element_text(size = 12))
+        } else {
+          plotDAB <- plotDAB +
+            ggplot2::coord_fixed(ratio = 1) +
+            ggplot2::geom_point(
+              data = data_circle,
+              ggplot2::aes(x0, y0, color = "estimated center"),
+              size = 1
+            ) +
+            ggforce::geom_circle(
+              data = data_circle,
+              ggplot2::aes(
+                x0 = x0,
+                y0 = y0,
+                r = r,
+                color = "fitted circle"
+              ),
+              inherit.aes = FALSE,
+              show.legend = TRUE,
+              size = 1
+            ) +
+            ggplot2::ggtitle("DBH") +
+            ggplot2::labs(
+              caption = paste(
+                "DBH = ",
+                as.character(round(out$diameter, 2)),
+                " m \n",
+                "R2 = ",
+                as.character(round(out$R2 * 100, 2)),
+                " cm",
+                "\n",
+                sep = ""
+              )
+            ) +
+            ggplot2::scale_color_manual(
+              name = "",
+              values = c(
+                "points at breast height" = plotcolors[1],
+                "estimated center" = plotcolors[5],
+                "fitted circle" = plotcolors[3]
+              ),
+              guide = ggplot2::guide_legend(override.aes =
+                                              list(
+                                                linetype = c(0, 1, 0),
+                                                shape = c(16, NA, 16),
+                                                size = c(2, 1, 2)
+                                              ))
+            ) +
+            ggplot2::theme(text = ggplot2::element_text(size = 12))
+        }
       }
       print(plotDAB)
       return(list(
@@ -1307,12 +1515,14 @@ classify_crown_pc <-
         )
       dab <- out$dab
     } else {
-      out <- dbh_pc(pc,
-                    thresholdR2,
-                    slice_thickness,
-                    dtm = dtm,
-                    concavity = concavity,
-                    r = r)
+      out <- dbh_pc(
+        pc,
+        thresholdR2,
+        slice_thickness,
+        dtm = dtm,
+        concavity = concavity,
+        r = r
+      )
       dab <- out$dbh
     }
     if (!is.nan(dab)) {
@@ -1327,7 +1537,8 @@ classify_crown_pc <-
         lh <- lh + dh
         uh <- uh + dh
         pc_slice <-
-          pc[(pc$Z > lowest_point + lh) & (pc$Z < lowest_point + uh),]
+          pc[(pc$Z > lowest_point + lh) &
+               (pc$Z < lowest_point + uh), ]
         if (nrow(pc_slice) == 0) {
           S_X <- S_Y <- 0
         } else {
@@ -1340,7 +1551,7 @@ classify_crown_pc <-
           knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
           remove <- which(knn_dist[, k - 1] > distance)
           if (length(remove) != 0) {
-            pc_slice <- pc_slice[-remove,]
+            pc_slice <- pc_slice[-remove, ]
           }
           if (nrow(pc_slice) != 0) {
             S_X <- max(pc_slice$X) - min(pc_slice$X)
@@ -1355,7 +1566,7 @@ classify_crown_pc <-
           lh <- lh - dh / 10
           uh <- uh - dh / 10
           pc_slice <- pc[(pc$Z > lowest_point + lh) &
-                           (pc$Z < lowest_point + uh),]
+                           (pc$Z < lowest_point + uh), ]
           if (nrow(pc_slice) == 0) {
             S_X <- S_Y <- 0
           } else {
@@ -1368,7 +1579,7 @@ classify_crown_pc <-
             knn_dist <- data.frame(knn.dist = knn1[[2]][, 2:k])
             remove <- which(knn_dist[, k - 1] > distance)
             if (length(remove) != 0) {
-              pc_slice <- pc_slice[-remove,]
+              pc_slice <- pc_slice[-remove, ]
             }
             if (nrow(pc_slice) != 0) {
               S_X <- max(pc_slice$X) - min(pc_slice$X)
@@ -1382,13 +1593,13 @@ classify_crown_pc <-
       if ((uh + dh > th)) {
         trunk_pc <- pc
         crown_pc <-
-          stats::setNames(data.frame(matrix(ncol = 3, nrow = 0)),
-                          c("X", "Y", "Z"))
+          stats::setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("X", "Y", "Z"))
       } else {
         lh <- lh - dh
         uh <- uh - dh
         pc_slice <-
-          pc[(pc$Z > lowest_point + lh) & (pc$Z < lowest_point + uh),]
+          pc[(pc$Z > lowest_point + lh) &
+               (pc$Z < lowest_point + uh), ]
         k1 <-
           stats::kmeans(
             pc_slice,
@@ -1398,21 +1609,20 @@ classify_crown_pc <-
           )
         pc_slice$C <- k1$cluster
         center_trunk <- k1$centers
-        trunk_pc <- pc[pc$Z < lowest_point + uh,]
-        crown_pc <- pc[FALSE,]
+        trunk_pc <- pc[pc$Z < lowest_point + uh, ]
+        crown_pc <- pc[FALSE, ]
         d <- thresholdbranch * dab
         S_X <- S_Y <- n <- stop <- 0
         while ((S_X < d) & (S_Y < d) & (stop == 0)) {
           if (n > 0) {
-            crown_pc <- rbind(crown_pc,
-                              pc_slice[pc_slice$C %in% crown, c("X", "Y", "Z")])
+            crown_pc <- rbind(crown_pc, pc_slice[pc_slice$C %in% crown, c("X", "Y", "Z")])
             trunk_pc <- rbind(trunk_pc, trunk_slice)
           }
           n <- n + 1
           lh <- lh + dh
           uh <- uh + dh
           pc_slice <- pc[(pc$Z > lowest_point + lh) &
-                           (pc$Z < lowest_point + uh),]
+                           (pc$Z < lowest_point + uh), ]
           k10 <-
             stats::kmeans(
               pc_slice,
@@ -1424,10 +1634,9 @@ classify_crown_pc <-
           distance_to_centers <- c()
           centers <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
           for (i in 1:10) {
-            distance_to_centers <- append(distance_to_centers,
-                                          ((k10$centers[i, "X"] - k1$centers[1, "X"]) ^ 2 +
-                                             (k10$centers[i, "Y"] - k1$centers[1, "Y"]) ^ 2
-                                          ) ^ (1 / 2))
+            distance_to_centers <- append(distance_to_centers, ((k10$centers[i, "X"] - k1$centers[1, "X"]) ^ 2 +
+                                                                  (k10$centers[i, "Y"] - k1$centers[1, "Y"]) ^ 2
+            ) ^ (1 / 2))
           }
           crown <- centers[distance_to_centers > d]
           trunk_slice <-
@@ -1447,7 +1656,7 @@ classify_crown_pc <-
             S_Y <- max(trunk_slice$Y) - min(trunk_slice$Y)
           }
         }
-        crown_pc <- rbind(crown_pc, pc[pc$Z > lowest_point + lh,])
+        crown_pc <- rbind(crown_pc, pc[pc$Z > lowest_point + lh, ])
       }
       if (plot) {
         if (nrow(crown_pc) == 0) {
@@ -1469,8 +1678,7 @@ classify_crown_pc <-
               name = "class",
               values = c("trunk" = plotcolors[2]),
               guide = ggplot2::guide_legend(override.aes = list(
-                shape = c(16),
-                size = c(2)
+                shape = c(16), size = c(2)
               ))
             )
           plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
@@ -1491,8 +1699,7 @@ classify_crown_pc <-
               name = "class",
               values = c("trunk" = plotcolors[2]),
               guide = ggplot2::guide_legend(override.aes = list(
-                shape = c(16),
-                size = c(2)
+                shape = c(16), size = c(2)
               ))
             )
           s <-
@@ -1510,8 +1717,7 @@ classify_crown_pc <-
           )
           plotCrown <-
             ggpubr::annotate_figure(plotCrown,
-                                    top = ggpubr::text_grob("Crown classification",
-                                                            size = 12))
+                                    top = ggpubr::text_grob("Crown classification", size = 12))
         } else {
           downsample <- 0.1
           crown <- crown_pc[sample(
@@ -1519,7 +1725,7 @@ classify_crown_pc <-
             size = floor(nrow(crown_pc) * downsample),
             replace = FALSE,
             prob = NULL
-          ),]
+          ), ]
           crown$class <- "crown"
           X <- Y <- Z <- NULL
           if (nrow(trunk_pc) == 0) {
@@ -1538,11 +1744,9 @@ classify_crown_pc <-
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
-                values = c("crown" = plotcolors[1],
-                           "trunk" = plotcolors[2]),
+                values = c("crown" = plotcolors[1], "trunk" = plotcolors[2]),
                 guide = ggplot2::guide_legend(override.aes = list(
-                  shape = c(16, 16),
-                  size = c(2, 2)
+                  shape = c(16, 16), size = c(2, 2)
                 ))
               )
             plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
@@ -1561,11 +1765,9 @@ classify_crown_pc <-
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
-                values = c("crown" = plotcolors[1],
-                           "trunk" = plotcolors[2]),
+                values = c("crown" = plotcolors[1], "trunk" = plotcolors[2]),
                 guide = ggplot2::guide_legend(override.aes = list(
-                  shape = c(16, 16),
-                  size = c(2, 2)
+                  shape = c(16, 16), size = c(2, 2)
                 ))
               )
             s <-
@@ -1583,15 +1785,14 @@ classify_crown_pc <-
             )
             plotCrown <-
               ggpubr::annotate_figure(plotCrown,
-                                      top = ggpubr::text_grob("Crown classification",
-                                                              size = 12))
+                                      top = ggpubr::text_grob("Crown classification", size = 12))
           } else {
             trunk <- trunk_pc[sample(
               nrow(trunk_pc),
               size = floor(nrow(trunk_pc) * downsample),
               replace = FALSE,
               prob = NULL
-            ),]
+            ), ]
             trunk$class <- "trunk"
             tree <- rbind(crown, trunk)
             tree$Z <- tree$Z - min(tree$Z)
@@ -1607,11 +1808,9 @@ classify_crown_pc <-
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
-                values = c("crown" = plotcolors[1],
-                           "trunk" = plotcolors[2]),
+                values = c("crown" = plotcolors[1], "trunk" = plotcolors[2]),
                 guide = ggplot2::guide_legend(override.aes = list(
-                  shape = c(16, 16),
-                  size = c(2, 2)
+                  shape = c(16, 16), size = c(2, 2)
                 ))
               )
             plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
@@ -1629,11 +1828,9 @@ classify_crown_pc <-
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
-                values = c("crown" = plotcolors[1],
-                           "trunk" = plotcolors[2]),
+                values = c("crown" = plotcolors[1], "trunk" = plotcolors[2]),
                 guide = ggplot2::guide_legend(override.aes = list(
-                  shape = c(16, 16),
-                  size = c(2, 2)
+                  shape = c(16, 16), size = c(2, 2)
                 ))
               )
             s <-
@@ -1651,8 +1848,7 @@ classify_crown_pc <-
             )
             plotCrown <-
               ggpubr::annotate_figure(plotCrown,
-                                      top = ggpubr::text_grob("Crown classification",
-                                                              size = 12))
+                                      top = ggpubr::text_grob("Crown classification", size = 12))
           }
         }
         print(plotCrown)
@@ -1689,11 +1885,9 @@ classify_crown_pc <-
           ) +
           ggplot2::scale_color_manual(
             name = "class",
-            values = c("crown" = plotcolors[1],
-                       "trunk" = plotcolors[2]),
+            values = c("crown" = plotcolors[1], "trunk" = plotcolors[2]),
             guide = ggplot2::guide_legend(override.aes = list(
-              shape = c(16, 16),
-              size = c(2, 2)
+              shape = c(16, 16), size = c(2, 2)
             ))
           )
         plotYZ <- ggplot2::ggplot(tree, ggplot2::aes(Y, Z)) +
@@ -1711,11 +1905,9 @@ classify_crown_pc <-
           ) +
           ggplot2::scale_color_manual(
             name = "class",
-            values = c("crown" = plotcolors[1],
-                       "trunk" = plotcolors[2]),
+            values = c("crown" = plotcolors[1], "trunk" = plotcolors[2]),
             guide = ggplot2::guide_legend(override.aes = list(
-              shape = c(16, 16),
-              size = c(2, 2)
+              shape = c(16, 16), size = c(2, 2)
             ))
           )
         s <-
@@ -1733,8 +1925,7 @@ classify_crown_pc <-
         )
         plotCrown <-
           ggpubr::annotate_figure(plotCrown,
-                                  top = ggpubr::text_grob("Crown classification",
-                                                          size = 12))
+                                  top = ggpubr::text_grob("Crown classification", size = 12))
         print(plotCrown)
         return(
           list(
@@ -1853,8 +2044,7 @@ projected_area_pc <- function(pc,
       ggplot2::ggtitle(bquote(PA == .(round(pa, 2)) ~ m ^ 2)) +
       ggplot2::scale_color_manual(
         name = "",
-        values = c("concave hull" = plotcolors[2],
-                   "points" = plotcolors[1]),
+        values = c("concave hull" = plotcolors[2], "points" = plotcolors[1]),
         guide = ggplot2::guide_legend(override.aes =
                                         list(
                                           linetype = c(1, 0),
@@ -1909,7 +2099,7 @@ projected_area_pc <- function(pc,
 #'   thresholdR2, thresholdbuttress,
 #'   maxbuttressheight, FALSE
 #' )
-#' vol_crown <- volume_crown_pc(pc = crown_pc$crownpoints, alpha = 2)
+#' vol_crown <- alpha_volume_pc(pc = crown_pc$crownpoints, alpha = 2)
 #' }
 alpha_volume_pc <- function(pc,
                             alpha = 1,
