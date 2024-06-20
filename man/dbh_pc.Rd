@@ -8,6 +8,7 @@ dbh_pc(
   pc,
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
+  functional = TRUE,
   concavity = 4,
   dtm = NA,
   r = 5,
@@ -29,6 +30,9 @@ clouds in multi-scan due to wind-effect).}
 
 \item{slice_thickness}{Numeric value (default = 0.06) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{concavity}{Numeric value (default=4) concavity for the computation of
 the functional diameter using a concave hull based on

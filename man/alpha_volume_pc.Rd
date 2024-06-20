@@ -48,6 +48,6 @@ crown_pc <- classify_crown_pc(
   thresholdR2, thresholdbuttress,
   maxbuttressheight, FALSE
 )
-vol_crown <- volume_crown_pc(pc = crown_pc$crownpoints, alpha = 2)
+vol_crown <- alpha_volume_pc(pc = crown_pc$crownpoints, alpha = 2)
 }
 }

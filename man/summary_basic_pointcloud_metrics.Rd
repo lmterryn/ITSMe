@@ -19,6 +19,7 @@ summary_basic_pointcloud_metrics(
   slice_thickness = 0.06,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
+  functional = TRUE,
   concavity_fdiameter = 4,
   OUT_path = FALSE,
   plot = FALSE,
@@ -75,6 +76,9 @@ buttresses. Only relevant when buttress == TRUE.}
 \item{maxbuttressheight}{Numeric value (default=7). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
 buttresses. Only relevant when buttress == TRUE.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{concavity_fdiameter}{Numeric value (default=4) concavity for the
 computation of the functional diameter using a concave hull based on

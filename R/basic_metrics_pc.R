@@ -1509,6 +1509,7 @@ classify_crown_pc <-
           thresholdbuttress,
           maxbuttressheight,
           slice_thickness,
+          functional = FALSE,
           concavity = concavity,
           dtm = dtm,
           r = r
@@ -1520,6 +1521,7 @@ classify_crown_pc <-
         thresholdR2,
         slice_thickness,
         dtm = dtm,
+        functional = FALSE,
         concavity = concavity,
         r = r
       )

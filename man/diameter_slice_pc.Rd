@@ -8,6 +8,7 @@ diameter_slice_pc(
   pc,
   slice_height = 0.1,
   slice_thickness = 0.06,
+  functional = TRUE,
   concavity = 4,
   dtm = NA,
   r = 5,
@@ -25,6 +26,9 @@ measured.}
 
 \item{slice_thickness}{Numeric value (default = 0.6) that determines the
 thickness of the slice which is used to measure the diameter.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{concavity}{Numeric value (default=4) concavity for the computation of
 the functional diameter using a concave hull based on

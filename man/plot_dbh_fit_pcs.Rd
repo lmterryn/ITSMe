@@ -9,6 +9,7 @@ plot_dbh_fit_pcs(
   extension = ".txt",
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
+  functional = TRUE,
   concavity = 4,
   dtm = NA,
   r = 5,
@@ -30,6 +31,9 @@ height.}
 \item{slice_thickness}{Numeric value (default = 0.06). Parameter of the
 \code{\link{dbh_pc}} function used to calculate the diameter at breast
 height.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{concavity}{Numeric value (default=4) concavity for the computation of
 the functional diameter using a concave hull based on

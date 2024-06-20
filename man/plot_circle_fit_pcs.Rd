@@ -9,6 +9,7 @@ plot_circle_fit_pcs(
   extension = ".txt",
   slice_height = 1.3,
   slice_thickness = 0.06,
+  functional = TRUE,
   concavity = 4,
   dtm = NA,
   r = 5,
@@ -32,6 +33,9 @@ calculate the diameter of a stem slice.}
 thickness of the slice which is used to measure the diameter. Parameter of
 the \code{\link{diameter_slice_pc}} function used to calculate the diameter
 of a stem slice.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{concavity}{Numeric value (default=2) concavity for the computation of
 the functional diameter using a concave hull based on

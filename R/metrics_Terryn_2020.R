@@ -72,10 +72,10 @@ dbh <-
       if (buttress) {
         out <-
           dab_pc(
-            pc,
-            thresholdbuttress,
-            maxbuttressheight,
-            slice_thickness,
+            pc = pc,
+            thresholdbuttress = thresholdbuttress,
+            maxbuttressheight = maxbuttressheight,
+            slice_thickness = slice_thickness,
             concavity = concavity,
             dtm = dtm,
             r = r
@@ -84,9 +84,9 @@ dbh <-
       } else {
         out <-
           dbh_pc(
-            pc,
-            thresholdR2,
-            slice_thickness,
+            pc = pc,
+            thresholdR2 = thresholdR2,
+            slice_thickness = slice_thickness,
             concavity = concavity,
             dtm = dtm,
             r = r
@@ -138,7 +138,7 @@ tree_height <- function(treedata,
   if (!is.data.frame(pc)) {
     return(tree_height_qsm(treedata))
   } else {
-    h_list <- tree_height_pc(pc, dtm = dtm, r = r)
+    h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
     return(h_list$h)
   }
 }
@@ -471,13 +471,13 @@ stem_branch_length_qsm <- function(branch,
     branch_len <- branch$length[ind_stem_branches]
     if (normalisation == "dbh") {
       dbh <- dbh(
-        treedata,
-        pc,
-        buttress,
-        thresholdR2,
-        slice_thickness,
-        thresholdbuttress,
-        maxbuttressheight,
+        treedata = treedata,
+        pc = pc,
+        buttress = buttress,
+        thresholdR2 = thresholdR2,
+        slice_thickness = slice_thickness,
+        thresholdbuttress = thresholdbuttress,
+        maxbuttressheight = maxbuttressheight,
         concavity = concavity,
         dtm = dtm,
         r = r
@@ -625,13 +625,13 @@ stem_branch_distance_qsm <-
       }
       if (normalisation == "dbh") {
         dbh <- dbh(
-          treedata,
-          pc,
-          buttress,
-          thresholdR2,
-          slice_thickness,
-          thresholdbuttress,
-          maxbuttressheight,
+          treedata = treedata,
+          pc = pc,
+          buttress = buttress,
+          thresholdR2 = thresholdR2,
+          slice_thickness = slice_thickness,
+          thresholdbuttress = thresholdbuttress,
+          maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
           r = r
@@ -728,13 +728,13 @@ dbh_height_ratio_qsm <-
            dtm = NA,
            r = 5) {
     dbh <- dbh(
-      treedata,
-      pc,
-      buttress,
-      thresholdR2,
-      slice_thickness,
-      thresholdbuttress,
-      maxbuttressheight,
+      treedata = treedata,
+      pc = pc,
+      buttress = buttress,
+      thresholdR2 = thresholdR2,
+      slice_thickness = slice_thickness,
+      thresholdbuttress = thresholdbuttress,
+      maxbuttressheight = maxbuttressheight,
       concavity = concavity,
       dtm = dtm,
       r = r
@@ -824,13 +824,13 @@ dbh_volume_ratio_qsm <-
            dtm = NA,
            r = 5) {
     dbh <- dbh(
-      treedata,
-      pc,
-      buttress,
-      thresholdR2,
-      slice_thickness,
-      thresholdbuttress,
-      maxbuttressheight,
+      treedata = treedata,
+      pc = pc,
+      buttress = buttress,
+      thresholdR2 = thresholdR2,
+      slice_thickness = slice_thickness,
+      thresholdbuttress = thresholdbuttress,
+      maxbuttressheight = maxbuttressheight,
       concavity = concavity,
       dtm = dtm,
       r = r
@@ -1361,8 +1361,7 @@ crown_evenness_qsm <- function(cylinder) {
     R <- sqrt(((cylinder$start[crownset, 1] - center_x) ^ 2 +
                  (cylinder$start[crownset, 2] - center_y) ^ 2
     ))
-    theta <- atan2((cylinder$start[crownset, 2] - center_y),
-                   (cylinder$start[crownset, 1] - center_x))
+    theta <- atan2((cylinder$start[crownset, 2] - center_y), (cylinder$start[crownset, 1] - center_x))
     minimums <- c()
     Ind_Bin <- c()
     for (i in 2:length(bins)) {
@@ -1496,8 +1495,10 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
       v2 <-
         sum((p - ds_bin1_branch[de_bin1_branch > p &
                                   ds_bin1_branch <= p]) /
-              (d_bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]) *
-              vol[bin1_branch[de_bin1_branch > p & ds_bin1_branch <= p]])
+              (d_bin1_branch[de_bin1_branch > p &
+                               ds_bin1_branch <= p]) *
+              vol[bin1_branch[de_bin1_branch > p &
+                                ds_bin1_branch <= p]])
       vol_p <- v1 + v2
       ratio <- vol_p / sum(vol[bin1_branch])
     }
@@ -1522,8 +1523,10 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
       v2 <-
         sum((p - ds_bin2_branch[de_bin2_branch > p &
                                   ds_bin2_branch <= p]) /
-              (d_bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]) *
-              vol[bin2_branch[de_bin2_branch > p & ds_bin2_branch <= p]])
+              (d_bin2_branch[de_bin2_branch > p &
+                               ds_bin2_branch <= p]) *
+              vol[bin2_branch[de_bin2_branch > p &
+                                ds_bin2_branch <= p]])
       vol_p <- v1 + v2
       ratio <- vol_p / sum(vol[bin2_branch])
     }
@@ -1548,8 +1551,10 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
       v2 <-
         sum((p - ds_bin3_branch[de_bin3_branch > p &
                                   ds_bin3_branch <= p]) /
-              (d_bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]) *
-              vol[bin3_branch[de_bin3_branch > p & ds_bin3_branch <= p]])
+              (d_bin3_branch[de_bin3_branch > p &
+                               ds_bin3_branch <= p]) *
+              vol[bin3_branch[de_bin3_branch > p &
+                                ds_bin3_branch <= p]])
       vol_p <- v1 + v2
       ratio <- vol_p / sum(vol[bin3_branch])
     }
@@ -1723,13 +1728,13 @@ dbh_minradius_ratio_qsm <- function(treedata,
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- min(radii) * 2
   dbh <- dbh(
-    treedata,
-    pc,
-    buttress,
-    thresholdR2,
-    slice_thickness,
-    thresholdbuttress,
-    maxbuttressheight,
+    treedata = treedata,
+    pc = pc,
+    buttress = buttress,
+    thresholdR2 = thresholdR2,
+    slice_thickness = slice_thickness,
+    thresholdbuttress = thresholdbuttress,
+    maxbuttressheight = maxbuttressheight,
     concavity = concavity,
     dtm = dtm,
     r = r

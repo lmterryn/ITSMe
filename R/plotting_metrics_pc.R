@@ -61,7 +61,13 @@ plot_tree_height_pcs <-
     for (i in 1:length(file_names)) {
       print(paste("processing ", file_names[i]))
       pc <- read_tree_pc(file_paths[i])
-      out <- tree_height_pc(pc, dtm, r, TRUE, plotcolors)
+      out <- tree_height_pc(
+        pc = pc,
+        dtm = dtm,
+        r = r,
+        plot = TRUE,
+        plotcolors = plotcolors
+      )
       filename <- paste(OUT_path,
                         "tree_height_",
                         strsplit(file_names[i], extension)[[1]],
@@ -106,6 +112,8 @@ plot_tree_height_pcs <-
 #'   thickness of the slice which is used to measure the diameter. Parameter of
 #'   the \code{\link{diameter_slice_pc}} function used to calculate the diameter
 #'   of a stem slice.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param concavity Numeric value (default=2) concavity for the computation of
 #'   the functional diameter using a concave hull based on
 #'   \code{\link[concaveman]{concaveman}}.
@@ -148,12 +156,12 @@ plot_circle_fit_pcs <- function(PCs_path,
                                 extension = ".txt",
                                 slice_height = 1.3,
                                 slice_thickness = 0.06,
+                                functional = TRUE,
                                 concavity = 4,
                                 dtm = NA,
                                 r = 5,
                                 OUT_path = "./",
-                                plotcolors = c("#000000", "#1c027a", "#08aa7c",
-                                               "#fac87f")) {
+                                plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")) {
   file_paths <- list.files(PCs_path,
                            pattern = paste("*", extension, sep = ""),
                            full.names = TRUE)
@@ -169,14 +177,15 @@ plot_circle_fit_pcs <- function(PCs_path,
     pc <- read_tree_pc(file_paths[i])
     out <-
       diameter_slice_pc(
-        pc,
-        slice_height,
-        slice_thickness,
+        pc = pc,
+        slice_height = slice_height,
+        slice_thickness = slice_thickness,
+        functional = functional,
         concavity = concavity,
         dtm = dtm,
         r = r,
         plot = TRUE,
-        plotcolors
+        plotcolors = plotcolors
       )
     filename <- paste(
       OUT_path,
@@ -224,6 +233,8 @@ plot_circle_fit_pcs <- function(PCs_path,
 #' @param slice_thickness Numeric value (default = 0.06). Parameter of the
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param concavity Numeric value (default=4) concavity for the computation of
 #'   the functional diameter using a concave hull based on
 #'   \code{\link[concaveman]{concaveman}}.
@@ -260,12 +271,12 @@ plot_dbh_fit_pcs <-
            extension = ".txt",
            thresholdR2 = 0.001,
            slice_thickness = 0.06,
+           functional = TRUE,
            concavity = 4,
            dtm = NA,
            r = 5,
            OUT_path = "./",
-           plotcolors = c("#000000", "#1c027a", "#08aa7c",
-                          "#fac87f")) {
+           plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")) {
     file_paths <- list.files(PCs_path,
                              pattern = paste("*", extension, sep = ""),
                              full.names = TRUE)
@@ -281,17 +292,17 @@ plot_dbh_fit_pcs <-
       pc <- read_tree_pc(file_paths[i])
       out <- tryCatch({
         dbh_pc(
-          pc,
-          thresholdR2,
-          slice_thickness,
+          pc = pc,
+          thresholdR2 = thresholdR2,
+          slice_thickness = slice_thickness,
+          functional = functional,
           concavity = concavity,
           dtm = dtm,
           r = r,
           plot = TRUE,
-          plotcolors
+          plotcolors = plotcolors
         )
-      },
-      error = function(cond) {
+      }, error = function(cond) {
         message(cond)
         return(list(
           "dbh" = NaN,
@@ -357,6 +368,8 @@ plot_dbh_fit_pcs <-
 #'   buttresses.
 #' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param concavity Numeric value (default=4) concavity for the computation of
 #'   the functional diameter using a concave hull based on
 #'   \code{\link[concaveman]{concaveman}}.
@@ -401,11 +414,11 @@ plot_dab_fit_pcs <-
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            slice_thickness = 0.06,
+           functional = TRUE,
            concavity = 4,
            dtm = NA,
            r = 5,
-           plotcolors = c("#000000", "#808080", "#1c027a",
-                          "#08aa7c", "#fac87f")) {
+           plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")) {
     file_paths <- list.files(PCs_path,
                              pattern = paste("*", extension, sep = ""),
                              full.names = TRUE)
@@ -422,15 +435,16 @@ plot_dab_fit_pcs <-
       pc <- read_tree_pc(file_paths[i])
       out <-
         dab_pc(
-          pc,
-          thresholdbuttress,
-          maxbuttressheight,
-          slice_thickness,
+          pc = pc,
+          thresholdbuttress = thresholdbuttress,
+          maxbuttressheight = maxbuttressheight,
+          slice_thickness = slice_thickness,
+          functional = functional,
           concavity = concavity,
           dtm = dtm,
           r = r,
           plot = TRUE,
-          plotcolors
+          plotcolors = plotcolors
         )
       filename <-
         paste(
@@ -580,19 +594,19 @@ plot_crown_classification_pcs <-
       print(paste("processing ", file_names[i]))
       pc <- read_tree_pc(file_paths[i])
       out <- classify_crown_pc(
-        pc,
-        thresholdbranch,
-        minheight,
-        buttress,
-        thresholdR2,
-        slice_thickness,
-        thresholdbuttress,
-        maxbuttressheight,
+        pc = pc,
+        thresholdbranch = thresholdbranch,
+        minheight = minheight,
+        buttress = buttress,
+        thresholdR2 = thresholdR2,
+        slice_thickness = slice_thickness,
+        thresholdbuttress = thresholdbuttress,
+        maxbuttressheight = maxbuttressheight,
         concavity = concavity,
         dtm = dtm,
-        r = r ,
+        r = r,
         plot = TRUE,
-        plotcolors
+        plotcolors = plotcolors
       )
       filename <- paste(
         OUT_path,
@@ -737,36 +751,44 @@ plot_pa_pcs <-
       pc <- read_tree_pc(file_paths[i])
       if (crown) {
         crown_pc <- classify_crown_pc(
-          pc,
-          thresholdbranch,
-          minheight,
-          buttress,
-          thresholdR2,
-          slice_thickness,
-          thresholdbuttress,
-          maxbuttressheight,
-          concavity_classify,
+          pc = pc,
+          thresholdbranch = thresholdbranch,
+          minheight = minheight,
+          buttress = buttress,
+          thresholdR2 = thresholdR2,
+          slice_thickness = slice_thickness,
+          thresholdbuttress = thresholdbuttress,
+          maxbuttressheight = maxbuttressheight,
+          concavity = concavity_classify,
           dtm = dtm,
           r = r,
-          FALSE
+          plot = FALSE
         )
         out <-
-          projected_area_pc(crown_pc$crownpoints, concavity, TRUE,
-                            plotcolors)
+          projected_area_pc(
+            pc = crown_pc$crownpoints,
+            concavity = concavity,
+            plot = TRUE,
+            plotcolors = plotcolors
+          )
         plot_area <- out$plot +
           ggplot2::ggtitle(bquote(PCA == .(round(out$pa, 2)) ~ m ^ 2))
         filename <- paste(
           OUT_path,
           "pca_",
-          strsplit(file_names[i],
-                   extension)[[1]],
+          strsplit(file_names[i], extension)[[1]],
           "_",
           as.character(concavity),
           ".jpeg",
           sep = ""
         )
       } else {
-        out <- projected_area_pc(pc, concavity, TRUE, plotcolors)
+        out <- projected_area_pc(
+          pc = pc,
+          concavity = concavity,
+          plot = TRUE,
+          plotcolors = plotcolors
+        )
         plot_area <- out$plot
         filename <- paste(
           OUT_path,
@@ -909,15 +931,15 @@ plot_av_pcs <-
       pc <- read_tree_pc(file_paths[i])
       if (crown) {
         crown_pc <- classify_crown_pc(
-          pc,
-          thresholdbranch,
-          minheight,
-          buttress,
-          thresholdR2,
-          slice_thickness,
-          thresholdbuttress,
-          maxbuttressheight,
-          concavity,
+          pc = pc,
+          thresholdbranch = thresholdbranch,
+          minheight = minheight,
+          buttress = buttress,
+          thresholdR2 = thresholdR2,
+          slice_thickness = slice_thickness,
+          thresholdbuttress = thresholdbuttress,
+          maxbuttressheight = maxbuttressheight,
+          concavity = concavity,
           dtm = dtm,
           r = r,
           plot = FALSE
