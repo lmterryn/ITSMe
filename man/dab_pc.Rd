@@ -9,7 +9,7 @@ dab_pc(
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   slice_thickness = 0.06,
-  functional = TRUE,
+  functional = FALSE,
   concavity = 4,
   dtm = NA,
   r = 5,

@@ -8,7 +8,7 @@ diameter_slice_pc(
   pc,
   slice_height = 0.1,
   slice_thickness = 0.06,
-  functional = TRUE,
+  functional = FALSE,
   concavity = 4,
   dtm = NA,
   r = 5,

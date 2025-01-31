@@ -8,7 +8,7 @@ dbh_pc(
   pc,
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
-  functional = TRUE,
+  functional = FALSE,
   concavity = 4,
   dtm = NA,
   r = 5,

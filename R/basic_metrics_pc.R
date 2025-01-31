@@ -312,7 +312,7 @@ diameter_slice_pc <-
   function(pc,
            slice_height = 0.1,
            slice_thickness = 0.06,
-           functional = TRUE,
+           functional = FALSE,
            concavity = 4,
            dtm = NA,
            r = 5,
@@ -520,8 +520,7 @@ diameter_slice_pc <-
                                                 list(
                                                   linetype = c(0, 1, 0),
                                                   shape = c(16, NA, 16),
-                                                  size = c(2, 1, 2)
-                                                ))
+                                                  size = c(2, 1, 2)                                                ))
               ) +
               ggplot2::theme(text = ggplot2::element_text(size = 12))
           }
@@ -770,7 +769,7 @@ extract_lower_trunk_pc <-
 dbh_pc <- function(pc,
                    thresholdR2 = 0.001,
                    slice_thickness = 0.06,
-                   functional = TRUE,
+                   functional = FALSE,
                    concavity = 4,
                    dtm = NA,
                    r = 5,
@@ -1090,7 +1089,7 @@ dab_pc <-
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            slice_thickness = 0.06,
-           functional = TRUE,
+           functional = FALSE,
            concavity = 4,
            dtm = NA,
            r = 5,
