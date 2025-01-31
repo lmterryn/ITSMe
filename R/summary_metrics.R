@@ -630,7 +630,7 @@ summary_qsm_metrics <-
         sbr <- stem_branch_radius_qsm(
           cylinder = qsm$cylinder,
           treedata = qsm$treedata,
-          sbr_normalisation = sbr_normalisation,
+          normalisation = sbr_normalisation,
           pc = pc,
           dtm = dtm,
           r = r
@@ -638,7 +638,7 @@ summary_qsm_metrics <-
         sbl <- stem_branch_length_qsm(
           branch = qsm$branch,
           treedata = qsm$treedata,
-          sbl_normalisation,
+          normalisation = sbl_normalisation,
           pc = pc,
           buttress = buttress,
           thresholdR2 = thresholdR2,
@@ -652,7 +652,7 @@ summary_qsm_metrics <-
         sbd <- stem_branch_distance_qsm(
           cylinder = qsm$cylinder,
           treedata = qsm$treedata,
-          sbd_normalisation,
+          normalisation = sbd_normalisation,
           pc = pc,
           buttress = buttress,
           thresholdR2 = thresholdR2,
