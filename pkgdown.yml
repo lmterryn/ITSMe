@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   ITSMe: ITSMe.html
-last_built: 2025-01-31T10:36Z
+last_built: 2025-04-28T12:27Z
 urls:
   reference: https://lmterryn.github.io/ITSMe/reference
   article: https://lmterryn.github.io/ITSMe/articles

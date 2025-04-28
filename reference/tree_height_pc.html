@@ -9,7 +9,7 @@ terrain model (dtm) is provided it is used to estimate the tree height."><meta p
 
     <a class="navbar-brand me-2" href="../index.html">ITSMe</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,7 @@ terrain model (dtm) is provided it is used to estimate the tree height."><meta p
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Tree height point cloud</h1>
-      <small class="dont-index">Source: <a href="https://github.com/lmterryn/ITSMe/blob/v1.0.2/R/basic_metrics_pc.R" class="external-link"><code>R/basic_metrics_pc.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/lmterryn/ITSMe/blob/main/R/basic_metrics_pc.R" class="external-link"><code>R/basic_metrics_pc.R</code></a></small>
       <div class="d-none name"><code>tree_height_pc.Rd</code></div>
     </div>
 
@@ -93,13 +93,17 @@ fourth and fifth elements.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The tree height is measured as the difference between the Z-value of the
-highest and lowest point of the tree point cloud. The lowest point of a tree
-point cloud is sometimes not sampled (e.g. for low density UAV-LS, in dense
-forests). In this case, a dtm can be provided and will be used to estimate
-the lowest point: this is the height of the dtm under the tree point cloud,
-which is calculated as the median Z-value of the digital terrain model points
-within a horizontal (x,y-)range (r) of the 10 lowest points of the tree point
-cloud.</p>
+highest and lowest point of the tree point cloud.</p>
+<p>The lowest point of a tree point cloud is sometimes not sampled (e.g. for low
+density UAV-LS, in dense forests). In this case, a dtm can be provided and
+will be used to estimate the lowest point: this is the height of the dtm
+under the tree point cloud, which is calculated as the median Z-value of the
+digital terrain model points within a horizontal (x,y-)range (r) of the 10
+lowest points of the tree point cloud.</p>
+<p>For multi-temporal analyses, the lowest point of the point cloud of
+the tree of interest acquired at the first time step can be provided as a
+data.frame with columns X,Y,Z in the dtm input. This will ensure the tree
+heights of the trees are measured based on the same lowest point.</p>
     </div>
 
     <div class="section level2">
@@ -108,10 +112,16 @@ cloud.</p>
 <span class="r-in"><span><span class="co"># Read tree point cloud and calculate the tree height</span></span></span>
 <span class="r-in"><span><span class="va">pc_tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>PC_path <span class="op">=</span> <span class="st">"path/to/point_cloud.txt"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">tree_height</span> <span class="op">&lt;-</span> <span class="fu">tree_height_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Read the digital terrain model</span></span></span>
 <span class="r-in"><span><span class="va">dtm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>PC_path <span class="op">=</span> <span class="st">"path/to/dtm.txt"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Calculate the tree height based on the point cloud and dtm</span></span></span>
 <span class="r-in"><span><span class="va">tree_height</span> <span class="op">&lt;-</span> <span class="fu">tree_height_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, dtm <span class="op">=</span> <span class="va">dtm</span>, r <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># multi-temporal analysis</span></span></span>
+<span class="r-in"><span><span class="va">pc_tree_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>PC_path <span class="op">=</span> <span class="st">"path/to/point_cloud_at_other_time.txt"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pc_tree_2</span><span class="op">$</span><span class="va">Z</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tree_height</span> <span class="op">&lt;-</span> <span class="fu">tree_height_pc</span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, dtm <span class="op">=</span> <span class="va">lp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
