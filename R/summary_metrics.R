@@ -132,12 +132,14 @@ summary_basic_pointcloud_metrics_pertree <-
     pc <- read_tree_pc(path = PC_path)
     #calculate tree position
     if ("tree position" %in% metrics) {
+      print("calculating tree position")
       pos <- tree_position_pc(pc = pc)
       tree$X_position = pos[1]
       tree$Y_position = pos[2]
     }
     #calculate tree height
     if ("tree height" %in% metrics & crown == TRUE) {
+      print("calculating tree height")
       h_out <-
         tree_height_pc(
           pc = pc,
@@ -147,6 +149,7 @@ summary_basic_pointcloud_metrics_pertree <-
           plotcolors = plotcolors[c(1, 4:5)]
         )
     } else if ("tree height" %in% metrics) {
+      print("calculating tree height")
       h_out <-
         tree_height_pc(
           pc = pc,
@@ -159,6 +162,7 @@ summary_basic_pointcloud_metrics_pertree <-
     tree$tree_height_m <- h <- h_out$h
     #calculate stem diameter
     if ("stem diameter" %in% metrics) {
+      print("calculating stem diameter")
       if (!("tree height" %in% metrics)){
         h_out <-
           tree_height_pc(
@@ -200,7 +204,6 @@ summary_basic_pointcloud_metrics_pertree <-
           d_plot <- d_plot + ggplot2::theme(legend.key = ggplot2::element_blank())
         }
       } else {
-        start_time <- Sys.time()
         dbh_out <- tryCatch({
           dbh_out <-
             dbh_pc(
@@ -223,9 +226,6 @@ summary_basic_pointcloud_metrics_pertree <-
             "plot" = empty_plot
           ))
         })
-        end_time <- Sys.time()
-        execution_time <- end_time - start_time
-        print(paste("Execution time DBH:", execution_time))
         tree$stem_diameter_m <- dbh <- dbh_out$dbh
         tree$R2 <- R2 <- dbh_out$R2
         tree$functional_stem_diameter_m <- fdbh <- dbh_out$fdbh
@@ -239,6 +239,7 @@ summary_basic_pointcloud_metrics_pertree <-
     #perform crown classification
     if (("projected area" %in% metrics |
          "alpha volume" %in% metrics) & crown) {
+      print("performing crown classification")
       classify_out <- tryCatch({
         classify_crown_pc(
           pc = pc,
@@ -263,17 +264,24 @@ summary_basic_pointcloud_metrics_pertree <-
             sep = ""
           )
         )
+        h_out <-
+          tree_height_pc(
+            pc = pc,
+            dtm = dtm,
+            r = r,
+            plot = plot,
+            plotcolors = plotcolors[c(1, 4:5)]
+          )
         return(
           list(
             "crownpoints" = pc,
             "trunkpoints" = NaN,
-            "plot" = NaN,
-            "plotXZ" = NaN,
-            "plotYZ" = NaN
+            "plot" = h_out$plot,
+            "plotXZ" = h_out$plotXZ,
+            "plotYZ" = h_out$plotYZ
           )
         )
       })
-
       pc <- classify_out$crownpoints
       if (plot == TRUE & "tree height" %in% metrics) {
         hxz_plot <- classify_out$plotXZ +
@@ -298,6 +306,7 @@ summary_basic_pointcloud_metrics_pertree <-
 
     #calculate alpha volume
     if ("alpha volume" %in% metrics) {
+      print("calculating alpha volume")
       av_out <- alpha_volume_pc(pc = pc,
                                 alpha = alpha,
                                 plot = FALSE)
@@ -307,6 +316,7 @@ summary_basic_pointcloud_metrics_pertree <-
 
     #calculate projected area
     if ("projected area" %in% metrics) {
+      print("calculating projected area")
       pa_out <- projected_area_pc(
         pc = pc,
         concavity = concavity,
@@ -550,7 +560,6 @@ summary_basic_pointcloud_metrics <-
       parallel::clusterEvalQ(cl, {
         library(ITSMe)
       })
-      parallel::clusterEvalQ(cl, devtools::load_all())
       parallel::clusterExport(
         cl,
         varlist = c(
