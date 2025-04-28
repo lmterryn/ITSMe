@@ -44,22 +44,34 @@ terrain model (dtm) is provided it is used to estimate the tree height.
 }
 \details{
 The tree height is measured as the difference between the Z-value of the
-highest and lowest point of the tree point cloud. The lowest point of a tree
-point cloud is sometimes not sampled (e.g. for low density UAV-LS, in dense
-forests). In this case, a dtm can be provided and will be used to estimate
-the lowest point: this is the height of the dtm under the tree point cloud,
-which is calculated as the median Z-value of the digital terrain model points
-within a horizontal (x,y-)range (r) of the 10 lowest points of the tree point
-cloud.
+highest and lowest point of the tree point cloud.
+
+The lowest point of a tree point cloud is sometimes not sampled (e.g. for low
+density UAV-LS, in dense forests). In this case, a dtm can be provided and
+will be used to estimate the lowest point: this is the height of the dtm
+under the tree point cloud, which is calculated as the median Z-value of the
+digital terrain model points within a horizontal (x,y-)range (r) of the 10
+lowest points of the tree point cloud.
+
+For multi-temporal analyses, the lowest point of the point cloud of
+the tree of interest acquired at the first time step can be provided as a
+data.frame with columns X,Y,Z in the dtm input. This will ensure the tree
+heights of the trees are measured based on the same lowest point.
 }
 \examples{
 \dontrun{
 # Read tree point cloud and calculate the tree height
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 tree_height <- tree_height_pc(pc = pc_tree)
+
 # Read the digital terrain model
 dtm <- read_tree_pc(PC_path = "path/to/dtm.txt")
 # Calculate the tree height based on the point cloud and dtm
 tree_height <- tree_height_pc(pc = pc_tree, dtm = dtm, r = 1)
+
+# multi-temporal analysis
+pc_tree_2 <- read_tree_pc(PC_path = "path/to/point_cloud_at_other_time.txt")
+lp <- min(pc_tree_2$Z)
+tree_height <- tree_height_pc(pc = pc_tree, dtm = lp)
 }
 }

@@ -23,7 +23,7 @@ library(ITSMe)
 
 ## Goal
 
-The goal of the ITSMe (Individual Tree Structural Metrics) R package is to 
+The goal of the **ITSMe** (Individual Tree Structural Metrics) R package is to 
 provide easy to use functions to quickly obtain structural metrics from 
 individual tree point clouds and their respective 
 [TreeQSMs](https://github.com/InverseTampere/TreeQSM). 
@@ -33,7 +33,7 @@ individual tree point clouds and their respective
 ### Overview
 
 An overview of the basic structural metrics which can be measured from an 
-individual tree point cloud with the ITSMe package: 
+individual tree point cloud with the **ITSMe** package: 
 
 | structural metric             | function name                     | 
 | ------------------------------|:---------------------------------:|
@@ -45,34 +45,60 @@ individual tree point cloud with the ITSMe package:
 
 ### Tree point cloud requirements
 
-The tree point cloud based functions were developed for point clouds acquired 
-with TLS. But they can also be used for tree point clouds obtained from other 
-LiDAR platforms (e.g. MLS, UAV-LS). Keep in mind that the accuracy of the metric 
-measurements will depend on the quality of the data. 
+The tree point cloud based functions (i.e. those ending with *_pc*) were
+developed for point clouds acquired with TLS. But they can also be used for tree
+point clouds obtained from other laser scanning/LiDAR platforms (e.g. MLS,
+UAV-LS). Keep in mind that the accuracy of the metric measurements will depend
+on the quality of the data.
 
-Make sure outliers and points that don't belong to the tree (especially near the 
+Make sure outliers and points that don't belong to the tree (especially near the
 trunk) are removed. Good segmentation quality leads to reliable measurements.
-Down sampling of the point cloud is not required but can reduce computation time 
-for very big tree point clouds (down sampling to 2 cm is suggested).
+For instance, if there are outliers floating above of below the tree point
+cloud, the tree height might be overestimated. If there is a lot of non-tree
+vegetations still left near the stem, the stem diameter measurement could be
+affected. If the crown is badly segmented the projected area and alpha volume
+might be inaccurate.
+
+Down/sub sampling of the point cloud is not required but can reduce computation
+time for very big tree point clouds (down sampling to 1 to 2 cm is suggested).
+Down sampling also results in a more homogeneous point density which can be
+beneficial for calculating metrics such as the stem diameter. Choose your down
+sampling size also keeping the characteristics (e.g. exit diameter, beam
+divergence) of your scanner in mind.
 
 ### Workflow for a single tree
 
-Before running the functions on multiple tree point clouds at a time, it is 
-advised to get familiar with the functions and their input parameters by running 
-the functions on a single tree point cloud. 
+Before running the functions on multiple tree point clouds at a time, it is
+advised to get familiar with the functions and their input parameters by running
+the functions on single tree point clouds. Different parameters might be needed
+for tree point clouds of different quality or trees with different sizes/shapes
+(e.g. big vs small trees; trees with or without buttresses).
 
 #### Read the point cloud
 
-All of the point cloud based functions (mentioned above) need a tree point cloud 
-in the form of a data.frame with columns X, Y, Z as their first argument. The 
-ITSMe package provides a function `read_tree_pc` that takes the path to a tree 
-point cloud file (txt, ply or las) as an argument and returns a data.frame with 
-X, Y, Z columns.
+All of the point cloud based functions (mentioned above) need a tree point cloud
+in the form of a data.frame with columns X, Y, Z as their first argument. The
+**ITSMe** package provides a function `read_tree_pc` that takes the *path* to a
+tree point cloud file (txt, ply, las or laz) as an argument and returns a
+data.frame with X, Y, Z columns.
 
 ```{r eval = FALSE}
 # Read the point cloud file from its' specified path
 tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
 ```
+
+For making visualisations of big point clouds you can optionally define a
+*samplefactor* as an argument as well. This determines the amount of points that
+are sampled from the point cloud. 1 to sample 100 percent of the points and for
+example 0.5 to sample 50 percent of the points. 
+
+```{r eval = FALSE}
+# Read the point cloud file from its' specified path but only sample 10%
+tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt", samplefactor = 0.1)
+```
+
+Don't use this samplefactor argument when calculating metrics as this could
+affect your results.
 
 #### Measure position of tree point cloud
 
@@ -85,13 +111,16 @@ also for UAV-LS tree point clouds that do not sample the stem very well.
 XYZ_pos <- tree_position_pc(pc = tree_pc)
 ```
 
+You can optionally use the estimate of the center of the stem diameter circle
+fit (see later) as the position of the tree. 
+
 #### Measure tree height
 
-The tree height can be measured using `tree_height_pc`, which calculates the 
-difference between the Z-value of the highest and lowest point of the tree point 
-cloud. `tree_height_pc` only requires the tree point cloud as an input. It also 
-optionally plots the tree point cloud in 2D (XZ and YZ plots next to each) when 
-the "plot" parameter equals TRUE. 
+The tree height can be measured using `tree_height_pc`, which calculates the
+difference between the Z-value of the highest and lowest point of the tree point
+cloud. `tree_height_pc` only requires the tree point cloud as an input. It also
+optionally plots the tree point cloud in 2D (XZ and YZ plots next to each other)
+when the *plot* parameter equals TRUE.
 ```{r eval = FALSE}
 # Measure tree height from the tree point cloud
 H <- tree_height_pc(pc = tree_pc)
@@ -100,14 +129,14 @@ H_out <- tree_height_pc(pc = tree_pc, plot = TRUE)
 H <- H_out$h
 plot_tree <- H_out$plot
 ```
-![](../man/figures/tree_height_tls_example.jpeg)
+![](../man/figures/tree_height_tls_example.jpeg){width=100%}
 
-However, for tree point clouds that are obtained with for example UAV-LS and 
-that do not sample the base of the tree sufficiently the tree height would be 
-underestimated. In this case a digital terrain model (DTM) with a certain 
-resolution can be provided to the `tree_height_pc` function to improve tree 
-height estimation. The DTM also needs to be supplied in the data.frame format 
-with columns X, Y, and Z.
+However, for tree point clouds that are obtained with for example UAV-LS (or
+trees where the stem is obstructed by vegetation) and that do not sample the
+base of the tree sufficiently the tree height would be underestimated. In this
+case a digital terrain model (DTM) with a certain resolution can be provided to
+the `tree_height_pc` function to improve tree height estimation. The DTM also
+needs to be supplied in the data.frame format with columns X, Y, and Z.
 
 ```{r eval = FALSE}
 # Read the DTM
@@ -119,53 +148,61 @@ H_out <- tree_height_pc(pc = tree_pc, dtm = DTM, r = 1.5, plot = TRUE)
 H <- H_out$h
 plot_tree <- H_out$plot
 ```
-![](../man/figures/tree_height_uavls_example.jpeg)
+
+![](../man/figures/tree_height_uavls_example.jpeg){width=100%}
+
 The provided resolution (r) value should be at least the resolution of the
 provided DTM.
 
 #### Measure DBH and/or DAB
 
-Depending on if your trees are buttressed or not, you will make a choice between 
-the diameter at breast height (DBH) and the diameter above buttresses (DAB). If 
-you are not sure if this is the case for your tree, you can check the slice 
-(and circle fitting) at 1.3 m with the `diameter_slice_pc` function. The 
-diameter is measured as the circle fit to the slice points. But this function 
-also determines the functional diameter which is calculated as the diameter of 
-the circle with the same area as the concave hull (concavity = 4) fitted to the 
-slice points. This value could be more interesting for trees that inherently 
-have non-circular stems. But this metric is influenced more by point cloud and 
-segmentation quality (e.g. noisy points, or vegetation points which have not 
-been removed from the point cloud).
+Depending on if your trees are buttressed or not, you will make a choice between
+the diameter at breast height (DBH) and the diameter above buttresses (DAB). If
+you are not sure if this is the case for your tree, you can check the slice (and
+circle fitting) at 1.3 m with the `diameter_slice_pc` function. The diameter is
+measured as the circle fit to the slice points. But this function also
+determines the functional diameter which is calculated as the diameter of the
+circle with the same area as the concave hull fitted to the slice points. This
+functional diameter value could be more interesting for trees that inherently
+have non-circular stems. But this metric is influenced more by point cloud and
+segmentation quality (e.g. noisy points, or vegetation points which have not
+been removed from the point cloud, or incomplete stem point cloud).
 
 ```{r eval = FALSE}
 # Measure DBH from the tree point cloud and plot the circle fitting
 D_out <- diameter_slice_pc(
   pc = tree_pc, slice_height = 1.3,
-  slice_thickness = 0.06, plot = TRUE
+  slice_thickness = 0.06, plot = TRUE, 
+  functional = TRUE
 )
 diameter <- D_out$diameter
 functional_diameter <- D_out$fdiameter
 ```
 
 For a regular non-buttressed tree:
-![](../man/figures/diameter_slice_example.jpeg)
+![](../man/figures/diameter_slice_example.jpeg){width=100%}
 For a buttressed tree:
-![](../man/figures/diameter_slice_example_butt.jpeg)
+![](../man/figures/diameter_slice_example_butt.jpeg){width=100%}
 
-The DBH is measured using `dbh_pc` and based on the `diameter_slice_pc` function 
-with *slice_height* of 1.3 m and a chosen *slice_thickness* (default = 0.06 m). 
-If branch or vegetation points are present in the slice, the lower (till 1.5 m 
-above lowest point) trunk is extracted (so without branch/vegetation points) and 
-the fit is done again. The `dbh_pc` function needs the tree point cloud as an 
-input. If the argument *plot* is set TRUE it also plots the circle fitting. This 
-function also reports the functional DBH (fDBH).
+The DBH is measured using `dbh_pc` and based on the `diameter_slice_pc` function
+with *slice_height* of 1.3 m and a chosen *slice_thickness* (default = 0.06 m).
+If branch or vegetation points are present in the slice, the lower (till 1.5 m
+above lowest point) trunk is extracted (so without branch/vegetation points) and
+the fit is done again. The `dbh_pc` function needs the tree point cloud as an
+input. If the argument *plot* is set TRUE it also plots the circle fitting. This
+function also reports the functional DBH (fDBH) when the argument *functional*
+is set TRUE.
 
 ```{r eval = FALSE}
 # Measure DBH from the tree point cloud and plot the circle fitting
-DBH_out <- dbh_pc(pc = tree_pc, plot = TRUE)
+DBH_out <- dbh_pc(pc = tree_pc, plot = TRUE, functional = TRUE)
 DBH <- DBH_out$dbh
 ```
-![](../man/figures/dbh_example.jpeg)
+
+For trees without branches at breast height:
+![](../man/figures/dbh_example-1.jpeg){width=100%}
+For trees with branches at breast height:
+![](../man/figures/dbh_example-2.jpeg){width=100%}
 
 Generally running the `dbh_pc` with default values is fine. But there are two 
 other parameters that can be optimised which influence the trunk extraction. The 
@@ -176,7 +213,7 @@ the thresholdR2 times the estimated diameter or the estimated diameter is
 smaller than the diameter estimated at 0.15 m. For trees with non-circular stems
 this value should be increased. Also for smaller trees (DBH < 10 cm) or tree 
 point cloud with a sub-optimal co-registration of scan positions, for example 
-due to wind) a higher value will lead to better results. The *slice_thickness* 
+due to wind a higher value will lead to better results. The *slice_thickness* 
 parameter determines the thickness of the slice at 1.3 m and is default 0.06 m. 
 For tree point clouds with a lower point density at the stem (e.g. UAV-LS) 
 increasing the slice_thickness to for example 20 cm is crucial for DBH 
@@ -184,13 +221,13 @@ measurements.
 
 For buttressed trees `dbh_pc` would result in:
 
-![](../man/figures/dbh_example_buttress.jpeg)
+![](../man/figures/dbh_example_buttress.jpeg){width=100%}
 
 
 In this case determining the DAB with `dab_pc` is the better option. Also for 
 trees with DBH larger than 2 m and no branches at or below breast height this 
 function is recommended (even if buttresses are not present). With `dab_pc`, the 
-diameter (from the optimal circle fitted through a 6mm thick horizontal slice) 
+diameter (from the optimal circle fitted through a 6 mm thick horizontal slice) 
 is measured above the buttresses (if there are no buttresses the diameter is 
 measured at breast height). The height at which the horizontal slice is taken 
 (the height above buttresses), is determined iteratively, starting at breast 
@@ -205,24 +242,29 @@ DAB (fDAB) is reported.
 
 ```{r eval = FALSE}
 # Measure DAB from the tree point cloud with default settings and plot the circle fitting
-DAB_out <- dab_pc(pc = tree_pc, plot = TRUE)
+DAB_out <- dab_pc(pc = tree_pc, plot = TRUE, functional = TRUE)
 DAB <- DAB_out$dab
 ```
-![](../man/figures/dab_example.jpeg)
+![](../man/figures/dab_example.jpeg){width=100%}
 
-Optimise the values of *thresholdbuttress* and or *maxbuttressheight* for your 
+Optimise the values of *thresholdbuttress* and or *maxbuttressheight* for your
 tree if default values do not lead to the desired results:
 
- * reduce/increase *thresholdbuttress* if the height above buttresses is 
- consistenly too low/high.
- * reduce/increase *maxbuttressheight* if your buttresses reach lower/higher 
- heights.
+ * reduce/increase *thresholdbuttress* if the height above buttresses is
+consistenly too low/high.
+ * reduce/increase *maxbuttressheight* if your buttresses reach lower/higher
+heights.
 
-The `dbh_pc` and `dab_pc` do not yet work well on very slanted trees. 
-Therefore it is advised to always check the plots of the circle fitting. 
+The `dbh_pc` and `dab_pc` functions do not yet work well on very slanted trees.
+Therefore it is advised to always check the plots of the circle fitting. For
+slanted trees it might be more accurate to extract the dbh from the treeQSM.
 
-For tree point clouds of which the stem of the tree is not sufficiently sampled 
-`dbh_pc` and `dab_pc` will not work due to a lack of stem points. 
+For tree point clouds of which the stem of the tree is not sufficiently sampled
+`dbh_pc` and `dab_pc` will not work due to a lack of stem points.
+
+The `dbh_pc` and `dab_pc` functions also output a center value which gives the X
+and Y coordinate of the center of the estimated circle fit. This can also be
+used as a tree position value.
 
 #### Classify crown points 
 
@@ -241,7 +283,7 @@ crown_pc <- C_out$crownpoints
 plot <- C_out$plot
 ```
 
-![](../man/figures/crown_example.jpeg)
+![](../man/figures/crown_example.jpeg){width=100%}
 
 Optimise the values of *thresholdbranch* and or *minheight* for your 
 tree if default values do not lead to the desired results:
@@ -253,7 +295,7 @@ tree if default values do not lead to the desired results:
  * increase *minheight* to the height above the widest part of the lower stem 
  (for example above the buttresses).
 
-For non-buttressed trees, specify the previosuly determined *thresholdR2* and 
+For non-buttressed trees, specify the previously determined *thresholdR2* and 
 *slice_thickness* parameters. For buttressed trees, the attribute *buttress* has 
 to be set TRUE and previously chosen attributes *thresholdbuttress* and 
 *maxbuttressheight* can be specified. It is recommended to increase the 
@@ -266,9 +308,13 @@ C_out <- classify_crown_pc(
   plot = TRUE
 )
 crown_pc <- C_out$crownpoints
+trunk_pc <- C_out$trunkpoints
 plot <- C_out$plot
 ```
-![](../man/figures/crown_example_tropical.jpeg)
+![](../man/figures/crown_example_tropical.jpeg){width=100%}
+
+From the crown point clouds and trunk point clouds you can easily determine the
+metrics including crown height, height of first branch etc.
 
 #### Measure the projected area
 
@@ -285,7 +331,10 @@ out <- projected_area_pc(pc = crown_pc, plot = TRUE)
 pca <- out$pa
 plot <- out$plot
 ```
-![](../man/figures/pca_example.jpeg)
+![](../man/figures/pca_example.jpeg){width=100%}
+
+Depending on the tree structure (e.g. not slanted, full crown, etc.) you can
+also determine the projected crown area from the full tree point cloud.
 
 #### Measure the 3D alpha volume
 
@@ -298,7 +347,7 @@ plot is made when parameter *plot* equals TRUE.
 out <- alpha_volume_pc(pc = crown_pc, plot = TRUE)
 volume <- out$av
 ```
-![](../man/figures/cv_example.jpeg)
+![](../man/figures/cv_example.jpeg){width=100%}
 
 ### Workflow for multiple trees
 
@@ -393,11 +442,11 @@ csv file) for all tree point clouds in a folder with
 `summary_basic_pointcloud_metrics`. If the *plot* parameter is TRUE, a summary 
 figure is rendered for each tree in the folder.
 
-If you find different optimal attribute values for different trees, split the 
-trees up in groups with the same parameter values (e.g. buttressed and 
-non-buttressed, small and big trees, species1 and species2). Put the groups in 
-different folders and run the summary function on the different folders 
-separately. Afterwards the outputs can be combined.
+If you find different optimal attribute values for different trees, split the
+trees up in groups with the same parameter values (e.g. small and big trees,
+species1 and species2). Put the groups in different folders and run the summary
+function on the different folders separately. Afterwards the outputs can be
+combined.
 
 ```{r eval = FALSE}
 # Summary with default setting for non-buttressed trees and plot the summary
@@ -407,9 +456,20 @@ summary <- summary_basic_pointcloud_metrics(
   PCs_path = "path/to/point/clouds/folder_buttressed_trees/",
   minheight = 4, buttress = TRUE
 )
+# Summary only with tree height and stem diameter info
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/point/clouds/folder_buttressed_trees/",
+  metrics = c("stem diameter","tree height")
+)
+
+# Summary of all point clouds with "control" in their names
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/point/clouds/folder_buttressed_trees/",
+  pattern = 'control'
+)
 ```
 
-![](../man/figures/summary.jpeg)
+![](../man/figures/summary.jpeg){width=100%}
 
 ## QSM based metrics
 

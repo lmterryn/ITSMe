@@ -1,6 +1,6 @@
 Package: ITSMe
 Title: Individual Tree Structural Metrics 
-Version: 1.0.0
+Version: 2.0.0
 Authors@R: 
     c(person(given = "Louise", 
              family = "Terryn", 
@@ -24,9 +24,7 @@ Imports:
     data.table,
     ggforce,
     ggplot2,
-    ggpubr,
     graphics,
-    grDevices,
     lidR,
     nabor,
     R.matlab,
@@ -34,7 +32,9 @@ Imports:
     Rvcg,
     sf,
     stats,
-    utils
+    utils,
+    patchwork,
+    ggtext
 URL: https://github.com/lmterryn/ITSMe,
     https://lmterryn.github.io/ITSMe/
 BugReports: https://github.com/lmterryn/ITSMe/issues 

@@ -64,9 +64,9 @@ first, second, third, fourth and fifth element of this list respectively.}
 }
 \value{
 List with the diameter of the stem above buttresses, the residuals on
-the fitting, and the functional diameter at breast height. Also optionally
-(plot=TRUE) plots the circle fitting on the horizontal slice which is then
-included in the list output.
+the fitting, the estimated center of the circle fit, and the functional
+diameter at breast height. Also optionally (plot=TRUE) plots the circle
+fitting on the horizontal slice which is then included in the list output.
 }
 \description{
 Returns the diameter above buttresses (DAB) and the functional diameter above

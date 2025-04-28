@@ -31,13 +31,19 @@ tree_position_pc <- function(pc) {
 #' terrain model (dtm) is provided it is used to estimate the tree height.
 #'
 #' The tree height is measured as the difference between the Z-value of the
-#' highest and lowest point of the tree point cloud. The lowest point of a tree
-#' point cloud is sometimes not sampled (e.g. for low density UAV-LS, in dense
-#' forests). In this case, a dtm can be provided and will be used to estimate
-#' the lowest point: this is the height of the dtm under the tree point cloud,
-#' which is calculated as the median Z-value of the digital terrain model points
-#' within a horizontal (x,y-)range (r) of the 10 lowest points of the tree point
-#' cloud.
+#' highest and lowest point of the tree point cloud.
+#'
+#' The lowest point of a tree point cloud is sometimes not sampled (e.g. for low
+#' density UAV-LS, in dense forests). In this case, a dtm can be provided and
+#' will be used to estimate the lowest point: this is the height of the dtm
+#' under the tree point cloud, which is calculated as the median Z-value of the
+#' digital terrain model points within a horizontal (x,y-)range (r) of the 10
+#' lowest points of the tree point cloud.
+#'
+#' For multi-temporal analyses, the lowest point of the point cloud of
+#' the tree of interest acquired at the first time step can be provided as a
+#' data.frame with columns X,Y,Z in the dtm input. This will ensure the tree
+#' heights of the trees are measured based on the same lowest point.
 #'
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}.
@@ -58,6 +64,7 @@ tree_position_pc <- function(pc) {
 #'   cloud and in this case returns a list with the tree height as first
 #'   element, the lowest point as the second element and the plots as third,
 #'   fourth and fifth elements.
+#' @import patchwork
 #'
 #' @export
 #'
@@ -66,27 +73,38 @@ tree_position_pc <- function(pc) {
 #' # Read tree point cloud and calculate the tree height
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
 #' tree_height <- tree_height_pc(pc = pc_tree)
+#'
 #' # Read the digital terrain model
 #' dtm <- read_tree_pc(PC_path = "path/to/dtm.txt")
 #' # Calculate the tree height based on the point cloud and dtm
 #' tree_height <- tree_height_pc(pc = pc_tree, dtm = dtm, r = 1)
+#'
+#' # multi-temporal analysis
+#' pc_tree_2 <- read_tree_pc(PC_path = "path/to/point_cloud_at_other_time.txt")
+#' lp <- min(pc_tree_2$Z)
+#' tree_height <- tree_height_pc(pc = pc_tree, dtm = lp)
 #' }
 tree_height_pc <- function(pc,
                            dtm = NA,
                            r = 5,
                            plot = FALSE,
                            plotcolors = c("#000000", "#08aa7c", "#fac87f")) {
+  empty_plot <- ggplot2::ggplot()
   if (nrow(pc) == 0) {
     if (plot) {
-      empty_plot <- ggplot2::ggplot()
       return(list(
-        "h" = 0,
+        "h" = NA,
         "plot" = empty_plot,
         "plotXZ" = empty_plot,
         "plotYZ" = empty_plot
       ))
     } else {
-      return(0)
+      return(list(
+        "h" = NA,
+        "plot" = empty_plot,
+        "plotXZ" = empty_plot,
+        "plotYZ" = empty_plot
+      ))
     }
   } else {
     z_min <- min(pc$Z)
@@ -109,8 +127,19 @@ tree_height_pc <- function(pc,
       X <- Y <- Z <- NULL
       plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = plotcolors[1]) +
         ggplot2::geom_point(size = 0.1, shape = ".") +
+        ggplot2::geom_hline(yintercept = max(pc_norm$Z), lty = 'dashed') +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::coord_fixed(ratio = 1) +
         ggplot2::theme(
+          panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+          panel.background = ggplot2::element_blank(),
+          title = ggplot2::element_text(size=12, face = 'bold'),
+          axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+          axis.title.y = ggplot2::element_text(size=14, color = "black"),
+          axis.text = ggplot2::element_text(size=14, color = "black"),
+          axis.title.x = ggplot2::element_text(size=14, color = "black"),
+          axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+          axis.ticks.length = ggplot2::unit(0.2, "cm"),
           axis.text.x = ggplot2::element_blank(),
           axis.ticks.x = ggplot2::element_blank(),
           plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
@@ -121,8 +150,16 @@ tree_height_pc <- function(pc,
         dtm_under_tree_norm$Z <- dtm_under_tree$Z - z_min
         plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z, col = "tree points")) +
           ggplot2::geom_point(size = 0.1, shape = ".") +
+          ggplot2::geom_hline(yintercept = max(pc_norm$Z), lty = 'dashed') +
+          ggplot2::scale_y_continuous(expand = c(0, 0)) +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
+            panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+            panel.background = ggplot2::element_blank(),
+            title = ggplot2::element_text(size=12, face = 'bold'),
+            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.text = ggplot2::element_text(size=14, color = "black"),
+            axis.title.x = ggplot2::element_text(size=14, color = "black"),
             axis.text.y = ggplot2::element_blank(),
             axis.title.y = ggplot2::element_blank(),
             axis.ticks.y = ggplot2::element_blank(),
@@ -149,14 +186,19 @@ tree_height_pc <- function(pc,
               "lowest point height" = plotcolors[2]
             )
           )
-        s <-
-          (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                               lowest_point) * 0.5 - 1.05
       } else {
         plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = plotcolors[1]) +
           ggplot2::geom_point(size = 0.1, shape = ".") +
+          ggplot2::geom_hline(yintercept = max(pc_norm$Z), lty = 'dashed') +
+          ggplot2::scale_y_continuous(expand = c(0, 0)) +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
+            panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+            panel.background = ggplot2::element_blank(),
+            title = ggplot2::element_text(size=12, face = 'bold'),
+            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.text = ggplot2::element_text(size=14, color = "black"),
+            axis.title.x = ggplot2::element_text(size=14, color = "black"),
             axis.text.y = ggplot2::element_blank(),
             axis.title.y = ggplot2::element_blank(),
             axis.ticks.y = ggplot2::element_blank(),
@@ -165,24 +207,11 @@ tree_height_pc <- function(pc,
             plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
             text = ggplot2::element_text(size = 12)
           )
-        s <-
-          (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                               lowest_point) * 0.48 - 1
       }
-      plotTree <- ggpubr::ggarrange(
-        plotXZ,
-        NULL,
-        plotYZ,
-        nrow = 1,
-        ncol = 3,
-        common.legend = TRUE,
-        heights = c(5, 5),
-        widths = c(1, s, 1)
+      plotTree <- plotXZ + plotYZ + patchwork::plot_annotation(
+        title = paste("H = ", as.character(round(h, 2)), " m", sep = ""),
+        theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
       )
-      plotTree <-
-        ggpubr::annotate_figure(plotTree, top = ggpubr::text_grob(paste(
-          "H = ", as.character(round(h, 2)), " m", sep = ""
-        ), size = 12))
       print(plotTree)
       return(
         list(
@@ -194,7 +223,15 @@ tree_height_pc <- function(pc,
         )
       )
     } else {
-      return(list("h" = h, "lp" = lowest_point))
+      return(
+        list(
+          "h" = h,
+          "lp" = lowest_point,
+          "plot" = empty_plot,
+          "plotXZ" = empty_plot,
+          "plotYZ" = empty_plot
+        )
+      )
     }
   }
 }
@@ -408,25 +445,21 @@ diameter_slice_pc <-
               size = 1,
               fill = NA
             ) +
-            ggplot2::ggtitle(paste("diameter at ", as.character(round(
-              slice_height, 2
-            )), " m", sep = "")) +
-            ggplot2::labs(
-              caption = paste(
-                "diameter = ",
-                as.character(round(diam, 2)),
-                " m \n",
-                "R2 = ",
+            ggplot2::ggtitle(
+              paste0(
+                "diameter at ", as.character(round(slice_height, 2)),
+                " m = ", as.character(round(diam*100)),
+                " cm ",
+                "(R2 = ",
                 as.character(round(residu * 100, 2)),
-                " cm",
+                " cm)",
                 "\n",
-                "fdiameter =",
-                as.character(round(fdiam, 2)),
-                " m",
+                "fDAB = ",
+                as.character(round(fdiam*100)),
+                " cm",
                 sep = ""
               )
             ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12)) +
             ggplot2::scale_color_manual(
               name = "",
               values = c(
@@ -439,26 +472,31 @@ diameter_slice_pc <-
                                                 shape = c(NA, 16),
                                                 size = c(1, 2)
                                               ))
-            )
+            ) +
+            ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                           panel.background = ggplot2::element_blank(),
+                           title = ggplot2::element_text(size=12, face = 'bold'),
+                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                           axis.text = ggplot2::element_text(size=14, color = "black"),
+                           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                           axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks.length = ggplot2::unit(0.2, "cm"))
         } else {
           plotDIAM <- plotDIAM +
             ggplot2::coord_fixed(ratio = 1) +
-            ggplot2::ggtitle(paste("diameter at ", as.character(round(
-              slice_height, 2
-            )), " m", sep = "")) +
-            ggplot2::labs(
-              caption = paste(
-                "diameter = ",
-                as.character(round(diam, 2)),
-                " m \n",
-                "R2 = ",
+            ggplot2::ggtitle(
+              paste0(
+                "diameter at ", as.character(round(slice_height, 2)),
+                " m = ", as.character(round(diam*100)),
+                " cm ",
+                "(R2 = ",
                 as.character(round(residu * 100, 2)),
-                " cm",
-                "\n",
+                " cm)",
                 sep = ""
               )
             ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12)) +
             ggplot2::scale_color_manual(
               name = "",
               values = c("points stem slice" = plotcolors[1]),
@@ -468,7 +506,17 @@ diameter_slice_pc <-
                                                 shape = c(16),
                                                 size = c(2)
                                               ))
-            )
+            ) +
+            ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                           panel.background = ggplot2::element_blank(),
+                           title = ggplot2::element_text(size=12, face = 'bold'),
+                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                           axis.text = ggplot2::element_text(size=14, color = "black"),
+                           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                           axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks.length = ggplot2::unit(0.2, "cm"))
         }
         if (!is.nan(R)) {
           data_circle <- data.frame(x0 = x_c, y0 = y_c, r = R)
@@ -506,7 +554,16 @@ diameter_slice_pc <-
                                                   size = c(1, 2, 1, 2)
                                                 ))
               ) +
-              ggplot2::theme(text = ggplot2::element_text(size = 12))
+              ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                             panel.background = ggplot2::element_blank(),
+                             title = ggplot2::element_text(size=12, face = 'bold'),
+                             axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                             axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                             axis.text = ggplot2::element_text(size=14, color = "black"),
+                             axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                             axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                             axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                             axis.ticks.length = ggplot2::unit(0.2, "cm"))
           } else {
             plotDIAM <- plotDIAM +
               ggplot2::scale_color_manual(
@@ -520,9 +577,19 @@ diameter_slice_pc <-
                                                 list(
                                                   linetype = c(0, 1, 0),
                                                   shape = c(16, NA, 16),
-                                                  size = c(2, 1, 2)                                                ))
+                                                  size = c(2, 1, 2)
+                                                ))
               ) +
-              ggplot2::theme(text = ggplot2::element_text(size = 12))
+              ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                             panel.background = ggplot2::element_blank(),
+                             title = ggplot2::element_text(size=12, face = 'bold'),
+                             axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                             axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                             axis.text = ggplot2::element_text(size=14, color = "black"),
+                             axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                             axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                             axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                             axis.ticks.length = ggplot2::unit(0.2, "cm"))
           }
         }
         print(plotDIAM)
@@ -751,9 +818,9 @@ extract_lower_trunk_pc <-
 #'   this list respectively.
 #'
 #' @return List with the diameter of the stem at breast height, the residuals on
-#'   the fitting, and the functional diameter at breast height. Also optionally
-#'   (plot=TRUE) plots the circle fitting on the horizontal slice which is then
-#'   included in the list output.
+#'   the fitting, the estimated center of the circle fit, and the functional
+#'   diameter at breast height. Also optionally (plot=TRUE) plots the circle
+#'   fitting on the horizontal slice which is then included in the list output.
 #'
 #' @export
 #'
@@ -855,8 +922,7 @@ dbh_pc <- function(pc,
           size = 1
         ) +
         ggplot2::coord_fixed(ratio = 1) +
-        ggplot2::ggtitle("DBH") +
-        ggplot2::labs(caption = paste("DBH = NaN", "\n", "R2 = NaN", "\n", "fDBH = NaN", sep = "")) +
+        ggplot2::ggtitle(paste("DBH = NaN, ", "R2 = NaN, ", "fDBH = NaN", sep = "")) +
         ggplot2::scale_color_manual(
           name = "",
           values = c("points stem slice" = plotcolors[1]),
@@ -867,7 +933,16 @@ dbh_pc <- function(pc,
                                             size = c(2)
                                           ))
         ) +
-        ggplot2::theme(text = ggplot2::element_text(size = 12))
+        ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                       panel.background = ggplot2::element_blank(),
+                       title = ggplot2::element_text(size=12, face = 'bold'),
+                       axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                       axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                       axis.text = ggplot2::element_text(size=14, color = "black"),
+                       axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                       axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                       axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                       axis.ticks.length = ggplot2::unit(0.2, "cm"))
     } else {
       pc_dbh <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
                      (pc$Z < lowest_point + 1.3 + slice_thickness / 2), ]
@@ -908,19 +983,18 @@ dbh_pc <- function(pc,
             show.legend = TRUE,
             size = 1
           ) +
-          ggplot2::ggtitle("DBH") +
-          ggplot2::labs(
-            caption = paste(
+          ggplot2::ggtitle(
+            paste(
               "DBH = ",
-              as.character(round(out_130$diameter, 2)),
-              " m \n",
-              "R2 = ",
+              as.character(round(out_130$diameter*100)),
+              " cm ",
+              "(R2 = ",
               as.character(round(out_130$R2 * 100, 2)),
-              " cm",
+              " cm)",
               "\n",
-              "fDBH =",
-              as.character(round(out_130$fdiameter, 2)),
-              " m",
+              "fDBH = ",
+              as.character(round(out_130$fdiameter*100)),
+              " cm",
               sep = ""
             )
           ) +
@@ -939,7 +1013,16 @@ dbh_pc <- function(pc,
                                               size = c(1, 2, 1, 2)
                                             ))
           ) +
-          ggplot2::theme(text = ggplot2::element_text(size = 12))
+          ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                         panel.background = ggplot2::element_blank(),
+                         title = ggplot2::element_text(size=12, face = 'bold'),
+                         axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                         axis.title = ggplot2::element_blank(),
+                         axis.text = ggplot2::element_text(size=14, color = "black"),
+                         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                         axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                         axis.ticks.length = ggplot2::unit(0.2, "cm"))
+
       } else {
         plotDBH <- plotDBH +
           ggplot2::coord_fixed(ratio = 1) +
@@ -960,16 +1043,14 @@ dbh_pc <- function(pc,
             show.legend = TRUE,
             size = 1
           ) +
-          ggplot2::ggtitle("DBH") +
-          ggplot2::labs(
-            caption = paste(
+          ggplot2::ggtitle(
+            paste(
               "DBH = ",
-              as.character(round(out_130$diameter, 2)),
-              " m \n",
-              "R2 = ",
+              as.character(round(out_130$diameter*100)),
+              " cm, ",
+              "(R2 = ",
               as.character(round(out_130$R2 * 100, 2)),
-              " cm",
-              "\n",
+              " cm)",
               sep = ""
             )
           ) +
@@ -987,7 +1068,15 @@ dbh_pc <- function(pc,
                                               size = c(2, 1, 2)
                                             ))
           ) +
-          ggplot2::theme(text = ggplot2::element_text(size = 12))
+          ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                         panel.background = ggplot2::element_blank(),
+                         title = ggplot2::element_text(size=12, face = 'bold'),
+                         axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                         axis.title = ggplot2::element_blank(),
+                         axis.text = ggplot2::element_text(size=14, color = "black"),
+                         axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                         axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                         axis.ticks.length = ggplot2::unit(0.2, "cm"))
       }
     }
     print(plotDBH)
@@ -995,6 +1084,7 @@ dbh_pc <- function(pc,
       list(
         "dbh" = out_130$diameter,
         "R2" = out_130$R2,
+        "center" = out_130$center,
         "fdbh" = out_130$fdiameter,
         "plot" = plotDBH
       )
@@ -1003,6 +1093,7 @@ dbh_pc <- function(pc,
     return(list(
       "dbh" = out_130$diameter,
       "R2" = out_130$R2,
+      "center" = out_130$center,
       "fdbh" = out_130$fdiameter
     ))
   }
@@ -1067,9 +1158,9 @@ dbh_pc <- function(pc,
 #'   first, second, third, fourth and fifth element of this list respectively.
 #'
 #' @return List with the diameter of the stem above buttresses, the residuals on
-#'   the fitting, and the functional diameter at breast height. Also optionally
-#'   (plot=TRUE) plots the circle fitting on the horizontal slice which is then
-#'   included in the list output.
+#'   the fitting, the estimated center of the circle fit, and the functional
+#'   diameter at breast height. Also optionally (plot=TRUE) plots the circle
+#'   fitting on the horizontal slice which is then included in the list output.
 #'
 #' @export
 #'
@@ -1195,21 +1286,18 @@ dab_pc <-
               show.legend = TRUE,
               size = 1
             ) +
-            ggplot2::ggtitle(paste("DAB at ", as.character(round(
-              slice_height, 2
-            )), " m", sep = "")) +
-            ggplot2::labs(
-              caption = paste(
-                "DAB = ",
-                as.character(round(out$diameter, 2)),
-                " m \n",
-                "R2 = ",
+            ggplot2::ggtitle(
+              paste0(
+                "DAB at ", as.character(round(slice_height, 2)),
+                " m = ", as.character(round(dab*100)),
+                " cm ",
+                "(R2 = ",
                 as.character(round(out$R2 * 100, 2)),
-                " cm",
+                " cm)",
                 "\n",
-                "fDAB =",
-                as.character(round(out$fdiameter, 2)),
-                " m",
+                "fDAB = ",
+                as.character(round(out$fdiameter*100)),
+                " cm",
                 sep = ""
               )
             ) +
@@ -1229,7 +1317,16 @@ dab_pc <-
                                                 size = c(1, 2, 1, 2, 2)
                                               ))
             ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12))
+            ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                           panel.background = ggplot2::element_blank(),
+                           title = ggplot2::element_text(size=12, face = 'bold'),
+                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                           axis.text = ggplot2::element_text(size=14, color = "black"),
+                           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                           axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks.length = ggplot2::unit(0.2, "cm"))
         } else {
           plotDAB <- plotDAB +
             ggplot2::coord_fixed(ratio = 1) +
@@ -1250,21 +1347,14 @@ dab_pc <-
               show.legend = TRUE,
               size = 1
             ) +
-            ggplot2::ggtitle(paste("DAB at ", as.character(round(
-              slice_height, 2
-            )), " m", sep = "")) +
-            ggplot2::labs(
-              caption = paste(
-                "DAB = ",
-                as.character(round(out$diameter, 2)),
-                " m \n",
-                "R2 = ",
-                as.character(round(out$R2 * 100, 2)),
-                " cm",
-                "\n",
-                sep = ""
-              )
-            ) +
+            ggplot2::ggtitle(
+              paste("DAB at ", as.character(round(slice_height, 2)),
+                    " m = ", as.character(round(dab*100)),
+                    " cm ",
+                    "(R2 = ",
+                    as.character(round(out$R2 * 100, 2)),
+                    " cm)",
+                    sep = "")) +
             ggplot2::scale_color_manual(
               name = "",
               values = c(
@@ -1280,7 +1370,16 @@ dab_pc <-
                                                 size = c(2, 1, 2, 2)
                                               ))
             ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12))
+            ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                           panel.background = ggplot2::element_blank(),
+                           title = ggplot2::element_text(size=12, face = 'bold'),
+                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                           axis.text = ggplot2::element_text(size=14, color = "black"),
+                           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                           axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks.length = ggplot2::unit(0.2, "cm"))
         }
       } else {
         plotDAB <- ggplot2::ggplot() +
@@ -1314,19 +1413,18 @@ dab_pc <-
               show.legend = TRUE,
               size = 1
             ) +
-            ggplot2::ggtitle("DBH") +
-            ggplot2::labs(
-              caption = paste(
+            ggplot2::ggtitle(
+              paste(
                 "DBH = ",
-                as.character(round(out$diameter, 2)),
-                " m \n",
-                "R2 = ",
+                as.character(round(out$diameter*100)),
+                " cm ",
+                "(R2 = ",
                 as.character(round(out$R2 * 100, 2)),
-                " cm",
+                " cm) ",
                 "\n",
-                "fDBH =",
-                as.character(round(out$fdiameter, 2)),
-                " m",
+                "fDBH = ",
+                as.character(round(out$fdiameter*100)),
+                " cm",
                 sep = ""
               )
             ) +
@@ -1345,7 +1443,16 @@ dab_pc <-
                                                 size = c(1, 2, 1, 2)
                                               ))
             ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12))
+            ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                           panel.background = ggplot2::element_blank(),
+                           title = ggplot2::element_text(size=12, face = 'bold'),
+                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                           axis.text = ggplot2::element_text(size=14, color = "black"),
+                           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                           axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks.length = ggplot2::unit(0.2, "cm"))
         } else {
           plotDAB <- plotDAB +
             ggplot2::coord_fixed(ratio = 1) +
@@ -1366,16 +1473,14 @@ dab_pc <-
               show.legend = TRUE,
               size = 1
             ) +
-            ggplot2::ggtitle("DBH") +
-            ggplot2::labs(
-              caption = paste(
+            ggplot2::ggtitle(
+              paste(
                 "DBH = ",
-                as.character(round(out$diameter, 2)),
-                " m \n",
-                "R2 = ",
+                as.character(round(out$diameter*100)),
+                " cm ",
+                "(R2 = ",
                 as.character(round(out$R2 * 100, 2)),
-                " cm",
-                "\n",
+                " cm)",
                 sep = ""
               )
             ) +
@@ -1393,13 +1498,23 @@ dab_pc <-
                                                 size = c(2, 1, 2)
                                               ))
             ) +
-            ggplot2::theme(text = ggplot2::element_text(size = 12))
+            ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                           panel.background = ggplot2::element_blank(),
+                           title = ggplot2::element_text(size=12, face = 'bold'),
+                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                           axis.text = ggplot2::element_text(size=14, color = "black"),
+                           axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                           axis.title.x = ggplot2::element_text(size=14, color = "black"),
+                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks.length = ggplot2::unit(0.2, "cm"))
         }
       }
       print(plotDAB)
       return(list(
         "dab" = dab,
         "R2" = out$R2,
+        "center" = out$center,
         "fdab" = out$fdiameter,
         "h" = round(slice_height, 2),
         "plot" = plotDAB
@@ -1408,6 +1523,7 @@ dab_pc <-
       return(list(
         "dab" = dab,
         "R2" = out$R2,
+        "center" = out$center,
         "fdab" = out$fdiameter,
         "h" = round(slice_height, 2)
       ))
@@ -1470,6 +1586,8 @@ dab_pc <-
 #'   non-crown points and in this case returns a list with the crown point cloud
 #'   as first element, trunk point clouds as a second element and the plots as
 #'   the third to fifth elements.
+#'
+#' @import patchwork
 #'
 #' @export
 #'
@@ -1668,12 +1786,21 @@ classify_crown_pc <-
             ggplot2::geom_point(size = 0.1,
                                 ggplot2::aes(col = class),
                                 shape = ".") +
+            ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
             ggplot2::coord_fixed(ratio = 1) +
             ggplot2::theme(
+              panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+              panel.background = ggplot2::element_blank(),
+              title = ggplot2::element_text(size=12, face = 'bold'),
+              axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+              axis.title.y = ggplot2::element_text(size=14, color = "black"),
+              axis.text = ggplot2::element_text(size=14, color = "black"),
+              axis.title.x = ggplot2::element_text(size=14, color = "black"),
               axis.text.x = ggplot2::element_blank(),
               axis.ticks.x = ggplot2::element_blank(),
               plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-              text = ggplot2::element_text(size = 12)
+              legend.position = "none"
             ) +
             ggplot2::scale_color_manual(
               name = "class",
@@ -1686,15 +1813,22 @@ classify_crown_pc <-
             ggplot2::geom_point(size = 0.1,
                                 ggplot2::aes(col = class),
                                 shape = ".") +
+            ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
             ggplot2::coord_fixed(ratio = 1) +
             ggplot2::theme(
+              panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+              panel.background = ggplot2::element_blank(),
+              title = ggplot2::element_text(size=12, face = 'bold'),
+              axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+              axis.text = ggplot2::element_text(size=14, color = "black"),
+              axis.title.x = ggplot2::element_text(size=14, color = "black"),
               axis.text.y = ggplot2::element_blank(),
               axis.title.y = ggplot2::element_blank(),
               axis.ticks.y = ggplot2::element_blank(),
               axis.text.x = ggplot2::element_blank(),
               axis.ticks.x = ggplot2::element_blank(),
-              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-              text = ggplot2::element_text(size = 12)
+              plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
             ) +
             ggplot2::scale_color_manual(
               name = "class",
@@ -1703,30 +1837,12 @@ classify_crown_pc <-
                 shape = c(16), size = c(2)
               ))
             )
-          s <-
-            (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                                 lowest_point) * 0.5 - 1.05
-          plotCrown <- ggpubr::ggarrange(
-            plotXZ,
-            NULL,
-            plotYZ,
-            nrow = 1,
-            ncol = 3,
-            common.legend = TRUE,
-            heights = c(5, 5),
-            widths = c(1, s, 1)
+          plotCrown <- plotXZ + plotYZ + patchwork::plot_annotation(
+            title = "Crown classification",
+            theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
           )
-          plotCrown <-
-            ggpubr::annotate_figure(plotCrown,
-                                    top = ggpubr::text_grob("Crown classification", size = 12))
         } else {
-          downsample <- 0.1
-          crown <- crown_pc[sample(
-            nrow(crown_pc),
-            size = floor(nrow(crown_pc) * downsample),
-            replace = FALSE,
-            prob = NULL
-          ), ]
+          crown <- crown_pc
           crown$class <- "crown"
           X <- Y <- Z <- NULL
           if (nrow(trunk_pc) == 0) {
@@ -1736,12 +1852,21 @@ classify_crown_pc <-
               ggplot2::geom_point(size = 0.1,
                                   ggplot2::aes(col = class),
                                   shape = ".") +
+              ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+              ggplot2::scale_y_continuous(expand = c(0, 0)) +
               ggplot2::coord_fixed(ratio = 1) +
               ggplot2::theme(
+                panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                panel.background = ggplot2::element_blank(),
+                title = ggplot2::element_text(size=12, face = 'bold'),
+                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                axis.text = ggplot2::element_text(size=14, color = "black"),
+                axis.title.x = ggplot2::element_text(size=14, color = "black"),
                 axis.text.x = ggplot2::element_blank(),
                 axis.ticks.x = ggplot2::element_blank(),
                 plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-                text = ggplot2::element_text(size = 12)
+                legend.position = "none"
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
@@ -1754,15 +1879,22 @@ classify_crown_pc <-
               ggplot2::geom_point(size = 0.1,
                                   ggplot2::aes(col = class),
                                   shape = ".") +
+              ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+              ggplot2::scale_y_continuous(expand = c(0, 0)) +
               ggplot2::coord_fixed(ratio = 1) +
               ggplot2::theme(
+                panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                panel.background = ggplot2::element_blank(),
+                title = ggplot2::element_text(size=12, face = 'bold'),
+                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.text = ggplot2::element_text(size=14, color = "black"),
+                axis.title.x = ggplot2::element_text(size=14, color = "black"),
                 axis.text.y = ggplot2::element_blank(),
                 axis.title.y = ggplot2::element_blank(),
                 axis.ticks.y = ggplot2::element_blank(),
                 axis.text.x = ggplot2::element_blank(),
                 axis.ticks.x = ggplot2::element_blank(),
-                plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
-                text = ggplot2::element_text(size = 12)
+                plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
@@ -1771,29 +1903,12 @@ classify_crown_pc <-
                   shape = c(16, 16), size = c(2, 2)
                 ))
               )
-            s <-
-              (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                                   lowest_point) * 0.5 - 1.05
-            plotCrown <- ggpubr::ggarrange(
-              plotXZ,
-              NULL,
-              plotYZ,
-              nrow = 1,
-              ncol = 3,
-              common.legend = TRUE,
-              heights = c(5, 5),
-              widths = c(1, s, 1)
+            plotCrown <- plotXZ + plotYZ + patchwork::plot_annotation(
+              title = "Crown classification",
+              theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
             )
-            plotCrown <-
-              ggpubr::annotate_figure(plotCrown,
-                                      top = ggpubr::text_grob("Crown classification", size = 12))
           } else {
-            trunk <- trunk_pc[sample(
-              nrow(trunk_pc),
-              size = floor(nrow(trunk_pc) * downsample),
-              replace = FALSE,
-              prob = NULL
-            ), ]
+            trunk <- trunk_pc
             trunk$class <- "trunk"
             tree <- rbind(crown, trunk)
             tree$Z <- tree$Z - min(tree$Z)
@@ -1801,11 +1916,21 @@ classify_crown_pc <-
               ggplot2::geom_point(size = 0.1,
                                   ggplot2::aes(col = class),
                                   shape = ".") +
+              ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+              ggplot2::scale_y_continuous(expand = c(0, 0)) +
               ggplot2::coord_fixed(ratio = 1) +
               ggplot2::theme(
+                panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                panel.background = ggplot2::element_blank(),
+                title = ggplot2::element_text(size=12, face = 'bold'),
+                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.title.y = ggplot2::element_text(size=14, color = "black"),
+                axis.text = ggplot2::element_text(size=14, color = "black"),
+                axis.title.x = ggplot2::element_text(size=14, color = "black"),
                 axis.text.x = ggplot2::element_blank(),
                 axis.ticks.x = ggplot2::element_blank(),
-                plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
+                plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
+                legend.position = "none"
               ) +
               ggplot2::scale_color_manual(
                 name = "class",
@@ -1818,8 +1943,16 @@ classify_crown_pc <-
               ggplot2::geom_point(size = 0.1,
                                   ggplot2::aes(col = class),
                                   shape = ".") +
+              ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+              ggplot2::scale_y_continuous(expand = c(0, 0)) +
               ggplot2::coord_fixed(ratio = 1) +
               ggplot2::theme(
+                panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                panel.background = ggplot2::element_blank(),
+                title = ggplot2::element_text(size=12, face = 'bold'),
+                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.text = ggplot2::element_text(size=14, color = "black"),
+                axis.title.x = ggplot2::element_text(size=14, color = "black"),
                 axis.text.y = ggplot2::element_blank(),
                 axis.title.y = ggplot2::element_blank(),
                 axis.ticks.y = ggplot2::element_blank(),
@@ -1834,22 +1967,10 @@ classify_crown_pc <-
                   shape = c(16, 16), size = c(2, 2)
                 ))
               )
-            s <-
-              (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                                   lowest_point) * 0.5 - 1.05
-            plotCrown <- ggpubr::ggarrange(
-              plotXZ,
-              NULL,
-              plotYZ,
-              nrow = 1,
-              ncol = 3,
-              common.legend = TRUE,
-              heights = c(5, 5),
-              widths = c(1, s, 1)
+            plotCrown <- plotXZ + plotYZ + patchwork::plot_annotation(
+              title = "Crown classification",
+              theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
             )
-            plotCrown <-
-              ggpubr::annotate_figure(plotCrown,
-                                      top = ggpubr::text_grob("Crown classification", size = 12))
           }
         }
         print(plotCrown)
@@ -1878,11 +1999,23 @@ classify_crown_pc <-
           ggplot2::geom_point(size = 0.1,
                               ggplot2::aes(col = class),
                               shape = ".") +
+          ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+          ggplot2::scale_y_continuous(expand = c(0, 0)) +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
+            panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+            panel.background = ggplot2::element_blank(),
+            title = ggplot2::element_text(size=12, face = 'bold'),
+            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.title.y = ggplot2::element_text(size=14, color = "black"),
+            axis.text = ggplot2::element_text(size=14, color = "black"),
+            axis.title.x = ggplot2::element_text(size=14, color = "black"),
+            axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+            axis.ticks.length = ggplot2::unit(0.2, "cm"),
             axis.text.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
-            plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines")
+            plot.margin = ggplot2::unit(c(0, 0, 0, 0), "lines"),
+            legend.position = "none"
           ) +
           ggplot2::scale_color_manual(
             name = "class",
@@ -1895,10 +2028,20 @@ classify_crown_pc <-
           ggplot2::geom_point(size = 0.1,
                               ggplot2::aes(col = class),
                               shape = ".") +
+          ggplot2::geom_hline(yintercept = max(tree$Z), lty = 'dashed') +
+          ggplot2::scale_y_continuous(expand = c(0, 0)) +
           ggplot2::coord_fixed(ratio = 1) +
           ggplot2::theme(
+            panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+            panel.background = ggplot2::element_blank(),
+            title = ggplot2::element_text(size=12, face = 'bold'),
+            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.title.y = ggplot2::element_text(size=14, color = "black"),
+            axis.text = ggplot2::element_text(size=14, color = "black"),
+            axis.title.x = ggplot2::element_text(size=14, color = "black"),
+            axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+            axis.ticks.length = ggplot2::unit(0.2, "cm"),
             axis.text.y = ggplot2::element_blank(),
-            axis.title.y = ggplot2::element_blank(),
             axis.ticks.y = ggplot2::element_blank(),
             axis.text.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
@@ -1911,22 +2054,10 @@ classify_crown_pc <-
               shape = c(16, 16), size = c(2, 2)
             ))
           )
-        s <-
-          (max(pc$X) - min(pc$X) + max(pc$Y) - min(pc$Y)) / (max(pc$Z) -
-                                                               lowest_point) * 0.5 - 1.05
-        plotCrown <- ggpubr::ggarrange(
-          plotXZ,
-          NULL,
-          plotYZ,
-          nrow = 1,
-          ncol = 3,
-          common.legend = TRUE,
-          heights = c(5, 5),
-          widths = c(1, s, 1)
+        plotCrown <- plotXZ + plotYZ + patchwork::plot_annotation(
+          title = "Crown classification",
+          theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
         )
-        plotCrown <-
-          ggpubr::annotate_figure(plotCrown,
-                                  top = ggpubr::text_grob("Crown classification", size = 12))
         print(plotCrown)
         return(
           list(
@@ -2053,11 +2184,18 @@ projected_area_pc <- function(pc,
                                           size = c(2, 2)
                                         ))
       ) +
-      ggplot2::theme(text = ggplot2::element_text(size = 12))
+      ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
+                     panel.background = ggplot2::element_blank(),
+                     axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                     axis.title = ggplot2::element_blank(),
+                     axis.text = ggplot2::element_text(size=14, color = "black"),
+                     axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
+                     axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                     axis.ticks.length = ggplot2::unit(0.2, "cm"))
     print(plotPA)
     return(list("pa" = pa, "plot" = plotPA))
   } else {
-    return(pa)
+    return(list("pa" = pa))
   }
 }
 
@@ -2120,8 +2258,6 @@ alpha_volume_pc <- function(pc,
       graphics::title(main = bquote(AV == .(round(vol, 2)) ~ m ^ 3), line = 2)
     })
     plot(ashape3d.obj, color = plotcolor)
-    return(list("av" = vol, "ashape3d" = ashape3d.obj))
-  } else {
-    return(vol)
   }
+  return(list("av" = vol, "ashape3d" = ashape3d.obj))
 }

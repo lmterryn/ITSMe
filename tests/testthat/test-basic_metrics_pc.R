@@ -9,7 +9,7 @@ test_that("tree height calculation works", {
   # output is a numeric
   expect_equal(length(
     tree_height_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))),
-    2) &
+    5) &
     # with plot TRUE, output is a list of 4
     expect_equal(length(
       tree_height_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
@@ -18,7 +18,7 @@ test_that("tree height calculation works", {
     expect_equal(length(
       tree_height_pc(pc = read_tree_pc(
         path = "../point_clouds/pc_tree_uav.txt"),
-        dtm = read_tree_pc(path = "../point_clouds/dtm.txt"))), 2) &
+        dtm = read_tree_pc(path = "../point_clouds/dtm.txt"))), 5) &
     # with dtm and plot TRUE, output is a list of 4
     expect_equal(length(
       tree_height_pc(pc = read_tree_pc(
@@ -62,28 +62,28 @@ test_that("extract lower trunk method works", {
 })
 
 test_that("dbh calculation from a tree point cloud works", {
-  # output is a list of 3
+  # output is a list of 4
   expect_equal(length(
-    dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))), 3) &
+    dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))), 4) &
     # with branches at bh, output is a list of 3
     expect_equal(length(
       dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_temp.ply"))),
-      3) &
-    # with plot TRUE, output is a list of 4
+      4) &
+    # with plot TRUE, output is a list of 5
     expect_equal(length(
       dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
-             plot = TRUE)), 4)
+             plot = TRUE)), 5)
 })
 
 test_that("dab calculation from a tree point cloud works", {
-  # output is a list of 3
+  # output is a list of 5
   expect_equal(length(
     dab_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"))),
-    4) &
-    # with plot TRUE, output is a list of 4
+    5) &
+    # with plot TRUE, output is a list of 6
     expect_equal(length(
       dab_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"),
-             plot = TRUE)), 5)
+             plot = TRUE)), 6)
 })
 
 test_that("classify crown method works", {
@@ -129,7 +129,7 @@ test_that("alpha volume calculation works", {
   # output is a numeric of length 1
   expect_equal(length(
     alpha_volume_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))),
-    1) &
+    2) &
     # with plot TRUE, output is a list of 2
     expect_equal(length(
       alpha_volume_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
