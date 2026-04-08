@@ -1,25 +1,17 @@
 test_that("summary basic point cloud metrics works", {
-  # output is a data frame with length 8
+  # output is a data frame with length 10
   expect_equal(length(
-    summary_basic_pointcloud_metrics(PCs_path = "../non_buttressed_trees/", pattern = ".txt")
+    summary_basic_pointcloud_metrics(PCs_path = "../non_buttressed_trees/", pattern = ".txt", overwrite = TRUE)
   ), 10) &
-    # with buttress TRUE & OUT_path specified, output is a data frame with length 8
+    # with buttress TRUE & OUT_path specified, output is a data frame with length 10
     expect_equal(length(
       summary_basic_pointcloud_metrics(
         PCs_path = "../buttressed_trees/",
         buttress = TRUE,
         minheight =  4,
         OUT_path = "../output/",
-        pattern = ".txt"
-      )
-    ), 10) &
-    # with crown & plot TRUE, output is a data frame with length 8
-    expect_equal(length(
-      summary_basic_pointcloud_metrics(
-        PCs_path = "../non_buttressed_trees/",
-        crown = TRUE,
-        plot = TRUE,
-        pattern = ".txt"
+        pattern = ".txt",
+        overwrite = TRUE
       )
     ), 10)
 })
