@@ -24,6 +24,7 @@ summary_basic_pointcloud_metrics_pertree(
   functional = TRUE,
   concavity_fdiameter = 4,
   OUT_path = FALSE,
+  overwrite = FALSE,
   plot = FALSE,
   plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")
 )
@@ -93,6 +94,9 @@ functions \code{\link{diameter_slice_pc}}, \code{\link{dbh_pc}},
 \item{OUT_path}{A character with name of the output folder where the summary
 figures should be saved or logical (default=FALSE) in this case no figures
 are saved.}
+
+\item{overwrite}{Logical (default=FALSE), indicates if the output file can be
+overwritten.}
 
 \item{plot}{Logical (default=FALSE), indicates if summary figure for each
 tree point cloud is plotted. If an OUT_path is provided, the figures are
