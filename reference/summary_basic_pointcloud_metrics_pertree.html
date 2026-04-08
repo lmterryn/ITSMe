@@ -34,7 +34,7 @@ diameter above buttresses, functional diameter above buttresses, projected
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Summary basic structural metrics tree point cloud for one tree.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/lmterryn/ITSMe/blob/v2.0.0/R/summary_metrics.R" class="external-link"><code>R/summary_metrics.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/lmterryn/ITSMe/blob/main/R/summary_metrics.R" class="external-link"><code>R/summary_metrics.R</code></a></small>
       <div class="d-none name"><code>summary_basic_pointcloud_metrics_pertree.Rd</code></div>
     </div>
 
@@ -67,6 +67,7 @@ diameter above buttresses, functional diameter above buttresses, projected
 <span>  functional <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  concavity_fdiameter <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  OUT_path <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  plotcolors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#000000"</span>, <span class="st">"#808080"</span>, <span class="st">"#1c027a"</span>, <span class="st">"#08aa7c"</span>, <span class="st">"#fac87f"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -177,6 +178,11 @@ figures should be saved or logical (default=FALSE) in this case no figures
 are saved.</p></dd>
 
 
+<dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
+<dd><p>Logical (default=FALSE), indicates if the output file can be
+overwritten.</p></dd>
+
+
 <dt id="arg-plot">plot<a class="anchor" aria-label="anchor" href="#arg-plot"></a></dt>
 <dd><p>Logical (default=FALSE), indicates if summary figure for each
 tree point cloud is plotted. If an OUT_path is provided, the figures are
@@ -234,7 +240,7 @@ and <code><a href="alpha_volume_pc.html">alpha_volume_pc</a></code> respectively
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

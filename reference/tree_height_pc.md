@@ -1,0 +1,91 @@
+# Tree height point cloud
+
+Returns the tree height measured from a tree point cloud. If a digital
+terrain model (dtm) is provided it is used to estimate the tree height.
+
+## Usage
+
+``` r
+tree_height_pc(
+  pc,
+  dtm = NA,
+  r = 5,
+  plot = FALSE,
+  plotcolors = c("#000000", "#08aa7c", "#fac87f")
+)
+```
+
+## Arguments
+
+- pc:
+
+  The tree point cloud as a data.frame with columns X,Y,Z. Output of
+  [`read_tree_pc`](https://lmterryn.github.io/ITSMe/reference/read_tree_pc.md).
+
+- dtm:
+
+  The digital terrain model as a data.frame with columns X,Y,Z (default
+  = NA). If the digital terrain model is in the same format as a point
+  cloud it can also be read with
+  [`read_tree_pc`](https://lmterryn.github.io/ITSMe/reference/read_tree_pc.md).
+
+- r:
+
+  Numeric value (default=5) r which determines the range taken for the
+  dtm. Should be at least the resolution of the dtm. Only relevant when
+  a dtm is provided.
+
+- plot:
+
+  Logical (default=FALSE), indicates if tree point cloud is plotted.
+
+- plotcolors:
+
+  list of three colors for plotting. Only relevant when plot = TRUE. The
+  tree points, the lowest point height and the DTM points are colored by
+  the first, second and third element of this list respectively.
+
+## Value
+
+List with the tree height (numeric value) and the determined lowest
+point (lp, numeric value). Also optionally (plot=TRUE) plots the tree
+point cloud and in this case returns a list with the tree height as
+first element, the lowest point as the second element and the plots as
+third, fourth and fifth elements.
+
+## Details
+
+The tree height is measured as the difference between the Z-value of the
+highest and lowest point of the tree point cloud.
+
+The lowest point of a tree point cloud is sometimes not sampled (e.g.
+for low density UAV-LS, in dense forests). In this case, a dtm can be
+provided and will be used to estimate the lowest point: this is the
+height of the dtm under the tree point cloud, which is calculated as the
+median Z-value of the digital terrain model points within a horizontal
+(x,y-)range (r) of the 10 lowest points of the tree point cloud.
+
+For multi-temporal analyses, the lowest point of the point cloud of the
+tree of interest acquired at the first time step can be provided as a
+data.frame with columns X,Y,Z in the dtm input. This will ensure the
+tree heights of the trees are measured based on the same lowest point.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Read tree point cloud and calculate the tree height
+pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
+tree_height <- tree_height_pc(pc = pc_tree)
+
+# Read the digital terrain model
+dtm <- read_tree_pc(PC_path = "path/to/dtm.txt")
+# Calculate the tree height based on the point cloud and dtm
+tree_height <- tree_height_pc(pc = pc_tree, dtm = dtm, r = 1)
+
+# multi-temporal analysis
+pc_tree_2 <- read_tree_pc(PC_path = "path/to/point_cloud_at_other_time.txt")
+lp <- min(pc_tree_2$Z)
+tree_height <- tree_height_pc(pc = pc_tree, dtm = lp)
+} # }
+```
