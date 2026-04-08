@@ -64,7 +64,6 @@ read_rct_qsm <- function(path, global = FALSE) {
   cylinder_headers <- cylinder_headers[cylinder_headers != ""]
 
   out <- list()
-  names_out <- c()
   for (i in 3:length(lines)){
     # Process data (line 3)
     data_line <- trimws(lines[i])
@@ -128,15 +127,10 @@ read_rct_qsm <- function(path, global = FALSE) {
       cylinder = cylinder,
       treedata = treedata
     )
-    if (length(lines) != 3){
-      out[[length(out) + 1]] <- single_out
-      names_out <-
-        append(names_out, paste("qsm_", as.character(i-2), sep = ""))
-    } else {
-      out <- single_out
-    }
+    idx <- length(out) + 1
+    out[[idx]] <- single_out
+    names(out)[idx] <- paste0("qsm_", idx)
   }
-  names(out) <- names_out
   # Handle global environment option
   if (global) {
     list2env(out, envir = .GlobalEnv)
