@@ -59,6 +59,8 @@
 #' @param OUT_path A character with name of the output folder where the summary
 #'   figures should be saved or logical (default=FALSE) in this case no figures
 #'   are saved.
+#' @param overwrite Logical (default=FALSE), indicates if the output file can be
+#'   overwritten.
 #' @param plot Logical (default=FALSE), indicates if summary figure for each
 #'   tree point cloud is plotted. If an OUT_path is provided, the figures are
 #'   saved in the OUT_path.
@@ -114,10 +116,23 @@ summary_basic_pointcloud_metrics_pertree <-
            functional = TRUE,
            concavity_fdiameter = 4,
            OUT_path = FALSE,
+           overwrite = FALSE,
            plot = FALSE,
            plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")) {
     #print which tree is processing and initiate data frame
     print(paste("processing ", basename(PC_path)))
+
+    #if the output file already exists
+    output_filename <- paste0(OUT_path, "summary_basic_metrics.csv")
+    if (file.exists(output_filename) & overwrite == FALSE) {
+      #read existing file
+      existing_tree_data <- read.csv(output_filename, stringsAsFactors = FALSE)
+      #check if tree_id already exists
+      if (basename(PC_path) %in% existing_tree_data$tree_id) {
+        print("tree already processed")
+        return(existing_tree_data[existing_tree_data$tree_id == basename(PC_path), ])  #exit the function
+      }
+    }
     tree <- data.frame("tree_id" = basename(PC_path))
     #empty plots
     empty_plot <- ggplot2::ggplot()
@@ -418,6 +433,8 @@ summary_basic_pointcloud_metrics_pertree <-
           dpi = 600
         )
       }
+      write.table(tree, file = paste0(OUT_path, "summary_basic_metrics.csv"), sep = ",", row.names = FALSE,
+                  col.names = !file.exists(paste0(OUT_path, "summary_basic_metrics.csv")), append = TRUE)
     }
     return(tree)
     gc()
@@ -491,6 +508,8 @@ summary_basic_pointcloud_metrics_pertree <-
 #' @param plot Logical (default=FALSE), indicates if summary figure for each
 #'   tree point cloud is plotted. If an OUT_path is provided, the figures are
 #'   saved in the OUT_path.
+#' @param overwrite Logical (default=FALSE), indicates if the output file can be
+#'   overwritten.
 #' @param plotcolors list of five colors for plotting. Only relevant when plot =
 #'   TRUE. The stem points above buttresses, stem points at breast height,
 #'   fitted circle, the concave hull and the estimated center are colored by the
@@ -545,6 +564,7 @@ summary_basic_pointcloud_metrics <-
            functional = TRUE,
            concavity_fdiameter = 4,
            OUT_path = FALSE,
+           overwrite = FALSE,
            plot = FALSE,
            plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f"),
            parallel = FALSE,
@@ -605,6 +625,7 @@ summary_basic_pointcloud_metrics <-
         functional = functional,
         concavity_fdiameter = concavity_fdiameter,
         OUT_path = OUT_path,
+        overwrite = overwrite,
         plot = plot,
         plotcolors = plotcolors
       )
@@ -630,21 +651,18 @@ summary_basic_pointcloud_metrics <-
         functional = functional,
         concavity_fdiameter = concavity_fdiameter,
         OUT_path = OUT_path,
+        overwrite = overwrite,
         plot = plot,
         plotcolors = plotcolors
       )
     }
     ##Adjusts pc_metrics in a more usable data.frame
-    print(pc_metrics)
     pc_metrics_dataframe <- pc_metrics[[1]]
     if (length(pc_metrics) > 1) {
       for (i in 2:length(pc_metrics)) {
         pc_metrics_dataframe <- rbind(pc_metrics_dataframe, pc_metrics[[i]])
       }
     }
-    utils::write.csv(pc_metrics_dataframe,
-                     paste0(OUT_path, "summary_basic_metrics.csv"),
-                     row.names = FALSE)
     return(pc_metrics_dataframe)
   }
 
