@@ -4,15 +4,53 @@
 \alias{read_rct_qsm}
 \title{Read a RCT QSM}
 \usage{
-read_rct_qsm(path, global = FALSE)
+read_rct_qsm(path, global = FALSE, remove_root = FALSE)
 }
 \arguments{
 \item{path}{A character with the path to the RCT QSM txt file.}
 
 \item{global}{Logical (default=FALSE), indicates if RCT QSM components should be read into global environment.}
+
+\item{remove_root}{Logical (default=FALSE), indicates if the root segment is removed from the data.frame.}
 }
 \value{
-Returns a list with the RCT QSM components (cylinder and treedata).
+Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of a list of 2 components (cylinder and treedata) containing:
+\describe{
+\item{cylinder}{A list containing cylinder-level attributes:
+\describe{
+\item{end}{Matrix (n x 3). 3D coordinates (x, y, z) of the segment end points.}
+\item{radius}{Numeric vector. Segment radius in meters.}
+\item{parent}{Integer vector. ID of the parent segment (adjusted to 1-based indexing). Root segment has index 1; first segment index 2.}
+\item{section}{Integer vector. Section identifier.}
+\item{volume}{Numeric vector. Segment volume in cubic meters.}
+\item{diameter}{Numeric vector. Segment diameter in meters.}
+\item{length}{Numeric vector. Length to the farthest leaf (converted from cm to m).}
+\item{strength}{Numeric vector. Structural strength (d^0.75 / l).}
+\item{min_strength}{Numeric vector. Minimum strength to the root.}
+\item{dominance}{Numeric vector. Branch dominance ratio.}
+\item{angle}{Numeric vector. Branch angle at bifurcation.}
+\item{children}{Integer vector. Number of child segments.}
+\item{branch}{Integer vector. Branch identifier.}
+\item{BranchOrder}{Integer vector. Hierarchical branch order.}
+\item{extension}{Integer vector. Branch extension identifier.}
+\item{PositionInBranch}{Integer vector. Position within the branch.}
+\item{segment_length}{Numeric vector. Individual segment length.}
+}
+}
+
+\item{treedata}{A list containing tree-level metrics:
+\describe{
+\item{TotalVolume}{Numeric. Total tree volume in litres (sum of cylinder volumes × 1000).}
+\item{TreeHeight}{Numeric. Total tree height in meters.}
+\item{DBHqsm}{Numeric. Diameter at breast height.}
+\item{CrownRadius}{Numeric. Average crown radius.}
+\item{Dimension}{Numeric. Fractal dimension of branches.}
+\item{Monocotal}{Numeric. Palm tree similarity metric.}
+\item{Bend}{Numeric. Trunk bend metric.}
+\item{BranchSlope}{Numeric. Branch slope characteristics.}
+}
+}
+}
 }
 \description{
 Reads a RayCloudTools (RCT) QSM txt file (.txt) generated using rayextract trees and treeinfo.
@@ -36,7 +74,7 @@ Segment-level attributes:
 \itemize{
 \item volume: Volume of the segment in cubic meters (for root segment: total tree volume)
 \item diameter: Segment diameter in meters (for root: maximum diameter in tree)
-\item length: Length from segment base to farthest leaf
+\item length: Length from segment base to farthest leaf in m
 \item strength: Structural strength metric calculated as diameter^0.75/length
 \item min_strength: Minimum strength value between this segment and root
 \item dominance: Branch dominance ratio (a1/(a1+a2) for largest child branches)
@@ -52,6 +90,11 @@ Optional branch data attributes (if treeinfo tree.txt --branch_data flag was use
 \item pos_in_branch: Position index within the branch
 \item segment_length: Length of individual segment
 }
+
+The first row of the cylinder list does \strong{not} represent an actual cylinder.
+Instead, it provides the starting x and y coordinates of the first cylinder
+in the model. This row should typically be excluded from analyses that operate
+on true segment (e.g. volume or length calculations).
 }
 \examples{
 \dontrun{
