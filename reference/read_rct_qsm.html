@@ -44,7 +44,7 @@ the global environment. It can handle a file including one or multiple RCT QSMs.
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_rct_qsm</span><span class="op">(</span><span class="va">path</span>, global <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_rct_qsm</span><span class="op">(</span><span class="va">path</span>, global <span class="op">=</span> <span class="cn">FALSE</span>, remove_root <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -58,11 +58,99 @@ the global environment. It can handle a file including one or multiple RCT QSMs.
 <dt id="arg-global">global<a class="anchor" aria-label="anchor" href="#arg-global"></a></dt>
 <dd><p>Logical (default=FALSE), indicates if RCT QSM components should be read into global environment.</p></dd>
 
+
+<dt id="arg-remove-root">remove_root<a class="anchor" aria-label="anchor" href="#arg-remove-root"></a></dt>
+<dd><p>Logical (default=FALSE), indicates if the root segment is removed from the data.frame.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Returns a list with the RCT QSM components (cylinder and treedata).</p>
-    </div>
+    <p>Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of a list of 2 components (cylinder and treedata) containing:</p><dl><dt>cylinder</dt>
+<dd><p>A list containing cylinder-level attributes:</p><dl><dt>end</dt>
+<dd><p>Matrix (n x 3). 3D coordinates (x, y, z) of the segment end points.</p></dd>
+
+<dt>radius</dt>
+<dd><p>Numeric vector. Segment radius in meters.</p></dd>
+
+<dt>parent</dt>
+<dd><p>Integer vector. ID of the parent segment (adjusted to 1-based indexing). Root segment has index 1; first segment index 2.</p></dd>
+
+<dt>section</dt>
+<dd><p>Integer vector. Section identifier.</p></dd>
+
+<dt>volume</dt>
+<dd><p>Numeric vector. Segment volume in cubic meters.</p></dd>
+
+<dt>diameter</dt>
+<dd><p>Numeric vector. Segment diameter in meters.</p></dd>
+
+<dt>length</dt>
+<dd><p>Numeric vector. Length to the farthest leaf (converted from cm to m).</p></dd>
+
+<dt>strength</dt>
+<dd><p>Numeric vector. Structural strength (d^0.75 / l).</p></dd>
+
+<dt>min_strength</dt>
+<dd><p>Numeric vector. Minimum strength to the root.</p></dd>
+
+<dt>dominance</dt>
+<dd><p>Numeric vector. Branch dominance ratio.</p></dd>
+
+<dt>angle</dt>
+<dd><p>Numeric vector. Branch angle at bifurcation.</p></dd>
+
+<dt>children</dt>
+<dd><p>Integer vector. Number of child segments.</p></dd>
+
+<dt>branch</dt>
+<dd><p>Integer vector. Branch identifier.</p></dd>
+
+<dt>BranchOrder</dt>
+<dd><p>Integer vector. Hierarchical branch order.</p></dd>
+
+<dt>extension</dt>
+<dd><p>Integer vector. Branch extension identifier.</p></dd>
+
+<dt>PositionInBranch</dt>
+<dd><p>Integer vector. Position within the branch.</p></dd>
+
+<dt>segment_length</dt>
+<dd><p>Numeric vector. Individual segment length.</p></dd>
+
+
+</dl></dd>
+
+
+<dt>treedata</dt>
+<dd><p>A list containing tree-level metrics:</p><dl><dt>TotalVolume</dt>
+<dd><p>Numeric. Total tree volume in litres (sum of cylinder volumes × 1000).</p></dd>
+
+<dt>TreeHeight</dt>
+<dd><p>Numeric. Total tree height in meters.</p></dd>
+
+<dt>DBHqsm</dt>
+<dd><p>Numeric. Diameter at breast height.</p></dd>
+
+<dt>CrownRadius</dt>
+<dd><p>Numeric. Average crown radius.</p></dd>
+
+<dt>Dimension</dt>
+<dd><p>Numeric. Fractal dimension of branches.</p></dd>
+
+<dt>Monocotal</dt>
+<dd><p>Numeric. Palm tree similarity metric.</p></dd>
+
+<dt>Bend</dt>
+<dd><p>Numeric. Trunk bend metric.</p></dd>
+
+<dt>BranchSlope</dt>
+<dd><p>Numeric. Branch slope characteristics.</p></dd>
+
+
+</dl></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The input file contains the following fields:
@@ -75,7 +163,7 @@ Tree-level attributes:</p><ul><li><p>height: Total height of the tree in meters<
 <li><p>branch_slope: Slope characteristics of the branches</p></li>
 </ul><p>Segment-level attributes:</p><ul><li><p>volume: Volume of the segment in cubic meters (for root segment: total tree volume)</p></li>
 <li><p>diameter: Segment diameter in meters (for root: maximum diameter in tree)</p></li>
-<li><p>length: Length from segment base to farthest leaf</p></li>
+<li><p>length: Length from segment base to farthest leaf in m</p></li>
 <li><p>strength: Structural strength metric calculated as diameter^0.75/length</p></li>
 <li><p>min_strength: Minimum strength value between this segment and root</p></li>
 <li><p>dominance: Branch dominance ratio (a1/(a1+a2) for largest child branches)</p></li>
@@ -86,7 +174,11 @@ Tree-level attributes:</p><ul><li><p>height: Total height of the tree in meters<
 <li><p>extension: Extension identifier for continuous branch segments</p></li>
 <li><p>pos_in_branch: Position index within the branch</p></li>
 <li><p>segment_length: Length of individual segment</p></li>
-</ul></div>
+</ul><p>The first row of the cylinder list does <strong>not</strong> represent an actual cylinder.
+Instead, it provides the starting x and y coordinates of the first cylinder
+in the model. This row should typically be excluded from analyses that operate
+on true segment (e.g. volume or length calculations).</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
