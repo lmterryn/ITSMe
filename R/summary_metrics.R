@@ -126,7 +126,7 @@ summary_basic_pointcloud_metrics_pertree <-
     output_filename <- paste0(OUT_path, "summary_basic_metrics.csv")
     if (file.exists(output_filename) & overwrite == FALSE) {
       #read existing file
-      existing_tree_data <- read.csv(output_filename, stringsAsFactors = FALSE)
+      existing_tree_data <- utils::read.csv(output_filename, stringsAsFactors = FALSE)
       #check if tree_id already exists
       if (basename(PC_path) %in% existing_tree_data$tree_id) {
         print("tree already processed")
@@ -433,7 +433,7 @@ summary_basic_pointcloud_metrics_pertree <-
           dpi = 600
         )
       }
-      write.table(tree, file = paste0(OUT_path, "summary_basic_metrics.csv"), sep = ",", row.names = FALSE,
+      utils::write.table(tree, file = paste0(OUT_path, "summary_basic_metrics.csv"), sep = ",", row.names = FALSE,
                   col.names = !file.exists(paste0(OUT_path, "summary_basic_metrics.csv")), append = TRUE)
     }
     return(tree)
