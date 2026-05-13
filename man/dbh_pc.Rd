@@ -12,10 +12,10 @@ dbh_pc(
   concavity = 4,
   dtm = NA,
   r = 5,
-  how = "mean",
+  how = "median",
   arc_min_length_cm = NULL,
   arc_min_angle = 18,
-  arc_tolerance = 0.06,
+  arc_tolerance = 0.05,
   min_inner_buffer = 0.06,
   inner_buffer_fraction = 0.5,
   plot = FALSE,
@@ -54,7 +54,7 @@ is provided.}
 
 \item{how}{Method used to summarise point-to-centre radii when estimating
 DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
-for the median radius, or a numeric value such as \code{10} to trim
+for the median radius (default), or a numeric value such as \code{10} to trim
 5 percent of radii on each side before taking the mean.}
 
 \item{arc_min_length_cm}{Optional numeric. Minimum arc length, in

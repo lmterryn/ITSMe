@@ -23,7 +23,7 @@ summary_basic_pointcloud_metrics(
   maxbuttressheight = 7,
   functional = TRUE,
   concavity_fdiameter = 4,
-  how = "mean",
+  how = "median",
   arc_min_length_cm = NULL,
   arc_min_angle = 18,
   arc_tolerance = 0.06,

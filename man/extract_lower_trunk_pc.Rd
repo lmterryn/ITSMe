@@ -10,7 +10,7 @@ extract_lower_trunk_pc(
   concavity = 4,
   dtm = NA,
   r = 5,
-  how = "mean"
+  how = "median"
 )
 }
 \arguments{
