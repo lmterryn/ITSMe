@@ -138,7 +138,7 @@ fdab <- out_dab$fdab
 <img src="man/figures/dab_example.jpeg" height="500" >
 </p>
 
-### DBH fit quality control
+DBH fit quality control
 
 `dbh_pc()` includes options for robust DBH estimation through the `how`
 argument and returns DBH fit quality-control metrics such as
