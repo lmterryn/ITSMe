@@ -142,7 +142,7 @@ DBH fit quality control
 
 `dbh_pc()` includes options for robust DBH estimation through the `how`
 argument and returns DBH fit quality-control metrics such as
-`arc_coverage`, `inner_circle_empty`, and `all_points_in_donut`. These
+`arc_coverage`and `inner_circle_empty`. These
 metrics are also included in `summary_basic_pointcloud_metrics()` when
 `"stem diameter"` is calculated.
 

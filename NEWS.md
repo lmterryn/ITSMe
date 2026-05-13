@@ -2,7 +2,7 @@
 
 ## DBH estimation and quality control
 
-- Added flexible radius summarisation to DBH estimation through the `how`
+- Added more robust DBH estimation through the `how`
   argument. The original ITSMe behaviour can be obtained with `how = "mean"`;
   `how = "median"` (new default) uses the median point-to-centre radius; and numeric values
   use a trimmed mean of the point-to-centre radii.
