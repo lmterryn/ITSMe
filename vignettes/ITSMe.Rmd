@@ -266,6 +266,67 @@ The `dbh_pc` and `dab_pc` functions also output a center value which gives the X
 and Y coordinate of the center of the estimated circle fit. This can also be
 used as a tree position value.
 
+### Other DBH estimation options and quality control
+
+
+The `how` argument in `dbh_pc()` controls how point-to-centre distances are summarised into
+the final fitted radius. "mean" follows the original ITSMe logic, while "median" (new default) or adding a number makes the fit less sensitive to outlier points:
+
+```{r dbh-how-example, eval=FALSE}
+# Original ITSMe behaviour
+out_mean <- dbh_pc(pc = pc_tree, how = "mean")
+
+# Median radius, more robust to a few distant slice points (new default)
+out_median <- dbh_pc(pc = pc_tree, how = "median")
+
+# Trim 20 percent of radii in total:
+# 10 percent lowest and 10 percent highest
+out_trimmed <- dbh_pc(pc = pc_tree, how = 20)
+```
+
+In addition to the original outputs (`dbh`, `R2`, `center`, and `fdbh`),
+`dbh_pc()` returns quality-control metrics that can help identify unreliable
+DBH fits:
+
+- `arc_coverage`: proportion of angular sectors around the fitted DBH circle
+  that contain nearby slice points;
+- `inner_circle_empty`: whether the checked inner part of the fitted circle
+  contains no slice points;
+
+
+```{r dbh-qc-example, eval=FALSE}
+out <- dbh_pc(pc = pc_tree, how = "median", plot = TRUE)
+
+out$dbh
+out$R2
+out$arc_coverage
+out$inner_circle_empty
+```
+
+Low `arc_coverage`, high `R2`, or `inner_circle_empty = FALSE` can be used to
+flag DBH estimates for inspection.
+
+When `"stem diameter"` is included in `summary_basic_pointcloud_metrics()`, the
+DBH quality-control metrics are also included in the returned summary table:
+
+```{r summary-dbh-qc-example, eval=FALSE}
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/folder/",
+  pattern = "\\.ply$",
+  metrics = c("tree position", "stem diameter", "tree height"),
+  how = "median"
+)
+
+summary$dbh_arc_coverage
+summary$dbh_inner_circle_empty
+summary$dbh_all_points_in_donut
+```
+
+For buttressed trees, `summary_basic_pointcloud_metrics()` may calculate
+diameter above buttresses instead of DBH. In that case, the DBH-specific
+quality-control columns are returned as `NA`.
+
+
 #### Classify crown points 
 
 As a basis for crown metrics (e.g. projected crown area and 3D alpha crown 

@@ -17,13 +17,13 @@ Description: With this package you can obtain structural metrics from individual
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
     alphashape3d,
     concaveman,
     data.table,
     ggforce,
     ggplot2,
+    nabor,
     graphics,
     lidR,
     nabor,
@@ -47,3 +47,4 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

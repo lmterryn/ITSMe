@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <p align="center">
+
 <img src="man/figures/ITSMe_logo_RGB_nobg.jpg" height="500" >
 </p>
 
@@ -127,11 +129,24 @@ fdab <- out_dab$fdab
 ```
 
 <p align="center">
+
 <img src="man/figures/diameter_slice_example_butt.jpeg" height="500" >
 </p>
+
 <p align="center">
+
 <img src="man/figures/dab_example.jpeg" height="500" >
 </p>
+
+### DBH fit quality control
+
+`dbh_pc()` includes options for robust DBH estimation through the `how`
+argument and returns DBH fit quality-control metrics such as
+`arc_coverage`, `inner_circle_empty`, and `all_points_in_donut`. These
+metrics are also included in `summary_basic_pointcloud_metrics()` when
+`"stem diameter"` is calculated.
+
+See `?dbh_pc` and `vignette("ITSMe")` for details.
 
 Calculating the stem branch distance of a TreeQSM:
 
@@ -170,6 +185,7 @@ If you set the plot parameter TRUE and provide an OUT_path, this
 function saves a summary figure for each tree:
 
 <p align="center">
+
 <img src="man/figures/summary.jpeg" height="500" >
 </p>
 
