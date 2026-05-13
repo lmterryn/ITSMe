@@ -26,7 +26,7 @@ summary_basic_pointcloud_metrics_pertree(
   how = "median",
   arc_min_length_cm = NULL,
   arc_min_angle = 18,
-  arc_tolerance = 0.06,
+  arc_tolerance = 0.05,
   min_inner_buffer = 0.06,
   inner_buffer_fraction = 0.5,
   OUT_path = FALSE,
