@@ -125,8 +125,8 @@ tree_height_pc <- function(pc,
       pc_norm <- pc
       pc_norm$Z <- pc$Z - z_min
       X <- Y <- Z <- NULL
-      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z), col = plotcolors[1]) +
-        ggplot2::geom_point(size = 0.1, shape = ".") +
+      plotXZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(X, Z)) +
+        ggplot2::geom_point(size = 0.1, shape = ".", color = plotcolors[1]) +
         ggplot2::geom_hline(yintercept = max(pc_norm$Z), lty = 'dashed') +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::coord_fixed(ratio = 1) +
@@ -134,11 +134,11 @@ tree_height_pc <- function(pc,
           panel.grid.major = ggplot2::element_line(colour = 'gray90'),
           panel.background = ggplot2::element_blank(),
           title = ggplot2::element_text(size=12, face = 'bold'),
-          axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+          axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
           axis.title.y = ggplot2::element_text(size=14, color = "black"),
           axis.text = ggplot2::element_text(size=14, color = "black"),
           axis.title.x = ggplot2::element_text(size=14, color = "black"),
-          axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+          axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
           axis.ticks.length = ggplot2::unit(0.2, "cm"),
           axis.text.x = ggplot2::element_blank(),
           axis.ticks.x = ggplot2::element_blank(),
@@ -157,7 +157,7 @@ tree_height_pc <- function(pc,
             panel.grid.major = ggplot2::element_line(colour = 'gray90'),
             panel.background = ggplot2::element_blank(),
             title = ggplot2::element_text(size=12, face = 'bold'),
-            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
             axis.text = ggplot2::element_text(size=14, color = "black"),
             axis.title.x = ggplot2::element_text(size=14, color = "black"),
             axis.text.y = ggplot2::element_blank(),
@@ -187,8 +187,8 @@ tree_height_pc <- function(pc,
             )
           )
       } else {
-        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z), col = plotcolors[1]) +
-          ggplot2::geom_point(size = 0.1, shape = ".") +
+        plotYZ <- ggplot2::ggplot(pc_norm, ggplot2::aes(Y, Z)) +
+          ggplot2::geom_point(size = 0.1, shape = ".", color = plotcolors[1]) +
           ggplot2::geom_hline(yintercept = max(pc_norm$Z), lty = 'dashed') +
           ggplot2::scale_y_continuous(expand = c(0, 0)) +
           ggplot2::coord_fixed(ratio = 1) +
@@ -196,7 +196,7 @@ tree_height_pc <- function(pc,
             panel.grid.major = ggplot2::element_line(colour = 'gray90'),
             panel.background = ggplot2::element_blank(),
             title = ggplot2::element_text(size=12, face = 'bold'),
-            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
             axis.text = ggplot2::element_text(size=14, color = "black"),
             axis.title.x = ggplot2::element_text(size=14, color = "black"),
             axis.text.y = ggplot2::element_blank(),
@@ -256,6 +256,7 @@ tree_height_pc <- function(pc,
 #' Ri <- calc_r(x_dbh, y_dbh, x_c, y_c)
 #' R <- mean(Ri)
 #' }
+
 calc_r <- function(x, y, xc, yc) {
   return(sqrt((x - xc) ** 2 + (y - yc) ** 2))
 }
@@ -284,6 +285,233 @@ f <- function(c, x, y) {
   return(sum((Ri - mean(Ri)) ** 2))
 }
 
+#' Summarise point-to-centre radii
+#'
+#' Internal helper used by \code{\link{diameter_slice_pc}} to summarise
+#' point-to-centre distances into one fitted radius.
+#'
+#' @param Ri Numeric vector of point-to-centre distances.
+#' @param how Method used to summarise the radii. Use \code{"mean"} for the
+#'   original ITSMe behaviour, \code{"median"} for the median radius, or a
+#'   numeric value such as \code{10} to trim 5 percent of radii on each side
+#'   before taking the mean.
+#'
+#' @return Numeric radius estimate.
+#'
+#' @noRd
+
+get_radius <- function(Ri, how = "median") {
+
+  if (is.character(how)) {
+    how <- tolower(trimws(how))
+
+    if (how == "mean") {
+      return(mean(Ri))
+    }
+
+    if (how == "median") {
+      return(stats::median(Ri))
+    }
+
+    stop("`how` must be 'mean', 'median', or a numeric trim percentage.")
+  }
+
+  if (is.numeric(how)) {
+    if (length(how) != 1 || is.na(how)) {
+      stop("`how` must be one numeric value.")
+    }
+
+    if (how < 0 || how >= 100) {
+      stop("Numeric `how` must be >= 0 and < 100.")
+    }
+
+    if (how == 0) {
+      return(mean(Ri))
+    }
+
+    q <- how / 2 / 100
+
+    q_low <- stats::quantile(Ri, q, names = FALSE)
+    q_high <- stats::quantile(Ri, 1 - q, names = FALSE)
+    Ri_trimmed <- Ri[Ri >= q_low & Ri <= q_high]
+
+    return(mean(Ri_trimmed))
+  }
+
+  stop("`how` must be 'mean', 'median', or a numeric trim percentage.")
+}
+
+#' Calculate arc coverage of a fitted stem circle
+#'
+#' Internal helper used as a quality-control metric for fitted diameter circles.
+#' Arc coverage is the proportion of angular sectors around the fitted circle
+#' that contain at least one point close to the fitted circumference.
+#'
+#' @param slice_points A data.frame containing slice points with columns X and Y.
+#' @param radius Numeric. Radius of the fitted circle, in metres.
+#' @param xc Numeric. X-coordinate of the fitted circle centre.
+#' @param yc Numeric. Y-coordinate of the fitted circle centre.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in centimetres,
+#'   represented by one angular sector.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle.
+#'
+#' @return Numeric value between 0 and 1.
+#'
+#' @noRd
+
+arc_coverage <- function(slice_points,
+                         radius,
+                         xc,
+                         yc,
+                         arc_min_length_cm = NULL,
+                         arc_min_angle = 18,
+                         arc_tolerance = 0.05) {
+  if (is.null(slice_points) || nrow(slice_points) == 0 ||
+      is.na(radius) || is.nan(radius) || radius <= 0 ||
+      is.na(xc) || is.na(yc)) {
+    return(NA_real_)
+  }
+
+  if (!all(c("X", "Y") %in% names(slice_points))) {
+    stop("`slice_points` must contain columns X and Y.", call. = FALSE)
+  }
+
+  if (!is.null(arc_min_length_cm)) {
+    degrees_from_arc_length <- (arc_min_length_cm * 0.01) /
+      (radius * 2 * pi / 360)
+    degrees <- max(degrees_from_arc_length, arc_min_angle)
+  } else {
+    degrees <- arc_min_angle
+  }
+
+  dx <- slice_points$X - xc
+  dy <- slice_points$Y - yc
+
+  angles <- atan2(dy, dx) * 180 / pi
+  angles <- ifelse(angles < 0, angles + 360, angles)
+
+  distances <- sqrt(dx^2 + dy^2)
+
+  in_donut <- distances > radius - arc_tolerance &
+    distances < radius + arc_tolerance
+
+  selected_angles <- angles[in_donut]
+
+  if (length(selected_angles) == 0) {
+    return(0)
+  }
+
+  angle_starts <- seq(0, 360 - degrees, by = degrees)
+
+  sector_has_point <- vapply(angle_starts, function(angle_start) {
+    angle_end <- angle_start + degrees
+    any(selected_angles >= angle_start & selected_angles < angle_end)
+  }, logical(1))
+
+  mean(sector_has_point)
+}
+
+#' Check whether the inner part of a fitted stem circle is empty
+#'
+#' Internal helper used as a quality-control metric for fitted diameter circles.
+#' The function checks whether any slice points occur inside an inner circle
+#' around the fitted centre. The inner circle radius is calculated as the fitted
+#' radius minus a buffer around the stem surface.
+#'
+#' @param slice_points A data.frame containing slice points with columns X and Y.
+#' @param radius Numeric. Radius of the fitted circle, in metres.
+#' @param xc Numeric. X-coordinate of the fitted circle centre.
+#' @param yc Numeric. Y-coordinate of the fitted circle centre.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted radius before checking the inner circle.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted radius used as
+#'   buffer before checking the inner circle. The effective buffer is
+#'   \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
+#'
+#' @return Logical. TRUE if no points occur inside the checked inner circle,
+#'   FALSE if at least one point occurs inside it, and NA if the check cannot be
+#'   performed.
+#'
+#' @noRd
+
+
+inner_circle_empty <- function(slice_points,
+                               radius,
+                               xc,
+                               yc,
+                               min_inner_buffer = 0.06,
+                               inner_buffer_fraction = 0.5) {
+  if (is.null(slice_points) || nrow(slice_points) == 0 ||
+      is.na(radius) || is.nan(radius) || radius <= 0 ||
+      is.na(xc) || is.na(yc)) {
+    return(NA)
+  }
+
+  if (!all(c("X", "Y") %in% names(slice_points))) {
+    stop("`slice_points` must contain columns X and Y.", call. = FALSE)
+  }
+
+  # Buffer around the fitted stem surface.
+  # Default behaviour:
+  # inner_buffer = max(0.06 m, 0.5 * radius)
+  inner_buffer <- max(min_inner_buffer, inner_buffer_fraction * radius)
+
+  inner_radius <- radius - inner_buffer
+
+  if (inner_radius <= 0) {
+    return(NA)
+  }
+
+  dx <- slice_points$X - xc
+  dy <- slice_points$Y - yc
+  distances <- sqrt(dx^2 + dy^2)
+
+  !any(distances < inner_radius)
+}
+
+#' Check whether all slice points fall inside the fitted stem donut
+#'
+#' Internal helper used as a quality-control metric for fitted diameter circles.
+#' The function checks whether all slice points fall within the radial donut
+#' around the fitted circle, defined as radius +/- arc_tolerance.
+#'
+#' @param slice_points A data.frame containing slice points with columns X and Y.
+#' @param radius Numeric. Radius of the fitted circle, in metres.
+#' @param xc Numeric. X-coordinate of the fitted circle centre.
+#' @param yc Numeric. Y-coordinate of the fitted circle centre.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle.
+#'
+#' @return Logical. TRUE if all points fall within the donut, FALSE otherwise,
+#'   and NA if the check cannot be performed.
+#'
+#' @noRd
+all_points_in_donut <- function(slice_points,
+                                radius,
+                                xc,
+                                yc,
+                                arc_tolerance = 0.05) {
+  if (is.null(slice_points) || nrow(slice_points) == 0 ||
+      is.na(radius) || is.nan(radius) || radius <= 0 ||
+      is.na(xc) || is.na(yc)) {
+    return(NA)
+  }
+
+  if (!all(c("X", "Y") %in% names(slice_points))) {
+    stop("`slice_points` must contain columns X and Y.", call. = FALSE)
+  }
+
+  dx <- slice_points$X - xc
+  dy <- slice_points$Y - yc
+  distances <- sqrt(dx^2 + dy^2)
+
+  all(distances >= radius - arc_tolerance &
+        distances <= radius + arc_tolerance)
+}
+
 #' Diameter at certain height point cloud
 #'
 #' Returns the diameter at a certain height of a tree measured from a tree point
@@ -307,7 +535,7 @@ f <- function(c, x, y) {
 #' @param slice_height Numeric value (default = 1.3) that determines the height
 #'   above the lowest point of the point cloud at which the diameter is
 #'   measured.
-#' @param slice_thickness Numeric value (default = 0.6) that determines the
+#' @param slice_thickness Numeric value (default = 0.06) that determines the
 #'   thickness of the slice which is used to measure the diameter.
 #' @param functional Logical (default=FALSE), indicates if the functional
 #'   diameter should be calculated.
@@ -322,6 +550,24 @@ f <- function(c, x, y) {
 #'   is provided.
 #' @param plot Logical (default=FALSE), indicates if the optimized circle
 #'   fitting is plotted.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   slice diameter. Use \code{"mean"} for the original ITSMe behaviour,
+#'   \code{"median"} for the median radius, or a numeric value such as
+#'   \code{10} to trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage. If supplied, this is converted to degrees based on the fitted
+#'   radius.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used
+#'   to calculate arc coverage. Default is 18, corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted radius before checking whether the inner circle is empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted radius used as
+#'   buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #' @param plotcolors list of four colors for plotting. Only relevant when plot =
 #'   TRUE. The stem points, fitted circle, the concave hull and the estimated
 #'   center are colored by the first, second, third and fourth element of this
@@ -331,6 +577,12 @@ f <- function(c, x, y) {
 #'   residual between circle fit and the points, the center of the circle fit,
 #'   and the functional diameter calculated from the concave hull fitting. Also
 #'   optionally (plot=TRUE) plots the circle fitting on the horizontal slice.
+#' The list also contains \code{arc_coverage}, a quality-control metric between
+#' 0 and 1 indicating the proportion of angular sectors around the fitted circle
+#' that contain at least one nearby point.
+#' The list also contains \code{inner_circle_empty}, a logical quality-control
+#' metric indicating whether the checked inner part of the fitted circle contains
+#' no slice points.
 #'
 #' @export
 #'
@@ -343,8 +595,9 @@ f <- function(c, x, y) {
 #' output <- diameter_slice_pc(pc = pc_tree, plot = TRUE)
 #' diameter <- output$diameter
 #' residual <- output$R2
-#' center <- out$center
+#' center <- output$center
 #' }
+
 diameter_slice_pc <-
   function(pc,
            slice_height = 0.1,
@@ -354,7 +607,14 @@ diameter_slice_pc <-
            dtm = NA,
            r = 5,
            plot = FALSE,
+           how = "median",
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5,
            plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")) {
+
     h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
     lowest_point <- h_list$lp
     if (max(pc$Z) - lowest_point > slice_height) {
@@ -392,9 +652,36 @@ diameter_slice_pc <-
           x_c <- center_estimate$par[1]
           y_c <- center_estimate$par[2]
           Ri <- calc_r(x_slice, y_slice, x_c, y_c)
-          R <- mean(Ri) # radius (DBH/2)
+          R <- get_radius(Ri, how = how)
           residu <- sum((Ri - R) ** 2) / length(Ri) # average residual
           diam <- 2 * R
+
+          arc_cov <- arc_coverage(
+            slice_points = xy_slice,
+            radius = R,
+            xc = x_c,
+            yc = y_c,
+            arc_min_length_cm = arc_min_length_cm,
+            arc_min_angle = arc_min_angle,
+            arc_tolerance = arc_tolerance
+          )
+
+          inner_empty <- inner_circle_empty(
+            slice_points = xy_slice,
+            radius = R,
+            xc = x_c,
+            yc = y_c,
+            min_inner_buffer = min_inner_buffer,
+            inner_buffer_fraction = inner_buffer_fraction
+          )
+          all_in_donut <- all_points_in_donut(
+            slice_points = xy_slice,
+            radius = R,
+            xc = x_c,
+            yc = y_c,
+            arc_tolerance = arc_tolerance
+          )
+
           if (functional) {
             points <-
               sf::st_as_sf(unique(xy_slice), coords = c("X", "Y"))
@@ -411,7 +698,12 @@ diameter_slice_pc <-
             "R2" = NaN,
             "center" = NaN,
             "fdiameter" = NaN,
-            "hull" = NaN
+            "hull" = NaN,
+            "arc_coverage" = NA_real_,
+            "inner_circle_empty" = NA,
+            "all_points_in_donut" = NA
+
+
           ))
         }
       } else {
@@ -420,12 +712,20 @@ diameter_slice_pc <-
           "R2" = NaN,
           "center" = NaN,
           "fdiameter" = NaN,
-          "hull" = NaN
+          "hull" = NaN,
+          "arc_coverage" = NA_real_,
+          "inner_circle_empty" = NA,
+          "all_points_in_donut" = NA
+
         ))
       }
       if (!is.nan(R)) {
         if (R > 1.5) {
           R <- diam <- center_estimate <- NaN
+          arc_cov <- NA_real_
+          inner_empty <- NA
+          all_in_donut <- NA
+
         }
       }
       if (plot) {
@@ -448,14 +748,14 @@ diameter_slice_pc <-
             ggplot2::ggtitle(
               paste0(
                 "diameter at ", as.character(round(slice_height, 2)),
-                " m = ", as.character(round(diam*100)),
+                " m = ", as.character(round(diam*100, 1)),
                 " cm ",
                 "(R2 = ",
                 as.character(round(residu * 100, 2)),
                 " cm)",
                 "\n",
                 "fDAB = ",
-                as.character(round(fdiam*100)),
+                as.character(round(fdiam*100, 1)),
                 " cm",
                 sep = ""
               )
@@ -476,12 +776,12 @@ diameter_slice_pc <-
             ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                            panel.background = ggplot2::element_blank(),
                            title = ggplot2::element_text(size=12, face = 'bold'),
-                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                            axis.title.y = ggplot2::element_text(size=14, color = "black"),
                            axis.text = ggplot2::element_text(size=14, color = "black"),
                            axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                            axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                            axis.ticks.length = ggplot2::unit(0.2, "cm"))
         } else {
           plotDIAM <- plotDIAM +
@@ -489,7 +789,7 @@ diameter_slice_pc <-
             ggplot2::ggtitle(
               paste0(
                 "diameter at ", as.character(round(slice_height, 2)),
-                " m = ", as.character(round(diam*100)),
+                " m = ", as.character(round(diam*100,1)),
                 " cm ",
                 "(R2 = ",
                 as.character(round(residu * 100, 2)),
@@ -510,12 +810,12 @@ diameter_slice_pc <-
             ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                            panel.background = ggplot2::element_blank(),
                            title = ggplot2::element_text(size=12, face = 'bold'),
-                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                            axis.title.y = ggplot2::element_text(size=14, color = "black"),
                            axis.text = ggplot2::element_text(size=14, color = "black"),
                            axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                            axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                            axis.ticks.length = ggplot2::unit(0.2, "cm"))
         }
         if (!is.nan(R)) {
@@ -557,12 +857,12 @@ diameter_slice_pc <-
               ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                              panel.background = ggplot2::element_blank(),
                              title = ggplot2::element_text(size=12, face = 'bold'),
-                             axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                             axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                              axis.title.y = ggplot2::element_text(size=14, color = "black"),
                              axis.text = ggplot2::element_text(size=14, color = "black"),
                              axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                              axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                             axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                             axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                              axis.ticks.length = ggplot2::unit(0.2, "cm"))
           } else {
             plotDIAM <- plotDIAM +
@@ -583,12 +883,12 @@ diameter_slice_pc <-
               ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                              panel.background = ggplot2::element_blank(),
                              title = ggplot2::element_text(size=12, face = 'bold'),
-                             axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                             axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                              axis.title.y = ggplot2::element_text(size=14, color = "black"),
                              axis.text = ggplot2::element_text(size=14, color = "black"),
                              axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                              axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                             axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                             axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                              axis.ticks.length = ggplot2::unit(0.2, "cm"))
           }
         }
@@ -600,6 +900,9 @@ diameter_slice_pc <-
             "center" = center_estimate,
             "fdiameter" = fdiam,
             "hull" = hull,
+            "arc_coverage" = arc_cov,
+            "inner_circle_empty" = inner_empty,
+            "all_points_in_donut" = all_in_donut,
             "plot" = plotDIAM
           )
         )
@@ -610,7 +913,11 @@ diameter_slice_pc <-
             "R2" = residu,
             "center" = center_estimate,
             "fdiameter" = fdiam,
-            "hull" = hull
+            "hull" = hull,
+            "arc_coverage" = arc_cov,
+            "inner_circle_empty" = inner_empty,
+            "all_points_in_donut" = all_in_donut
+
           )
         )
       }
@@ -620,7 +927,11 @@ diameter_slice_pc <-
         "R2" = NaN,
         "center" = NaN,
         "fdiameter" = NaN,
-        "hull" = NaN
+        "hull" = NaN,
+        "arc_coverage" = NA_real_,
+        "inner_circle_empty" = NA,
+        "all_points_in_donut" = NA
+
       ))
     }
   }
@@ -653,6 +964,10 @@ diameter_slice_pc <-
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   slice diameter. Use \code{"mean"} for the original ITSMe behaviour,
+#'   \code{"median"} for the median radius, or a numeric value such as
+#'   \code{10} to trim 5 percent of radii on each side before taking the mean.
 #'
 #' @return Data.frame with the lower trunk point cloud (part of the trunk below
 #'   1.5 m).
@@ -670,18 +985,21 @@ extract_lower_trunk_pc <-
            slice_thickness = 0.08,
            concavity = 4,
            dtm = NA,
-           r = 5) {
+           r = 5,
+           how = "median") {
     initial_height <- 0.15
     h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
     lowest_point <- h_list$lp
     dh <- slice_thickness
+
     diam <- diameter_slice_pc(
       pc = pc,
       slice_height = initial_height,
       slice_thickness = slice_thickness,
       concavity = concavity,
       dtm = dtm,
-      r = r
+      r = r,
+      how = how
     )
     a <- 0.02
     d <- diam$diameter + a
@@ -738,7 +1056,8 @@ extract_lower_trunk_pc <-
           slice_thickness = slice_thickness * 2,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how
         )
         if (!is.nan(diam$diameter) & diam$diameter < 2) {
           if (diam$R2 > 0.002 * diam$diameter) {
@@ -753,7 +1072,8 @@ extract_lower_trunk_pc <-
               slice_thickness = slice_thickness * 2,
               concavity = concavity,
               dtm = dtm,
-              r = r
+              r = r,
+              how = how
             )
             if (!is.nan(diam2$diameter)) {
               trunk_slice <- trunk_slice_b
@@ -782,7 +1102,7 @@ extract_lower_trunk_pc <-
 #' this the area of the concave hull with (concavity 4) is determined on the
 #' slice. From this area the diameter is determined as the diameter of a circle
 #' with this area. In case there are branches or foliage at this height, the
-#' lower trunk is extracted using \code{\link{extract_lower_trunk_pc}}. Wether
+#' lower trunk is extracted using \code{\link{extract_lower_trunk_pc}}. Whether
 #' this is the case is determined using the thresholdR2 parameter. When the
 #' bottom of the point cloud is incomplete or obstructed you can choose to add a
 #' digital terrain model as an input which is used to estimate lowest point of
@@ -810,6 +1130,25 @@ extract_lower_trunk_pc <-
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to trim
+#'   5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used
+#'   to calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #' @param plot Logical (default=FALSE), indicates if the optimised circle
 #'   fitting is plotted.
 #' @param plotcolors list of four colors for plotting. Only relevant when plot
@@ -821,6 +1160,12 @@ extract_lower_trunk_pc <-
 #'   the fitting, the estimated center of the circle fit, and the functional
 #'   diameter at breast height. Also optionally (plot=TRUE) plots the circle
 #'   fitting on the horizontal slice which is then included in the list output.
+#' The list also contains \code{arc_coverage}, a quality-control metric between
+#' 0 and 1 indicating the proportion of angular sectors around the fitted DBH
+#' circle that contain at least one nearby point.
+#' The list also contains \code{inner_circle_empty}, a logical quality-control
+#' metric indicating whether the checked inner part of the fitted DBH circle
+#' contains no slice points.
 #'
 #' @export
 #'
@@ -833,6 +1178,7 @@ extract_lower_trunk_pc <-
 #' output <- dbh_pc(pc = pc_tree, plot = TRUE)
 #' dbh <- output$dbh
 #' }
+
 dbh_pc <- function(pc,
                    thresholdR2 = 0.001,
                    slice_thickness = 0.06,
@@ -840,6 +1186,12 @@ dbh_pc <- function(pc,
                    concavity = 4,
                    dtm = NA,
                    r = 5,
+                   how = "median", #'mean": original ITSMe behaviour
+                   arc_min_length_cm = NULL,
+                   arc_min_angle = 18,
+                   arc_tolerance = 0.05,
+                   min_inner_buffer = 0.06,
+                   inner_buffer_fraction = 0.5,
                    plot = FALSE,
                    plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")) {
   h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
@@ -851,7 +1203,8 @@ dbh_pc <- function(pc,
     functional = functional,
     concavity = concavity,
     dtm = dtm,
-    r = r
+    r = r,
+    how = how
   )
   if (is.nan(out_015$diameter)) {
     out_015$diameter <- 2
@@ -863,7 +1216,13 @@ dbh_pc <- function(pc,
     functional = functional,
     concavity = concavity,
     dtm = dtm,
-    r = r
+    r = r,
+    how = how,
+    arc_min_length_cm = arc_min_length_cm,
+    arc_min_angle = arc_min_angle,
+    arc_tolerance = arc_tolerance,
+    min_inner_buffer = min_inner_buffer,
+    inner_buffer_fraction = inner_buffer_fraction
   )
   if (is.nan(out_130$diameter)) {
     trunk_pc <- tryCatch({
@@ -871,7 +1230,8 @@ dbh_pc <- function(pc,
         pc = pc,
         slice_thickness = slice_thickness + 0.02,
         dtm = dtm,
-        r = r
+        r = r,
+        how = how
       )
     }, error = function(cond) {
       return(pc)
@@ -883,10 +1243,21 @@ dbh_pc <- function(pc,
       functional = functional,
       concavity = concavity,
       dtm = dtm,
-      r = r
+      r = r,
+      how = how,
+      arc_min_length_cm = arc_min_length_cm,
+      arc_min_angle = arc_min_angle,
+      arc_tolerance = arc_tolerance,
+      min_inner_buffer = min_inner_buffer,
+      inner_buffer_fraction = inner_buffer_fraction
     )
   } else {
-    if (out_015$diameter < out_130$diameter |
+    skip_low_slice_check <- isTRUE(out_130$all_points_in_donut) &&
+      !is.na(out_130$arc_coverage) &&
+      out_130$arc_coverage == 1 &&
+      isTRUE(out_130$inner_circle_empty)
+
+    if ((!skip_low_slice_check & out_015$diameter < out_130$diameter) |
         out_130$R2 > thresholdR2 * out_130$diameter |
         out_130$diameter > 2) {
       trunk_pc <- tryCatch({
@@ -894,7 +1265,8 @@ dbh_pc <- function(pc,
           pc = pc,
           slice_thickness = slice_thickness + 0.02,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how
         )
       }, error = function(cond) {
         return(pc)
@@ -906,7 +1278,13 @@ dbh_pc <- function(pc,
         functional = functional,
         concavity = concavity,
         dtm = dtm,
-        r = r
+        r = r,
+        how = how,
+        arc_min_length_cm = arc_min_length_cm,
+        arc_min_angle = arc_min_angle,
+        arc_tolerance = arc_tolerance,
+        min_inner_buffer = min_inner_buffer,
+        inner_buffer_fraction = inner_buffer_fraction
       )
     }
   }
@@ -936,12 +1314,12 @@ dbh_pc <- function(pc,
         ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                        panel.background = ggplot2::element_blank(),
                        title = ggplot2::element_text(size=12, face = 'bold'),
-                       axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                       axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                        axis.title.y = ggplot2::element_text(size=14, color = "black"),
                        axis.text = ggplot2::element_text(size=14, color = "black"),
                        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                        axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                       axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                       axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                        axis.ticks.length = ggplot2::unit(0.2, "cm"))
     } else {
       pc_dbh <- pc[(pc$Z > lowest_point + 1.3 - slice_thickness / 2) &
@@ -952,7 +1330,70 @@ dbh_pc <- function(pc,
         y0 = out_130$center[[1]][2],
         r = out_130$diameter / 2
       )
+
+      radius <- out_130$diameter / 2
+
+      donut_outer_radius <- radius + arc_tolerance
+      donut_inner_radius <- max(0, radius - arc_tolerance)
+
+      inner_buffer <- max(min_inner_buffer, inner_buffer_fraction * radius)
+      inner_radius <- radius - inner_buffer
+
+      data_donut_outer <- data.frame(
+        x0 = out_130$center[[1]][1],
+        y0 = out_130$center[[1]][2],
+        r = donut_outer_radius
+      )
+
+      data_donut_inner <- data.frame(
+        x0 = out_130$center[[1]][1],
+        y0 = out_130$center[[1]][2],
+        r = donut_inner_radius
+      )
+
+      data_inner_buffer <- data.frame(
+        x0 = out_130$center[[1]][1],
+        y0 = out_130$center[[1]][2],
+        r = inner_radius
+      )
+
       plotDBH <- ggplot2::ggplot() +
+        #ggplot2::coord_fixed(ratio = 1) +
+
+        # --- QC background layers ---
+
+        # optional outlines for the QC zones
+        ggforce::geom_circle(
+          data = data_donut_outer,
+          ggplot2::aes(x0 = x0, y0 = y0, r = r, color = "arc coverage zone"),
+          inherit.aes = FALSE,
+          linetype = "solid",
+          linewidth = .5,
+          fill = NA,
+          show.legend = TRUE
+        ) +
+
+        ggforce::geom_circle(
+          data = data_donut_inner,
+          ggplot2::aes(x0 = x0, y0 = y0, r = r, color = "arc coverage zone"),
+          inherit.aes = FALSE,
+          linetype = "solid",
+          linewidth = .5,
+          fill = NA,
+          show.legend = FALSE
+        ) +
+        ggforce::geom_circle(
+          data = data_inner_buffer,
+          ggplot2::aes(x0 = x0, y0 = y0, r = r, color = "inner empty zone"),
+          inherit.aes = FALSE,
+          linetype = "solid",
+          linewidth = .5,
+          fill = NA,
+          show.legend = TRUE
+        ) +
+
+        # --- actual data ---
+
         ggplot2::geom_point(
           data = pc_dbh,
           ggplot2::aes(X, Y, color = "points stem slice"),
@@ -981,19 +1422,19 @@ dbh_pc <- function(pc,
             ),
             inherit.aes = FALSE,
             show.legend = TRUE,
-            size = 1
+            linewidth = 1
           ) +
           ggplot2::ggtitle(
             paste(
               "DBH = ",
-              as.character(round(out_130$diameter*100)),
+              as.character(round(out_130$diameter*100,1)),
               " cm ",
               "(R2 = ",
               as.character(round(out_130$R2 * 100, 2)),
-              " cm)",
+              " cm);",
               "\n",
               "fDBH = ",
-              as.character(round(out_130$fdiameter*100)),
+              as.character(round(out_130$fdiameter*100,1)),
               " cm",
               sep = ""
             )
@@ -1004,24 +1445,28 @@ dbh_pc <- function(pc,
               "points stem slice" = plotcolors[1],
               "concave hull" = plotcolors[3],
               "estimated center" = plotcolors[4],
-              "fitted circle" = plotcolors[2]
+              "fitted circle" = plotcolors[2],
+              "arc coverage zone" = "grey55",
+              "inner empty zone" = "grey85"
             ),
-            guide = ggplot2::guide_legend(override.aes =
-                                            list(
-                                              linetype = c(1, 0, 1, 0),
-                                              shape = c(NA, 16, NA, 16),
-                                              size = c(1, 2, 1, 2)
-                                            ))
+            guide = ggplot2::guide_legend(
+              override.aes = list(
+                linetype = c(0, 1, 0, 1, 1, 1),
+                shape = c(16, NA, 16, NA, NA, NA),
+                size = c(2, 1, 2, 1, 0.5, 0.5)
+              )
+            )
           ) +
           ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                          panel.background = ggplot2::element_blank(),
                          title = ggplot2::element_text(size=12, face = 'bold'),
-                         axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                         axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                          axis.title = ggplot2::element_blank(),
                          axis.text = ggplot2::element_text(size=14, color = "black"),
                          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
-                         axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
-                         axis.ticks.length = ggplot2::unit(0.2, "cm"))
+                         axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
+                         axis.ticks.length = ggplot2::unit(0.2, "cm"),
+                         legend.position = "right")
 
       } else {
         plotDBH <- plotDBH +
@@ -1041,42 +1486,53 @@ dbh_pc <- function(pc,
             ),
             inherit.aes = FALSE,
             show.legend = TRUE,
-            size = 1
+            linewidth = 1
           ) +
           ggplot2::ggtitle(
-            paste(
-              "DBH = ",
-              as.character(round(out_130$diameter*100)),
-              " cm, ",
-              "(R2 = ",
-              as.character(round(out_130$R2 * 100, 2)),
-              " cm)",
-              sep = ""
+            paste0(
+              "DBH = ", round(out_130$diameter * 100, 2), " cm ",
+              "(R2 = ", round(out_130$R2 * 100, 2), " cm)",
+              "\n",
+              "arc coverage = ", round(out_130$arc_coverage, 2),
+              "; inner empty = ", out_130$inner_circle_empty
             )
           ) +
           ggplot2::scale_color_manual(
             name = "",
+            breaks = c(
+              "points stem slice",
+              "estimated center",
+              "fitted circle",
+              "arc coverage zone",
+              "inner empty zone"
+            ),
             values = c(
               "points stem slice" = plotcolors[1],
               "estimated center" = plotcolors[4],
-              "fitted circle" = plotcolors[2]
+              "fitted circle" = plotcolors[2],
+              "arc coverage zone" = "grey55",
+              "inner empty zone" = "grey85"
             ),
-            guide = ggplot2::guide_legend(override.aes =
-                                            list(
-                                              linetype = c(0, 1, 0),
-                                              shape = c(16, NA, 16),
-                                              size = c(2, 1, 2)
-                                            ))
+            guide = ggplot2::guide_legend(
+              override.aes = list(
+                shape = c(16, 16, NA, NA, NA),
+                linetype = c(0, 0, 1, 1, 1),
+                size = c(2, 2, NA, NA, NA),
+                linewidth = c(NA, NA, 1, 0.5, 0.5),
+                fill = rep(NA, 5)
+              )
+            )
           ) +
           ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                          panel.background = ggplot2::element_blank(),
                          title = ggplot2::element_text(size=12, face = 'bold'),
-                         axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                         axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                          axis.title = ggplot2::element_blank(),
                          axis.text = ggplot2::element_text(size=14, color = "black"),
                          axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
-                         axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
-                         axis.ticks.length = ggplot2::unit(0.2, "cm"))
+                         axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
+                         axis.ticks.length = ggplot2::unit(0.2, "cm"),
+                         legend.position = "right")
       }
     }
     print(plotDBH)
@@ -1086,6 +1542,8 @@ dbh_pc <- function(pc,
         "R2" = out_130$R2,
         "center" = out_130$center,
         "fdbh" = out_130$fdiameter,
+        "arc_coverage" = out_130$arc_coverage,
+        "inner_circle_empty" = out_130$inner_circle_empty,
         "plot" = plotDBH
       )
     )
@@ -1094,7 +1552,10 @@ dbh_pc <- function(pc,
       "dbh" = out_130$diameter,
       "R2" = out_130$R2,
       "center" = out_130$center,
-      "fdbh" = out_130$fdiameter
+      "fdbh" = out_130$fdiameter,
+      "arc_coverage" = out_130$arc_coverage,
+      "inner_circle_empty" = out_130$inner_circle_empty
+
     ))
   }
 }
@@ -1284,7 +1745,7 @@ dab_pc <-
               ),
               inherit.aes = FALSE,
               show.legend = TRUE,
-              size = 1
+              linewidth = 1
             ) +
             ggplot2::ggtitle(
               paste0(
@@ -1320,12 +1781,12 @@ dab_pc <-
             ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                            panel.background = ggplot2::element_blank(),
                            title = ggplot2::element_text(size=12, face = 'bold'),
-                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                            axis.title.y = ggplot2::element_text(size=14, color = "black"),
                            axis.text = ggplot2::element_text(size=14, color = "black"),
                            axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                            axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                            axis.ticks.length = ggplot2::unit(0.2, "cm"))
         } else {
           plotDAB <- plotDAB +
@@ -1345,7 +1806,7 @@ dab_pc <-
               ),
               inherit.aes = FALSE,
               show.legend = TRUE,
-              size = 1
+              linewidth = 1
             ) +
             ggplot2::ggtitle(
               paste("DAB at ", as.character(round(slice_height, 2)),
@@ -1373,12 +1834,12 @@ dab_pc <-
             ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                            panel.background = ggplot2::element_blank(),
                            title = ggplot2::element_text(size=12, face = 'bold'),
-                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                            axis.title.y = ggplot2::element_text(size=14, color = "black"),
                            axis.text = ggplot2::element_text(size=14, color = "black"),
                            axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                            axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                            axis.ticks.length = ggplot2::unit(0.2, "cm"))
         }
       } else {
@@ -1411,7 +1872,7 @@ dab_pc <-
               ),
               inherit.aes = FALSE,
               show.legend = TRUE,
-              size = 1
+              linewidth = 1
             ) +
             ggplot2::ggtitle(
               paste(
@@ -1446,12 +1907,12 @@ dab_pc <-
             ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                            panel.background = ggplot2::element_blank(),
                            title = ggplot2::element_text(size=12, face = 'bold'),
-                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                            axis.title.y = ggplot2::element_text(size=14, color = "black"),
                            axis.text = ggplot2::element_text(size=14, color = "black"),
                            axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                            axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                            axis.ticks.length = ggplot2::unit(0.2, "cm"))
         } else {
           plotDAB <- plotDAB +
@@ -1471,7 +1932,7 @@ dab_pc <-
               ),
               inherit.aes = FALSE,
               show.legend = TRUE,
-              size = 1
+              linewidth = 1
             ) +
             ggplot2::ggtitle(
               paste(
@@ -1501,12 +1962,12 @@ dab_pc <-
             ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                            panel.background = ggplot2::element_blank(),
                            title = ggplot2::element_text(size=12, face = 'bold'),
-                           axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                           axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                            axis.title.y = ggplot2::element_text(size=14, color = "black"),
                            axis.text = ggplot2::element_text(size=14, color = "black"),
                            axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
                            axis.title.x = ggplot2::element_text(size=14, color = "black"),
-                           axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                           axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                            axis.ticks.length = ggplot2::unit(0.2, "cm"))
         }
       }
@@ -1574,6 +2035,30 @@ dab_pc <-
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH with \code{\link{dbh_pc}}. Use \code{"mean"} for the original ITSMe
+#'   behaviour, \code{"median"} for the median radius, or a numeric value such
+#'   as \code{10} to trim 5 percent of radii on each side before taking the
+#'   mean. Only relevant when buttress == FALSE.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in centimetres,
+#'   represented by one angular sector when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. If supplied, this is converted to degrees based on
+#'   the fitted radius. Only relevant when buttress == FALSE.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used
+#'   to calculate arc coverage with \code{\link{dbh_pc}}. Default is 18,
+#'   corresponding to 20 sectors. Only relevant when buttress == FALSE.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   DBH circle. Points within radius +/- arc_tolerance are counted as
+#'   supporting the fitted circle when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty with \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty with
+#'   \code{\link{dbh_pc}}. The effective buffer is
+#'   \code{max(min_inner_buffer, inner_buffer_fraction * radius)}. Only relevant
+#'   when buttress == FALSE.
 #' @param plot Logical (default=FALSE), indicates if the classified tree is
 #'   plotted.
 #' @param plotcolors list of two colors for plotting. Only relevant when plot =
@@ -1614,6 +2099,12 @@ classify_crown_pc <-
            concavity = 4,
            dtm = NA,
            r = 5,
+           how = "median",
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5,
            plot = FALSE,
            plotcolors = c("#08aa7c", "#fac87f")) {
     h_list <- tree_height_pc(pc = pc, dtm = dtm, r = r)
@@ -1634,13 +2125,20 @@ classify_crown_pc <-
       dab <- out$dab
     } else {
       out <- dbh_pc(
-        pc,
-        thresholdR2,
-        slice_thickness,
-        dtm = dtm,
+        pc = pc,
+        thresholdR2 = thresholdR2,
+        slice_thickness = slice_thickness,
         functional = FALSE,
         concavity = concavity,
-        r = r
+        dtm = dtm,
+        r = r,
+        how = how,
+        arc_min_length_cm = arc_min_length_cm,
+        arc_min_angle = arc_min_angle,
+        arc_tolerance = arc_tolerance,
+        min_inner_buffer = min_inner_buffer,
+        inner_buffer_fraction = inner_buffer_fraction,
+        plot = FALSE
       )
       dab <- out$dbh
     }
@@ -1793,7 +2291,7 @@ classify_crown_pc <-
               panel.grid.major = ggplot2::element_line(colour = 'gray90'),
               panel.background = ggplot2::element_blank(),
               title = ggplot2::element_text(size=12, face = 'bold'),
-              axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+              axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
               axis.title.y = ggplot2::element_text(size=14, color = "black"),
               axis.text = ggplot2::element_text(size=14, color = "black"),
               axis.title.x = ggplot2::element_text(size=14, color = "black"),
@@ -1820,7 +2318,7 @@ classify_crown_pc <-
               panel.grid.major = ggplot2::element_line(colour = 'gray90'),
               panel.background = ggplot2::element_blank(),
               title = ggplot2::element_text(size=12, face = 'bold'),
-              axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+              axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
               axis.text = ggplot2::element_text(size=14, color = "black"),
               axis.title.x = ggplot2::element_text(size=14, color = "black"),
               axis.text.y = ggplot2::element_blank(),
@@ -1859,7 +2357,7 @@ classify_crown_pc <-
                 panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                 panel.background = ggplot2::element_blank(),
                 title = ggplot2::element_text(size=12, face = 'bold'),
-                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                 axis.title.y = ggplot2::element_text(size=14, color = "black"),
                 axis.text = ggplot2::element_text(size=14, color = "black"),
                 axis.title.x = ggplot2::element_text(size=14, color = "black"),
@@ -1886,7 +2384,7 @@ classify_crown_pc <-
                 panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                 panel.background = ggplot2::element_blank(),
                 title = ggplot2::element_text(size=12, face = 'bold'),
-                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                 axis.text = ggplot2::element_text(size=14, color = "black"),
                 axis.title.x = ggplot2::element_text(size=14, color = "black"),
                 axis.text.y = ggplot2::element_blank(),
@@ -1923,7 +2421,7 @@ classify_crown_pc <-
                 panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                 panel.background = ggplot2::element_blank(),
                 title = ggplot2::element_text(size=12, face = 'bold'),
-                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                 axis.title.y = ggplot2::element_text(size=14, color = "black"),
                 axis.text = ggplot2::element_text(size=14, color = "black"),
                 axis.title.x = ggplot2::element_text(size=14, color = "black"),
@@ -1950,7 +2448,7 @@ classify_crown_pc <-
                 panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                 panel.background = ggplot2::element_blank(),
                 title = ggplot2::element_text(size=12, face = 'bold'),
-                axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                 axis.text = ggplot2::element_text(size=14, color = "black"),
                 axis.title.x = ggplot2::element_text(size=14, color = "black"),
                 axis.text.y = ggplot2::element_blank(),
@@ -2006,11 +2504,11 @@ classify_crown_pc <-
             panel.grid.major = ggplot2::element_line(colour = 'gray90'),
             panel.background = ggplot2::element_blank(),
             title = ggplot2::element_text(size=12, face = 'bold'),
-            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
             axis.title.y = ggplot2::element_text(size=14, color = "black"),
             axis.text = ggplot2::element_text(size=14, color = "black"),
             axis.title.x = ggplot2::element_text(size=14, color = "black"),
-            axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+            axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
             axis.ticks.length = ggplot2::unit(0.2, "cm"),
             axis.text.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
@@ -2035,11 +2533,11 @@ classify_crown_pc <-
             panel.grid.major = ggplot2::element_line(colour = 'gray90'),
             panel.background = ggplot2::element_blank(),
             title = ggplot2::element_text(size=12, face = 'bold'),
-            axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+            axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
             axis.title.y = ggplot2::element_text(size=14, color = "black"),
             axis.text = ggplot2::element_text(size=14, color = "black"),
             axis.title.x = ggplot2::element_text(size=14, color = "black"),
-            axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+            axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
             axis.ticks.length = ggplot2::unit(0.2, "cm"),
             axis.text.y = ggplot2::element_blank(),
             axis.ticks.y = ggplot2::element_blank(),
@@ -2137,17 +2635,17 @@ normalize_pc <- function(pc, dtm = NA, r = 5) {
 #' \dontrun{
 #' # Read tree point cloud and calculate the projected tree area
 #' pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-#' pta <- projected_crown_area_pc(pc = pc_tree)
+#' pa <- projected_area_pc(pc = pc_tree)
 #' # and plot the concave hull fitting
-#' output <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
-#' pca <- output$pca
+#' output <- projected_area_pc(pc = pc_tree, plot = TRUE)
+#' pa <- output$pa
 #' # classify the tree point cloud and calculate the projected crown area
 #' crown_pc <- classify_crown_pc(
 #'   pc, thresholdbranch, minheight, buttress,
 #'   thresholdR2, thresholdbuttress,
 #'   maxbuttressheight, FALSE
 #' )
-#' pca <- projected_crown_area_pc(pc = crown_pc$crownpoints)
+#' pca <- projected_area_pc(pc = crown_pc$crownpoints)
 #' }
 projected_area_pc <- function(pc,
                               concavity = 2,
@@ -2186,11 +2684,11 @@ projected_area_pc <- function(pc,
       ) +
       ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = 'gray90'),
                      panel.background = ggplot2::element_blank(),
-                     axis.line = ggplot2::element_line(size = 0.8, color = "black"),
+                     axis.line = ggplot2::element_line(linewidth = 0.8, color = "black"),
                      axis.title = ggplot2::element_blank(),
                      axis.text = ggplot2::element_text(size=14, color = "black"),
                      axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1),
-                     axis.ticks = ggplot2::element_line(size=0.8, color = "black"),
+                     axis.ticks = ggplot2::element_line(linewidth=0.8, color = "black"),
                      axis.ticks.length = ggplot2::unit(0.2, "cm"))
     print(plotPA)
     return(list("pa" = pa, "plot" = plotPA))

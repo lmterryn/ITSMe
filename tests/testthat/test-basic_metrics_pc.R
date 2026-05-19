@@ -28,30 +28,83 @@ test_that("tree height calculation works", {
 })
 
 test_that("diameter slice calculation works", {
-  # output is a list of 5
-  expect_equal(length(
-    diameter_slice_pc(pc = read_tree_pc(
-      path = "../point_clouds/pc_tree.txt"))), 5) &
-    # with plot TRUE, output is a list of 6
-    expect_equal(length(
-      diameter_slice_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
-                        plot = TRUE)), 6) &
-    # with no points at slice height, NaN is returned
-    expect_equal((diameter_slice_pc(
+  out <- diameter_slice_pc(pc = read_tree_pc(
+    path = "../point_clouds/pc_tree.txt"
+  ))
+
+  expect_true(all(c(
+    "diameter",
+    "R2",
+    "center",
+    "fdiameter",
+    "hull",
+    "arc_coverage",
+    "inner_circle_empty",
+    "all_points_in_donut"
+  ) %in% names(out)))
+
+  out_plot <- diameter_slice_pc(
+    pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
+    plot = TRUE
+  )
+
+  expect_true(all(c(
+    "diameter",
+    "R2",
+    "center",
+    "fdiameter",
+    "hull",
+    "arc_coverage",
+    "inner_circle_empty",
+    "all_points_in_donut",
+    "plot"
+  ) %in% names(out_plot)))
+
+  # with no points at slice height, NaN is returned
+  expect_equal(
+    diameter_slice_pc(
       pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
-      slice_height = 25))[[1]], NaN) &
-    # with diameter over 3 m, NaN is returned
-    expect_equal((diameter_slice_pc(
+      slice_height = 25
+    )$diameter,
+    NaN
+  )
+
+  # with diameter over 3 m, NaN is returned
+  expect_equal(
+    diameter_slice_pc(
       pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"),
-      slice_height = 0.5))[[1]], NaN) &
-    # with plot TRUE, output is a list of 6
-    expect_equal(length(diameter_slice_pc(
-      pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"),
-      slice_height = 0.5, plot = TRUE)), 6) &
-    # with less than 3 point within the slice, NaN is returned
-    expect_equal((diameter_slice_pc(
+      slice_height = 0.5
+    )$diameter,
+    NaN
+  )
+
+  out_buttress_plot <- diameter_slice_pc(
+    pc = read_tree_pc(path = "../point_clouds/pc_tree_buttress.txt"),
+    slice_height = 0.5,
+    plot = TRUE
+  )
+
+  expect_true(all(c(
+    "diameter",
+    "R2",
+    "center",
+    "fdiameter",
+    "hull",
+    "arc_coverage",
+    "inner_circle_empty",
+    "all_points_in_donut",
+    "plot"
+  ) %in% names(out_buttress_plot)))
+
+  # with less than 3 points within the slice, NaN is returned
+  expect_equal(
+    diameter_slice_pc(
       pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
-      slice_height = 1.3, slice_thickness = 0.005))[[1]], NaN)
+      slice_height = 1.3,
+      slice_thickness = 0.005
+    )$diameter,
+    NaN
+  )
 })
 
 test_that("extract lower trunk method works", {
@@ -62,17 +115,42 @@ test_that("extract lower trunk method works", {
 })
 
 test_that("dbh calculation from a tree point cloud works", {
-  # output is a list of 4
-  expect_equal(length(
-    dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))), 4) &
-    # with branches at bh, output is a list of 3
-    expect_equal(length(
-      dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_temp.ply"))),
-      4) &
-    # with plot TRUE, output is a list of 5
-    expect_equal(length(
-      dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
-             plot = TRUE)), 5)
+  out <- dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"))
+
+  expect_true(all(c(
+    "dbh",
+    "R2",
+    "center",
+    "fdbh",
+    "arc_coverage",
+    "inner_circle_empty"
+  ) %in% names(out)))
+
+  out_branches <- dbh_pc(pc = read_tree_pc(path = "../point_clouds/pc_tree_temp.ply"))
+
+  expect_true(all(c(
+    "dbh",
+    "R2",
+    "center",
+    "fdbh",
+    "arc_coverage",
+    "inner_circle_empty"
+  ) %in% names(out_branches)))
+
+  out_plot <- dbh_pc(
+    pc = read_tree_pc(path = "../point_clouds/pc_tree.txt"),
+    plot = TRUE
+  )
+
+  expect_true(all(c(
+    "dbh",
+    "R2",
+    "center",
+    "fdbh",
+    "arc_coverage",
+    "inner_circle_empty",
+    "plot"
+  ) %in% names(out_plot)))
 })
 
 test_that("dab calculation from a tree point cloud works", {

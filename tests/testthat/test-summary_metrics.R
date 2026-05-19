@@ -1,19 +1,46 @@
 test_that("summary basic point cloud metrics works", {
-  # output is a data frame with length 10
-  expect_equal(length(
-    summary_basic_pointcloud_metrics(PCs_path = "../non_buttressed_trees/", pattern = ".txt", overwrite = TRUE)
-  ), 10) &
-    # with buttress TRUE & OUT_path specified, output is a data frame with length 10
-    expect_equal(length(
-      summary_basic_pointcloud_metrics(
-        PCs_path = "../buttressed_trees/",
-        buttress = TRUE,
-        minheight =  4,
-        OUT_path = "../output/",
-        pattern = ".txt",
-        overwrite = TRUE
-      )
-    ), 10)
+  out <- summary_basic_pointcloud_metrics(
+    PCs_path = "../non_buttressed_trees/",
+    pattern = ".txt",
+    overwrite = TRUE
+  )
+
+  expect_s3_class(out, "data.frame")
+
+  expect_true(all(c(
+    "stem_diameter_m",
+    "R2",
+    "functional_stem_diameter_m",
+    "height_stem_diameter_m"
+  ) %in% names(out)))
+
+  expect_true(all(c(
+    "dbh_arc_coverage",
+    "dbh_inner_circle_empty"
+  ) %in% names(out)))
+
+  out_buttress <- summary_basic_pointcloud_metrics(
+    PCs_path = "../buttressed_trees/",
+    buttress = TRUE,
+    minheight = 4,
+    OUT_path = "../output/",
+    pattern = ".txt",
+    overwrite = TRUE
+  )
+
+  expect_s3_class(out_buttress, "data.frame")
+
+  expect_true(all(c(
+    "stem_diameter_m",
+    "R2",
+    "functional_stem_diameter_m",
+    "height_stem_diameter_m"
+  ) %in% names(out_buttress)))
+
+  expect_true(all(c(
+    "dbh_arc_coverage",
+    "dbh_inner_circle_empty"
+  ) %in% names(out_buttress)))
 })
 
 test_that("summary qsm metrics works", {
