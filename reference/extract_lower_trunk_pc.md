@@ -11,7 +11,8 @@ extract_lower_trunk_pc(
   slice_thickness = 0.08,
   concavity = 4,
   dtm = NA,
-  r = 5
+  r = 5,
+  how = "median"
 )
 ```
 
@@ -45,6 +46,13 @@ extract_lower_trunk_pc(
   Numeric value (default=5) r which determines the range taken for the
   dtm. Should be at least the resolution of the dtm. Only relevant when
   a dtm is provided.
+
+- how:
+
+  Method used to summarise point-to-centre radii when estimating slice
+  diameter. Use `"mean"` for the original ITSMe behaviour, `"median"`
+  for the median radius, or a numeric value such as `10` to trim 5
+  percent of radii on each side before taking the mean.
 
 ## Value
 

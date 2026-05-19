@@ -59,16 +59,16 @@ clouds.
 if (FALSE) { # \dontrun{
 # Read tree point cloud and calculate the projected tree area
 pc_tree <- read_tree_pc(PC_path = "path/to/point_cloud.txt")
-pta <- projected_crown_area_pc(pc = pc_tree)
+pa <- projected_area_pc(pc = pc_tree)
 # and plot the concave hull fitting
-output <- projected_crown_area_pc(pc = pc_tree, plot = TRUE)
-pca <- output$pca
+output <- projected_area_pc(pc = pc_tree, plot = TRUE)
+pa <- output$pa
 # classify the tree point cloud and calculate the projected crown area
 crown_pc <- classify_crown_pc(
   pc, thresholdbranch, minheight, buttress,
   thresholdR2, thresholdbuttress,
   maxbuttressheight, FALSE
 )
-pca <- projected_crown_area_pc(pc = crown_pc$crownpoints)
+pca <- projected_area_pc(pc = crown_pc$crownpoints)
 } # }
 ```

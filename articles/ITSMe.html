@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="ITSMe">
 </head>
@@ -36,6 +36,7 @@
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/ITSMe.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -326,6 +327,64 @@ a center value which gives the X and Y coordinate of the center of the
 estimated circle fit. This can also be used as a tree position
 value.</p>
 </div>
+</div>
+<div class="section level3">
+<h3 id="other-dbh-estimation-options-and-quality-control">Other DBH estimation options and quality control<a class="anchor" aria-label="anchor" href="#other-dbh-estimation-options-and-quality-control"></a>
+</h3>
+<p>The <code>how</code> argument in <code><a href="../reference/dbh_pc.html">dbh_pc()</a></code> controls how
+point-to-centre distances are summarised into the final fitted radius.
+“mean” follows the original ITSMe logic, while “median” (new default) or
+adding a number makes the fit less sensitive to outlier points:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Original ITSMe behaviour</span></span>
+<span><span class="va">out_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, how <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Median radius, more robust to a few distant slice points (new default)</span></span>
+<span><span class="va">out_median</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, how <span class="op">=</span> <span class="st">"median"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Trim 20 percent of radii in total:</span></span>
+<span><span class="co"># 10 percent lowest and 10 percent highest</span></span>
+<span><span class="va">out_trimmed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, how <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
+<p>In addition to the original outputs (<code>dbh</code>,
+<code>R2</code>, <code>center</code>, and <code>fdbh</code>),
+<code><a href="../reference/dbh_pc.html">dbh_pc()</a></code> returns quality-control metrics that can help
+identify unreliable DBH fits:</p>
+<ul>
+<li>
+<code>arc_coverage</code>: proportion of angular sectors around the
+fitted DBH circle that contain nearby slice points;</li>
+<li>
+<code>inner_circle_empty</code>: whether the checked inner part of
+the fitted circle contains no slice points;</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dbh_pc.html">dbh_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">pc_tree</span>, how <span class="op">=</span> <span class="st">"median"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">dbh</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">R2</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">arc_coverage</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">inner_circle_empty</span></span></code></pre></div>
+<p>Low <code>arc_coverage</code>, high <code>R2</code>, or
+<code>inner_circle_empty = FALSE</code> can be used to flag DBH
+estimates for inspection.</p>
+<p>When <code>"stem diameter"</code> is included in
+<code><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics()</a></code>, the DBH quality-control
+metrics are also included in the returned summary table:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span></span>
+<span>  PCs_path <span class="op">=</span> <span class="st">"path/to/folder/"</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">"\\.ply$"</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tree position"</span>, <span class="st">"stem diameter"</span>, <span class="st">"tree height"</span><span class="op">)</span>,</span>
+<span>  how <span class="op">=</span> <span class="st">"median"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">summary</span><span class="op">$</span><span class="va">dbh_arc_coverage</span></span>
+<span><span class="va">summary</span><span class="op">$</span><span class="va">dbh_inner_circle_empty</span></span>
+<span><span class="va">summary</span><span class="op">$</span><span class="va">dbh_all_points_in_donut</span></span></code></pre></div>
+<p>For buttressed trees, <code><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics()</a></code>
+may calculate diameter above buttresses instead of DBH. In that case,
+the DBH-specific quality-control columns are returned as
+<code>NA</code>.</p>
 <div class="section level4">
 <h4 id="classify-crown-points">Classify crown points<a class="anchor" aria-label="anchor" href="#classify-crown-points"></a>
 </h4>
@@ -337,7 +396,7 @@ the first branch. The height where the first branch emerges is
 iteratively determined (starting from <em>minheight</em>) as the height
 where the diameter of the stem exceeds <em>thresholdbranch</em>
 multiplied with the DBH or DAB.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Classify the tree point cloud with default settings and plot the classification results</span></span>
 <span><span class="va">C_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">tree_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">crown_pc</span> <span class="op">&lt;-</span> <span class="va">C_out</span><span class="op">$</span><span class="va">crownpoints</span></span>
@@ -360,7 +419,7 @@ buttressed trees, the attribute <em>buttress</em> has to be set TRUE and
 previously chosen attributes <em>thresholdbuttress</em> and
 <em>maxbuttressheight</em> can be specified. It is recommended to
 increase the <em>minheight</em> for buttressed trees.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Classify the tree point cloud of a buttressed tree and plot the classification results</span></span>
 <span><span class="va">C_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_crown_pc.html">classify_crown_pc</a></span><span class="op">(</span></span>
 <span>  pc <span class="op">=</span> <span class="va">tree_pc</span>, minheight <span class="op">=</span> <span class="fl">4</span>, buttress <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -386,7 +445,7 @@ If the input point cloud is the full tree point cloud the output is the
 projected tree area. If the input is the crown point cloud (determined
 with <code>classify_crown_pc</code> or in your own way) the output is
 the projected crown area.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Measure the projected crown area and plot the results</span></span>
 <span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/projected_area_pc.html">projected_area_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">crown_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">pa</span></span>
@@ -405,7 +464,7 @@ alpha-shape (based on <a href="https://cran.r-project.org/web/packages/alphashap
 fitted to the (crown) points. The <em>alpha</em> (default=1) can be
 chosen and a 3D plot is made when parameter <em>plot</em> equals
 TRUE.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Measure the crown volume and generate 3D plot</span></span>
 <span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/alpha_volume_pc.html">alpha_volume_pc</a></span><span class="op">(</span>pc <span class="op">=</span> <span class="va">crown_pc</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">volume</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">av</span></span></code></pre></div>
@@ -456,7 +515,7 @@ provided)</li>
 <em>concavity</em> &amp; <em>alpha</em>
 </li>
 </ol>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Tree height:</span></span>
 <span><span class="co"># Plot the tree point clouds (check for outliers)</span></span>
 <span><span class="co"># Specify dtm and r in case lower part of tree is not sampled</span></span>
@@ -531,7 +590,7 @@ split the trees up in groups with the same parameter values (e.g. small
 and big trees, species1 and species2). Put the groups in different
 folders and run the summary function on the different folders
 separately. Afterwards the outputs can be combined.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Summary with default setting for non-buttressed trees and plot the summary</span></span>
 <span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics</a></span><span class="op">(</span>PCs_path <span class="op">=</span> <span class="st">"path/to/point/clouds/folder_non-buttressed_trees/"</span><span class="op">)</span></span>
 <span><span class="co"># Summary with default setting (except minheight and buttress) for buttressed trees</span></span>
@@ -623,7 +682,7 @@ is indicated “TRUE” the DAB instead of the DBH is used.</p>
 </tr>
 <tr class="odd">
 <td>dbh tree volume ratio
-(m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mo>−</mo><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
+(m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mi>−</mi><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
 <td align="center">dbh_volume_ratio_qsm</td>
 <td align="right">TreeQSM (+point cloud)</td>
 </tr>
@@ -634,7 +693,7 @@ is indicated “TRUE” the DAB instead of the DBH is used.</p>
 </tr>
 <tr class="odd">
 <td>cylinder length volume ratio
-(m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mo>−</mo><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
+(m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mi>−</mi><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
 <td align="center">cylinder_length_volume_ratio_qsm</td>
 <td align="right">TreeQSM</td>
 </tr>
@@ -697,7 +756,7 @@ TreeQSM components into the global environment when <em>global</em> =
 TRUE). It requires the <em>path</em> to the TreeQSM .mat file as a first
 argument and the TreeQSM <em>version</em> as a second (default =
 “2.4.0”) argument.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read the TreeQSM file from its' specified path</span></span>
 <span><span class="va">qsm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_qsm.html">read_tree_qsm</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/treeqsm.mat"</span><span class="op">)</span></span>
 <span><span class="co"># Read the TreeQSM file of version "2.3.0" from its' specified path into the global environment</span></span>
@@ -712,7 +771,7 @@ argument and the TreeQSM <em>version</em> as a second (default =
 <p>After reading in the TreeQSM, the 17 different structural metrics
 listed in the table above can easily be calculated. Some of these
 structural metrics rely on only one of the TreeQSM components.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the stem branch angle and branch angle ratio from the branch component</span></span>
 <span><span class="va">sba</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_angle_qsm.html">stem_branch_angle_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span><span class="op">)</span></span>
 <span><span class="va">bar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/branch_angle_ratio_qsm.html">branch_angle_ratio_qsm</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">branch</span><span class="op">)</span></span>
@@ -722,7 +781,7 @@ structural metrics rely on only one of the TreeQSM components.</p>
 <span><span class="co"># Calculate the cylinder length volume ratio from the treedata component</span></span>
 <span><span class="va">clvr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder_length_volume_ratio_qsm.html">cylinder_length_volume_ratio_qsm</a></span><span class="op">(</span>treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></span></code></pre></div>
 <p>Other metrics rely on two of the TreeQSM components.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the volume below 55 and the relative volume ratio from</span></span>
 <span><span class="co"># the cylinder and treedata component</span></span>
 <span><span class="va">vol_55</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/volume_below_55_qsm.html">volume_below_55_qsm</a></span><span class="op">(</span>cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span><span class="op">)</span></span>
@@ -740,7 +799,7 @@ cloud. When the DBH is involved the DAB will be used if
 <em>buttress</em> = TRUE. Also specify the attribute values determined
 for the DBH or DAB measurement from a tree point cloud (see previous
 sections),</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read the tree point cloud</span></span>
 <span><span class="va">tree_pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_tree_pc.html">read_tree_pc</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"path/to/point/cloud.txt"</span><span class="op">)</span></span>
 <span><span class="co"># Calculate the dbh min tree radius and volume ratio using additional point cloud data</span></span>
@@ -779,7 +838,7 @@ sections),</p>
 et al. (2017) is possible through the normalisation parameter included
 in the functions of the metrics that were adapted by Terryn et al. 
 (2020).</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the stem branch radius according to Åkerblom et al. (2017)</span></span>
 <span><span class="va">sbr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stem_branch_radius_qsm.html">stem_branch_radius_qsm</a></span><span class="op">(</span></span>
 <span>  cylinder <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">cylinder</span>, treedata <span class="op">=</span> <span class="va">qsm</span><span class="op">$</span><span class="va">treedata</span>,</span>
@@ -831,7 +890,7 @@ different QSMs of one tree are also returned in additional data.frames.
 When provided, the tree point clouds files have to be of the format
 xxx_pc in order to link the tree point cloud to its’ respective
 treeQSM.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the summary function with default settings (without point cloud info)</span></span>
 <span><span class="fu"><a href="../reference/summary_qsm_metrics.html">summary_qsm_metrics</a></span><span class="op">(</span>QSMs_path <span class="op">=</span> <span class="st">"path/to/treeqsm/folder/"</span><span class="op">)</span></span>
 <span><span class="co"># Run the summary function with multiple QSMs per *mat file</span></span>

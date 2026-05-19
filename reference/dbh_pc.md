@@ -15,6 +15,12 @@ dbh_pc(
   concavity = 4,
   dtm = NA,
   r = 5,
+  how = "median",
+  arc_min_length_cm = NULL,
+  arc_min_angle = 18,
+  arc_tolerance = 0.05,
+  min_inner_buffer = 0.06,
+  inner_buffer_fraction = 0.5,
   plot = FALSE,
   plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")
 )
@@ -68,6 +74,42 @@ dbh_pc(
   dtm. Should be at least the resolution of the dtm. Only relevant when
   a dtm is provided.
 
+- how:
+
+  Method used to summarise point-to-centre radii when estimating DBH.
+  Use `"mean"` for the original ITSMe behaviour, `"median"` for the
+  median radius (default), or a numeric value such as `10` to trim 5
+  percent of radii on each side before taking the mean.
+
+- arc_min_length_cm:
+
+  Optional numeric. Minimum arc length, in centimetres, represented by
+  one angular sector when calculating arc coverage for the final DBH
+  circle.
+
+- arc_min_angle:
+
+  Numeric. Minimum angular sector width in degrees used to calculate arc
+  coverage for the final DBH circle. Default is 18, corresponding to 20
+  sectors.
+
+- arc_tolerance:
+
+  Numeric. Radial tolerance, in metres, around the fitted circle. Points
+  within radius +/- arc_tolerance are counted as supporting the fitted
+  circle when calculating arc coverage.
+
+- min_inner_buffer:
+
+  Numeric. Minimum buffer distance, in metres, excluded from the fitted
+  DBH radius before checking whether the inner circle is empty.
+
+- inner_buffer_fraction:
+
+  Numeric. Fraction of the fitted DBH radius used as buffer before
+  checking whether the inner circle is empty. The effective buffer is
+  `max(min_inner_buffer, inner_buffer_fraction * radius)`.
+
 - plot:
 
   Logical (default=FALSE), indicates if the optimised circle fitting is
@@ -86,7 +128,12 @@ List with the diameter of the stem at breast height, the residuals on
 the fitting, the estimated center of the circle fit, and the functional
 diameter at breast height. Also optionally (plot=TRUE) plots the circle
 fitting on the horizontal slice which is then included in the list
-output.
+output. The list also contains `arc_coverage`, a quality-control metric
+between 0 and 1 indicating the proportion of angular sectors around the
+fitted DBH circle that contain at least one nearby point. The list also
+contains `inner_circle_empty`, a logical quality-control metric
+indicating whether the checked inner part of the fitted DBH circle
+contains no slice points.
 
 ## Details
 
@@ -103,7 +150,7 @@ on the slice. From this area the diameter is determined as the diameter
 of a circle with this area. In case there are branches or foliage at
 this height, the lower trunk is extracted using
 [`extract_lower_trunk_pc`](https://lmterryn.github.io/ITSMe/reference/extract_lower_trunk_pc.md).
-Wether this is the case is determined using the thresholdR2 parameter.
+Whether this is the case is determined using the thresholdR2 parameter.
 When the bottom of the point cloud is incomplete or obstructed you can
 choose to add a digital terrain model as an input which is used to
 estimate lowest point of the point cloud in order to obtain slices at

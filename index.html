@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Individual Tree Structural Metrics">
 <meta name="description" content="With this package you can obtain structural metrics from individual tree point clouds and their respective quantitative structure models (treeQSM).">
@@ -39,6 +39,7 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="articles/ITSMe.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -87,63 +88,63 @@
 <col width="41%">
 <col width="21%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>structural metric</th>
 <th align="center">function name</th>
 <th align="right">input</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>tree position</td>
 <td align="center">tree_position_pc, dbh_pc, dbh_qsm</td>
 <td align="right">point cloud</td>
 </tr>
-<tr class="even">
+<tr>
 <td>diameter at breast height (m)</td>
 <td align="center">dbh_pc, dbh_qsm</td>
 <td align="right">point cloud, QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>diameter above buttresses (m)</td>
 <td align="center">dab_pc</td>
 <td align="right">point cloud</td>
 </tr>
-<tr class="even">
+<tr>
 <td>tree height (m)</td>
 <td align="center">tree_height_pc, tree_height_qsm</td>
 <td align="right">point cloud, QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>projected area (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>2</mn></msup><annotation encoding="application/x-tex">^{2}</annotation></semantics></math>)</td>
 <td align="center">projected_area_pc</td>
 <td align="right">point cloud</td>
 </tr>
-<tr class="even">
+<tr>
 <td>alpha volume (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>3</mn></msup><annotation encoding="application/x-tex">^{3}</annotation></semantics></math>)</td>
 <td align="center">alpha_volume_pc</td>
 <td align="right">point cloud</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>tree volume (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>3</mn></msup><annotation encoding="application/x-tex">^{3}</annotation></semantics></math>)</td>
 <td align="center">tree_volume_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="even">
+<tr>
 <td>trunk volume (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>3</mn></msup><annotation encoding="application/x-tex">^{3}</annotation></semantics></math>)</td>
 <td align="center">trunk_volume_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>total branch volume (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mn>3</mn></msup><annotation encoding="application/x-tex">^{3}</annotation></semantics></math>)</td>
 <td align="center">total_branch_volume_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="even">
+<tr>
 <td>total branch length (m)</td>
 <td align="center">total_branch_length_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>total cylinder length (m)</td>
 <td align="center">total_cyl_length_qsm</td>
 <td align="right">QSM</td>
@@ -161,93 +162,93 @@
 <col width="35%">
 <col width="21%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>structural metric</th>
 <th align="center">function name</th>
 <th align="right">input</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>stem branch angle (degrees)</td>
 <td align="center">stem_branch_angle_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="even">
+<tr>
 <td>stem branch cluster size</td>
 <td align="center">stem_branch_cluster_size_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>stem branch radius (-/m)</td>
 <td align="center">stem_branch_radius_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>stem branch length (-/m)</td>
 <td align="center">stem_branch_length_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>stem branch distance (-/m)</td>
 <td align="center">stem_branch_distance_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>dbh tree height ratio</td>
 <td align="center">dbh_height_ratio_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="odd">
-<td>dbh tree volume ratio (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mo>−</mo><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
+<tr>
+<td>dbh tree volume ratio (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mi>−</mi><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
 <td align="center">dbh_volume_ratio_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>volume below 55</td>
 <td align="center">volume_below_55_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="odd">
-<td>cylinder length volume ratio (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mo>−</mo><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
+<tr>
+<td>cylinder length volume ratio (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi></mi><mrow><mi>−</mi><mn>2</mn></mrow></msup><annotation encoding="application/x-tex">^{-2}</annotation></semantics></math>)</td>
 <td align="center">cylinder_length_volume_ratio_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="even">
+<tr>
 <td>shedding ratio</td>
 <td align="center">shedding_ratio_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>branch angle ratio</td>
 <td align="center">branch_angle_ratio_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="even">
+<tr>
 <td>relative volume ratio</td>
 <td align="center">relative_volume_ratio_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>crown start height</td>
 <td align="center">crown_start_height_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>crown height</td>
 <td align="center">crown_height_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>crown evenness</td>
 <td align="center">crown_evenness_qsm</td>
 <td align="right">QSM</td>
 </tr>
-<tr class="even">
+<tr>
 <td>crown diameter crown height ratio</td>
 <td align="center">crown_diameterheight_ratio_qsm</td>
 <td align="right">QSM (+point cloud)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>dbh minimum tree radius ratio</td>
 <td align="center">dbh_minradius_ratio_qsm</td>
 <td align="right">QSM (+point cloud)</td>
@@ -283,6 +284,9 @@
 <img src="reference/figures/diameter_slice_example_butt.jpeg" height="500"></p>
 <p align="center">
 <img src="reference/figures/dab_example.jpeg" height="500"></p>
+<p>DBH fit quality control</p>
+<p><code><a href="reference/dbh_pc.html">dbh_pc()</a></code> includes options for robust DBH estimation through the <code>how</code> argument and returns DBH fit quality-control metrics such as <code>arc_coverage</code>and <code>inner_circle_empty</code>. These metrics are also included in <code><a href="reference/summary_basic_pointcloud_metrics.html">summary_basic_pointcloud_metrics()</a></code> when <code>"stem diameter"</code> is calculated.</p>
+<p>See <code><a href="reference/dbh_pc.html">?dbh_pc</a></code> and <code><a href="articles/ITSMe.html">vignette("ITSMe")</a></code> for details.</p>
 <p>Calculating the stem branch distance of a TreeQSM:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lmterryn/ITSMe" class="external-link">ITSMe</a></span><span class="op">)</span></span>

@@ -15,6 +15,12 @@ diameter_slice_pc(
   dtm = NA,
   r = 5,
   plot = FALSE,
+  how = "median",
+  arc_min_length_cm = NULL,
+  arc_min_angle = 18,
+  arc_tolerance = 0.05,
+  min_inner_buffer = 0.06,
+  inner_buffer_fraction = 0.5,
   plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")
 )
 ```
@@ -33,7 +39,7 @@ diameter_slice_pc(
 
 - slice_thickness:
 
-  Numeric value (default = 0.6) that determines the thickness of the
+  Numeric value (default = 0.06) that determines the thickness of the
   slice which is used to measure the diameter.
 
 - functional:
@@ -65,6 +71,41 @@ diameter_slice_pc(
   Logical (default=FALSE), indicates if the optimized circle fitting is
   plotted.
 
+- how:
+
+  Method used to summarise point-to-centre radii when estimating slice
+  diameter. Use `"mean"` for the original ITSMe behaviour, `"median"`
+  for the median radius, or a numeric value such as `10` to trim 5
+  percent of radii on each side before taking the mean.
+
+- arc_min_length_cm:
+
+  Optional numeric. Minimum arc length, in centimetres, represented by
+  one angular sector when calculating arc coverage. If supplied, this is
+  converted to degrees based on the fitted radius.
+
+- arc_min_angle:
+
+  Numeric. Minimum angular sector width in degrees used to calculate arc
+  coverage. Default is 18, corresponding to 20 sectors.
+
+- arc_tolerance:
+
+  Numeric. Radial tolerance, in metres, around the fitted circle. Points
+  within radius +/- arc_tolerance are counted as supporting the fitted
+  circle when calculating arc coverage.
+
+- min_inner_buffer:
+
+  Numeric. Minimum buffer distance, in metres, excluded from the fitted
+  radius before checking whether the inner circle is empty.
+
+- inner_buffer_fraction:
+
+  Numeric. Fraction of the fitted radius used as buffer before checking
+  whether the inner circle is empty. The effective buffer is
+  `max(min_inner_buffer, inner_buffer_fraction * radius)`.
+
 - plotcolors:
 
   list of four colors for plotting. Only relevant when plot = TRUE. The
@@ -78,7 +119,12 @@ A list with the diameter at a specified height (numeric value), the
 residual between circle fit and the points, the center of the circle
 fit, and the functional diameter calculated from the concave hull
 fitting. Also optionally (plot=TRUE) plots the circle fitting on the
-horizontal slice.
+horizontal slice. The list also contains `arc_coverage`, a
+quality-control metric between 0 and 1 indicating the proportion of
+angular sectors around the fitted circle that contain at least one
+nearby point. The list also contains `inner_circle_empty`, a logical
+quality-control metric indicating whether the checked inner part of the
+fitted circle contains no slice points.
 
 ## Details
 
@@ -107,6 +153,6 @@ diameter <- diameter_slice_pc(pc = pc_tree)
 output <- diameter_slice_pc(pc = pc_tree, plot = TRUE)
 diameter <- output$diameter
 residual <- output$R2
-center <- out$center
+center <- output$center
 } # }
 ```

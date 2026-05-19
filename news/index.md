@@ -1,0 +1,27 @@
+# Changelog
+
+## ITSMe 2.0.0.9000
+
+### DBH estimation and quality control
+
+- Added more robust DBH estimation through the `how` argument. The
+  original ITSMe behaviour can be obtained with `how = "mean"`;
+  `how = "median"` (new default) uses the median point-to-centre radius;
+  and numeric values use a trimmed mean of the point-to-centre radii.
+- Added DBH quality-control metrics to
+  [`diameter_slice_pc()`](https://lmterryn.github.io/ITSMe/reference/diameter_slice_pc.md)
+  and
+  [`dbh_pc()`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md):
+  `arc_coverage` and `inner_circle_empty`.
+- Updated
+  [`summary_basic_pointcloud_metrics_pertree()`](https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics_pertree.md)
+  and
+  [`summary_basic_pointcloud_metrics()`](https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics.md)
+  so DBH quality-control metrics are included in the returned summary
+  data frame when `"stem diameter"` is calculated.
+- Updated the lower-trunk fallback logic in
+  [`dbh_pc()`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md) so
+  that a well-supported direct DBH slice is less likely to be
+  overwritten because of noisy or incomplete lower-stem points.
+- Documented the new DBH estimation options and quality-control metrics
+  in the main ITSMe vignette.

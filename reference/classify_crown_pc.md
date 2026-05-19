@@ -17,6 +17,12 @@ classify_crown_pc(
   concavity = 4,
   dtm = NA,
   r = 5,
+  how = "median",
+  arc_min_length_cm = NULL,
+  arc_min_angle = 18,
+  arc_tolerance = 0.05,
+  min_inner_buffer = 0.06,
+  inner_buffer_fraction = 0.5,
   plot = FALSE,
   plotcolors = c("#08aa7c", "#fac87f")
 )
@@ -96,6 +102,55 @@ classify_crown_pc(
   Numeric value (default=5) r which determines the range taken for the
   dtm. Should be at least the resolution of the dtm. Only relevant when
   a dtm is provided.
+
+- how:
+
+  Method used to summarise point-to-centre radii when estimating DBH
+  with [`dbh_pc`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md).
+  Use `"mean"` for the original ITSMe behaviour, `"median"` for the
+  median radius, or a numeric value such as `10` to trim 5 percent of
+  radii on each side before taking the mean. Only relevant when buttress
+  == FALSE.
+
+- arc_min_length_cm:
+
+  Optional numeric. Minimum arc length, in centimetres, represented by
+  one angular sector when calculating arc coverage with
+  [`dbh_pc`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md). If
+  supplied, this is converted to degrees based on the fitted radius.
+  Only relevant when buttress == FALSE.
+
+- arc_min_angle:
+
+  Numeric. Minimum angular sector width in degrees used to calculate arc
+  coverage with
+  [`dbh_pc`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md).
+  Default is 18, corresponding to 20 sectors. Only relevant when
+  buttress == FALSE.
+
+- arc_tolerance:
+
+  Numeric. Radial tolerance, in metres, around the fitted DBH circle.
+  Points within radius +/- arc_tolerance are counted as supporting the
+  fitted circle when calculating arc coverage with
+  [`dbh_pc`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md). Only
+  relevant when buttress == FALSE.
+
+- min_inner_buffer:
+
+  Numeric. Minimum buffer distance, in metres, excluded from the fitted
+  DBH radius before checking whether the inner circle is empty with
+  [`dbh_pc`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md). Only
+  relevant when buttress == FALSE.
+
+- inner_buffer_fraction:
+
+  Numeric. Fraction of the fitted DBH radius used as buffer before
+  checking whether the inner circle is empty with
+  [`dbh_pc`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md). The
+  effective buffer is
+  `max(min_inner_buffer, inner_buffer_fraction * radius)`. Only relevant
+  when buttress == FALSE.
 
 - plot:
 

@@ -1,6 +1,7 @@
 # ITSMe
 
 ``` r
+
 library(ITSMe)
 ```
 
@@ -23,8 +24,8 @@ an individual tree point cloud with the **ITSMe** package:
 | diameter at breast height (m) |      `dbh_pc`       |
 | diameter above buttresses (m) |      `dab_pc`       |
 | tree height (m)               |  `tree_height_pc`   |
-| projected area (m$^{2}$)      | `projected_area_pc` |
-| alpha volume (m$^{3}$)        |  `alpha_volume_pc`  |
+| projected area (m$`^{2}`$)    | `projected_area_pc` |
+| alpha volume (m$`^{3}`$)      |  `alpha_volume_pc`  |
 
 ### Tree point cloud requirements
 
@@ -68,6 +69,7 @@ that takes the *path* to a tree point cloud file (txt, ply, las or laz)
 as an argument and returns a data.frame with X, Y, Z columns.
 
 ``` r
+
 # Read the point cloud file from its' specified path
 tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
 ```
@@ -78,6 +80,7 @@ points that are sampled from the point cloud. 1 to sample 100 percent of
 the points and for example 0.5 to sample 50 percent of the points.
 
 ``` r
+
 # Read the point cloud file from its' specified path but only sample 10%
 tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt", samplefactor = 0.1)
 ```
@@ -94,6 +97,7 @@ makes it possible to use this function also for UAV-LS tree point clouds
 that do not sample the stem very well.
 
 ``` r
+
 # Measure tree position from the tree point cloud
 XYZ_pos <- tree_position_pc(pc = tree_pc)
 ```
@@ -111,6 +115,7 @@ cloud as an input. It also optionally plots the tree point cloud in 2D
 TRUE.
 
 ``` r
+
 # Measure tree height from the tree point cloud
 H <- tree_height_pc(pc = tree_pc)
 # also plot the tree point cloud
@@ -130,6 +135,7 @@ improve tree height estimation. The DTM also needs to be supplied in the
 data.frame format with columns X, Y, and Z.
 
 ``` r
+
 # Read the DTM
 DTM <- read_tree_pc(path = "path/to/dtm.txt")
 # Measure tree height from the tree point cloud and DTM with resolution r
@@ -162,6 +168,7 @@ have not been removed from the point cloud, or incomplete stem point
 cloud).
 
 ``` r
+
 # Measure DBH from the tree point cloud and plot the circle fitting
 D_out <- diameter_slice_pc(
   pc = tree_pc, slice_height = 1.3,
@@ -187,6 +194,7 @@ function also reports the functional DBH (fDBH) when the argument
 *functional* is set TRUE.
 
 ``` r
+
 # Measure DBH from the tree point cloud and plot the circle fitting
 DBH_out <- dbh_pc(pc = tree_pc, plot = TRUE, functional = TRUE)
 DBH <- DBH_out$dbh
@@ -234,6 +242,7 @@ restarted with a *thresholdbuttress* increased with 0.0005. Also in this
 case a functional DAB (fDAB) is reported.
 
 ``` r
+
 # Measure DAB from the tree point cloud with default settings and plot the circle fitting
 DAB_out <- dab_pc(pc = tree_pc, plot = TRUE, functional = TRUE)
 DAB <- DAB_out$dab
@@ -262,6 +271,75 @@ The `dbh_pc` and `dab_pc` functions also output a center value which
 gives the X and Y coordinate of the center of the estimated circle fit.
 This can also be used as a tree position value.
 
+### Other DBH estimation options and quality control
+
+The `how` argument in
+[`dbh_pc()`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md)
+controls how point-to-centre distances are summarised into the final
+fitted radius. “mean” follows the original ITSMe logic, while “median”
+(new default) or adding a number makes the fit less sensitive to outlier
+points:
+
+``` r
+
+# Original ITSMe behaviour
+out_mean <- dbh_pc(pc = pc_tree, how = "mean")
+
+# Median radius, more robust to a few distant slice points (new default)
+out_median <- dbh_pc(pc = pc_tree, how = "median")
+
+# Trim 20 percent of radii in total:
+# 10 percent lowest and 10 percent highest
+out_trimmed <- dbh_pc(pc = pc_tree, how = 20)
+```
+
+In addition to the original outputs (`dbh`, `R2`, `center`, and `fdbh`),
+[`dbh_pc()`](https://lmterryn.github.io/ITSMe/reference/dbh_pc.md)
+returns quality-control metrics that can help identify unreliable DBH
+fits:
+
+- `arc_coverage`: proportion of angular sectors around the fitted DBH
+  circle that contain nearby slice points;
+- `inner_circle_empty`: whether the checked inner part of the fitted
+  circle contains no slice points;
+
+``` r
+
+out <- dbh_pc(pc = pc_tree, how = "median", plot = TRUE)
+
+out$dbh
+out$R2
+out$arc_coverage
+out$inner_circle_empty
+```
+
+Low `arc_coverage`, high `R2`, or `inner_circle_empty = FALSE` can be
+used to flag DBH estimates for inspection.
+
+When `"stem diameter"` is included in
+[`summary_basic_pointcloud_metrics()`](https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics.md),
+the DBH quality-control metrics are also included in the returned
+summary table:
+
+``` r
+
+summary <- summary_basic_pointcloud_metrics(
+  PCs_path = "path/to/folder/",
+  pattern = "\\.ply$",
+  metrics = c("tree position", "stem diameter", "tree height"),
+  how = "median"
+)
+
+summary$dbh_arc_coverage
+summary$dbh_inner_circle_empty
+summary$dbh_all_points_in_donut
+```
+
+For buttressed trees,
+[`summary_basic_pointcloud_metrics()`](https://lmterryn.github.io/ITSMe/reference/summary_basic_pointcloud_metrics.md)
+may calculate diameter above buttresses instead of DBH. In that case,
+the DBH-specific quality-control columns are returned as `NA`.
+
 #### Classify crown points
 
 As a basis for crown metrics (e.g. projected crown area and 3D alpha
@@ -273,6 +351,7 @@ determined (starting from *minheight*) as the height where the diameter
 of the stem exceeds *thresholdbranch* multiplied with the DBH or DAB.
 
 ``` r
+
 # Classify the tree point cloud with default settings and plot the classification results
 C_out <- classify_crown_pc(pc = tree_pc, plot = TRUE)
 crown_pc <- C_out$crownpoints
@@ -298,6 +377,7 @@ attributes *thresholdbuttress* and *maxbuttressheight* can be specified.
 It is recommended to increase the *minheight* for buttressed trees.
 
 ``` r
+
 # Classify the tree point cloud of a buttressed tree and plot the classification results
 C_out <- classify_crown_pc(
   pc = tree_pc, minheight = 4, buttress = TRUE,
@@ -328,6 +408,7 @@ with `classify_crown_pc` or in your own way) the output is the projected
 crown area.
 
 ``` r
+
 # Measure the projected crown area and plot the results
 out <- projected_area_pc(pc = crown_pc, plot = TRUE)
 pca <- out$pa
@@ -350,6 +431,7 @@ fitted to the (crown) points. The *alpha* (default=1) can be chosen and
 a 3D plot is made when parameter *plot* equals TRUE.
 
 ``` r
+
 # Measure the crown volume and generate 3D plot
 out <- alpha_volume_pc(pc = crown_pc, plot = TRUE)
 volume <- out$av
@@ -384,6 +466,7 @@ functions:
 5.  `plot_pca_pcs` & `volume_crown_pc`: *concavity* & *alpha*
 
 ``` r
+
 # Tree height:
 # Plot the tree point clouds (check for outliers)
 # Specify dtm and r in case lower part of tree is not sampled
@@ -460,6 +543,7 @@ folders and run the summary function on the different folders
 separately. Afterwards the outputs can be combined.
 
 ``` r
+
 # Summary with default setting for non-buttressed trees and plot the summary
 summary <- summary_basic_pointcloud_metrics(PCs_path = "path/to/point/clouds/folder_non-buttressed_trees/")
 # Summary with default setting (except minheight and buttress) for buttressed trees
@@ -507,25 +591,25 @@ DAB and tree height values are based on the point clouds rather than the
 QSMs. When the *buttress* parameter is indicated “TRUE” the DAB instead
 of the DBH is used.
 
-| structural metric                        |          function name           |                  input |
-|------------------------------------------|:--------------------------------:|-----------------------:|
-| stem branch angle (degrees)              |      stem_branch_angle_qsm       |                TreeQSM |
-| stem branch cluster size                 |   stem_branch_cluster_size_qsm   |                TreeQSM |
-| stem branch radius (-/m)                 |      stem_branch_radius_qsm      | TreeQSM (+point cloud) |
-| stem branch length (-/m)                 |      stem_branch_length_qsm      | TreeQSM (+point cloud) |
-| stem branch distance (-/m)               |     stem_branch_distance_qsm     | TreeQSM (+point cloud) |
-| dbh tree height ratio                    |       dbh_height_ratio_qsm       | TreeQSM (+point cloud) |
-| dbh tree volume ratio (m$^{- 2}$)        |       dbh_volume_ratio_qsm       | TreeQSM (+point cloud) |
-| volume below 55                          |       volume_below_55_qsm        |                TreeQSM |
-| cylinder length volume ratio (m$^{- 2}$) | cylinder_length_volume_ratio_qsm |                TreeQSM |
-| shedding ratio                           |        shedding_ratio_qsm        |                TreeQSM |
-| branch angle ratio                       |      branch_angle_ratio_qsm      |                TreeQSM |
-| relative volume ratio                    |    relative_volume_ratio_qsm     |                TreeQSM |
-| crown start height                       |      crown_start_height_qsm      | TreeQSM (+point cloud) |
-| crown height                             |         crown_height_qsm         | TreeQSM (+point cloud) |
-| crown evenness                           |        crown_evenness_qsm        |                TreeQSM |
-| crown diameter crown height ratio        |  crown_diameterheight_ratio_qsm  | TreeQSM (+point cloud) |
-| dbh minimum tree radius ratio            |     dbh_minradius_ratio_qsm      | TreeQSM (+point cloud) |
+| structural metric | function name | input |
+|----|:--:|---:|
+| stem branch angle (degrees) | stem_branch_angle_qsm | TreeQSM |
+| stem branch cluster size | stem_branch_cluster_size_qsm | TreeQSM |
+| stem branch radius (-/m) | stem_branch_radius_qsm | TreeQSM (+point cloud) |
+| stem branch length (-/m) | stem_branch_length_qsm | TreeQSM (+point cloud) |
+| stem branch distance (-/m) | stem_branch_distance_qsm | TreeQSM (+point cloud) |
+| dbh tree height ratio | dbh_height_ratio_qsm | TreeQSM (+point cloud) |
+| dbh tree volume ratio (m$`^{-2}`$) | dbh_volume_ratio_qsm | TreeQSM (+point cloud) |
+| volume below 55 | volume_below_55_qsm | TreeQSM |
+| cylinder length volume ratio (m$`^{-2}`$) | cylinder_length_volume_ratio_qsm | TreeQSM |
+| shedding ratio | shedding_ratio_qsm | TreeQSM |
+| branch angle ratio | branch_angle_ratio_qsm | TreeQSM |
+| relative volume ratio | relative_volume_ratio_qsm | TreeQSM |
+| crown start height | crown_start_height_qsm | TreeQSM (+point cloud) |
+| crown height | crown_height_qsm | TreeQSM (+point cloud) |
+| crown evenness | crown_evenness_qsm | TreeQSM |
+| crown diameter crown height ratio | crown_diameterheight_ratio_qsm | TreeQSM (+point cloud) |
+| dbh minimum tree radius ratio | dbh_minradius_ratio_qsm | TreeQSM (+point cloud) |
 
 ### Workflow for a single tree
 
@@ -541,6 +625,7 @@ requires the *path* to the TreeQSM .mat file as a first argument and the
 TreeQSM *version* as a second (default = “2.4.0”) argument.
 
 ``` r
+
 # Read the TreeQSM file from its' specified path
 qsm <- read_tree_qsm(path = "path/to/treeqsm.mat")
 # Read the TreeQSM file of version "2.3.0" from its' specified path into the global environment
@@ -557,6 +642,7 @@ in the table above can easily be calculated. Some of these structural
 metrics rely on only one of the TreeQSM components.
 
 ``` r
+
 # Calculate the stem branch angle and branch angle ratio from the branch component
 sba <- stem_branch_angle_qsm(branch = qsm$branch)
 bar <- branch_angle_ratio_qsm(branch = qsm$branch)
@@ -570,6 +656,7 @@ clvr <- cylinder_length_volume_ratio_qsm(treedata = qsm$treedata)
 Other metrics rely on two of the TreeQSM components.
 
 ``` r
+
 # Calculate the volume below 55 and the relative volume ratio from
 # the cylinder and treedata component
 vol_55 <- volume_below_55_qsm(cylinder = qsm$cylinder, treedata = qsm$treedata)
@@ -590,6 +677,7 @@ TRUE. Also specify the attribute values determined for the DBH or DAB
 measurement from a tree point cloud (see previous sections),
 
 ``` r
+
 # Read the tree point cloud
 tree_pc <- read_tree_pc(path = "path/to/point/cloud.txt")
 # Calculate the dbh min tree radius and volume ratio using additional point cloud data
@@ -631,6 +719,7 @@ al. (2017) is possible through the normalisation parameter included in
 the functions of the metrics that were adapted by Terryn et al.  (2020).
 
 ``` r
+
 # Calculate the stem branch radius according to Åkerblom et al. (2017)
 sbr <- stem_branch_radius_qsm(
   cylinder = qsm$cylinder, treedata = qsm$treedata,
@@ -680,6 +769,7 @@ provided, the tree point clouds files have to be of the format xxx_pc in
 order to link the tree point cloud to its’ respective treeQSM.
 
 ``` r
+
 # Run the summary function with default settings (without point cloud info)
 summary_qsm_metrics(QSMs_path = "path/to/treeqsm/folder/")
 # Run the summary function with multiple QSMs per *mat file
