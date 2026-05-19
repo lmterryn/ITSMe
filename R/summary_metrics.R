@@ -56,6 +56,30 @@
 #'   \code{\link[concaveman]{concaveman}}. This concavity value is used in the
 #'   functions \code{\link{diameter_slice_pc}}, \code{\link{dbh_pc}},
 #'   \code{\link{dab_pc}}, and \code{\link{classify_crown_pc}}.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH with \code{\link{dbh_pc}}. Use \code{"mean"} for the original ITSMe
+#'   behaviour, \code{"median"} for the median radius, or a numeric value such
+#'   as \code{10} to trim 5 percent of radii on each side before taking the
+#'   mean. Only relevant when buttress == FALSE.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in centimetres,
+#'   represented by one angular sector when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. If supplied, this is converted to degrees based on
+#'   the fitted radius. Only relevant when buttress == FALSE.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used
+#'   to calculate arc coverage with \code{\link{dbh_pc}}. Default is 18,
+#'   corresponding to 20 sectors. Only relevant when buttress == FALSE.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   DBH circle. Points within radius +/- arc_tolerance are counted as
+#'   supporting the fitted circle when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty with \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty with
+#'   \code{\link{dbh_pc}}. The effective buffer is
+#'   \code{max(min_inner_buffer, inner_buffer_fraction * radius)}. Only relevant
+#'   when buttress == FALSE.
 #' @param OUT_path A character with name of the output folder where the summary
 #'   figures should be saved or logical (default=FALSE) in this case no figures
 #'   are saved.
@@ -93,6 +117,9 @@
 #'   crown = TRUE, minheight = 4, buttress = TRUE
 #' )
 #' }
+#'
+#'
+
 summary_basic_pointcloud_metrics_pertree <-
   function(PC_path,
            metrics = c("tree position",
@@ -115,12 +142,23 @@ summary_basic_pointcloud_metrics_pertree <-
            maxbuttressheight = 7,
            functional = TRUE,
            concavity_fdiameter = 4,
+           how = "median",
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5,
            OUT_path = FALSE,
            overwrite = FALSE,
            plot = FALSE,
            plotcolors = c("#000000", "#808080", "#1c027a", "#08aa7c", "#fac87f")) {
     #print which tree is processing and initiate data frame
     print(paste("processing ", basename(PC_path)))
+
+    safe_extract <- function(x, name, default = NA) {
+      if (is.null(x) || is.null(x[[name]])) return(default)
+      x[[name]]
+    }
 
     #if the output file already exists
     output_filename <- paste0(OUT_path, "summary_basic_metrics.csv")
@@ -178,16 +216,20 @@ summary_basic_pointcloud_metrics_pertree <-
     #calculate stem diameter
     if ("stem diameter" %in% metrics) {
       print("calculating stem diameter")
-      if (!("tree height" %in% metrics)){
-        h_out <-
-          tree_height_pc(
-            pc = pc,
-            dtm = dtm,
-            r = r
-          )
+
+      if (!("tree height" %in% metrics)) {
+        h_out <- tree_height_pc(
+          pc = pc,
+          dtm = dtm,
+          r = r
+        )
       }
+
+      diameter_out <- NULL
+
       if (buttress & (h_out$h > h_cutoff)) {
-        dab_out <- tryCatch({
+
+        diameter_out <- tryCatch({
           dab_pc(
             pc = pc,
             thresholdbuttress = thresholdbuttress,
@@ -206,49 +248,65 @@ summary_basic_pointcloud_metrics_pertree <-
             "dab" = NaN,
             "R2" = NaN,
             "fdab" = NaN,
-            "plot" = empty_plot,
-            "h" = NaN
+            "h" = NaN,
+            "arc_coverage" = NA_real_,
+            "inner_circle_empty" = NA,
+            "plot" = empty_plot
           ))
         })
-        tree$stem_diameter_m <- dab <- dab_out$dab
-        tree$R2 <- R2 <- dab_out$R2
-        tree$functional_stem_diameter_m <- fdab <- dab_out$fdab
-        tree$height_stem_diameter_m <- dab_out$h
-        if (plot == TRUE) {
-          d_plot <- dab_out$plot
-          d_plot <- d_plot + ggplot2::theme(legend.key = ggplot2::element_blank())
-        }
+
+        tree$stem_diameter_m <- dab <- diameter_out$dab
+        tree$R2 <- R2 <- diameter_out$R2
+        tree$functional_stem_diameter_m <- fdab <- diameter_out$fdab
+        tree$height_stem_diameter_m <- diameter_out$h
+
       } else {
-        dbh_out <- tryCatch({
-          dbh_out <-
-            dbh_pc(
-              pc = pc,
-              thresholdR2 = thresholdR2,
-              slice_thickness = slice_thickness,
-              functional = functional,
-              concavity = concavity_fdiameter,
-              dtm = dtm,
-              r = r,
-              plot = plot,
-              plotcolors = plotcolors[c(1, 3:5)]
-            )
+
+        diameter_out <- tryCatch({
+          dbh_pc(
+            pc = pc,
+            thresholdR2 = thresholdR2,
+            slice_thickness = slice_thickness,
+            functional = functional,
+            concavity = concavity_fdiameter,
+            dtm = dtm,
+            r = r,
+            how = how,
+            arc_min_length_cm = arc_min_length_cm,
+            arc_min_angle = arc_min_angle,
+            arc_tolerance = arc_tolerance,
+            min_inner_buffer = min_inner_buffer,
+            inner_buffer_fraction = inner_buffer_fraction,
+            plot = plot,
+            plotcolors = plotcolors[c(1, 3:5)]
+          )
         }, error = function(cond) {
           message(cond)
           return(list(
             "dbh" = NaN,
             "R2" = NaN,
             "fdbh" = NaN,
+            "arc_coverage" = NA_real_,
+            "inner_circle_empty" = NA,
             "plot" = empty_plot
           ))
         })
-        tree$stem_diameter_m <- dbh <- dbh_out$dbh
-        tree$R2 <- R2 <- dbh_out$R2
-        tree$functional_stem_diameter_m <- fdbh <- dbh_out$fdbh
+
+        tree$stem_diameter_m <- dbh <- diameter_out$dbh
+        tree$R2 <- R2 <- diameter_out$R2
+        tree$functional_stem_diameter_m <- fdbh <- diameter_out$fdbh
         tree$height_stem_diameter_m <- 1.3
-        if (plot == TRUE) {
-          d_plot <- dbh_out$plot
-          d_plot <- d_plot + ggplot2::theme(legend.key = ggplot2::element_blank())
-        }
+      }
+
+      # Always add these columns, for both DBH and DAB.
+      # For DAB they will be NA unless dab_pc() is later extended
+      # to return the same QC metrics.
+      tree$dbh_arc_coverage <- safe_extract(diameter_out, "arc_coverage", NA_real_)
+      tree$dbh_inner_circle_empty <- safe_extract(diameter_out, "inner_circle_empty", NA)
+
+      if (plot == TRUE) {
+        d_plot <- safe_extract(diameter_out, "plot", empty_plot)
+        d_plot <- d_plot + ggplot2::theme(legend.key = ggplot2::element_blank())
       }
     }
     #perform crown classification
@@ -268,6 +326,12 @@ summary_basic_pointcloud_metrics_pertree <-
           concavity = concavity_fdiameter,
           dtm = dtm,
           r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction,
           plot = plot,
           plotcolors = plotcolors[c(4:5)]
         )
@@ -502,6 +566,30 @@ summary_basic_pointcloud_metrics_pertree <-
 #'   \code{\link[concaveman]{concaveman}}. This concavity value is used in the
 #'   functions \code{\link{diameter_slice_pc}}, \code{\link{dbh_pc}},
 #'   \code{\link{dab_pc}}, and \code{\link{classify_crown_pc}}.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH with \code{\link{dbh_pc}}. Use \code{"mean"} for the original ITSMe
+#'   behaviour, \code{"median"} for the median radius, or a numeric value such
+#'   as \code{10} to trim 5 percent of radii on each side before taking the
+#'   mean. Only relevant when buttress == FALSE.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in centimetres,
+#'   represented by one angular sector when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. If supplied, this is converted to degrees based on
+#'   the fitted radius. Only relevant when buttress == FALSE.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used
+#'   to calculate arc coverage with \code{\link{dbh_pc}}. Default is 18,
+#'   corresponding to 20 sectors. Only relevant when buttress == FALSE.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   DBH circle. Points within radius +/- arc_tolerance are counted as
+#'   supporting the fitted circle when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty with \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty with
+#'   \code{\link{dbh_pc}}. The effective buffer is
+#'   \code{max(min_inner_buffer, inner_buffer_fraction * radius)}. Only relevant
+#'   when buttress == FALSE.
 #' @param OUT_path A character with name of the output file (including the path
 #'   to the folder), where the summary csv file should be saved or logical
 #'   (default=FALSE) in this case no csv file is produced.
@@ -563,6 +651,12 @@ summary_basic_pointcloud_metrics <-
            maxbuttressheight = 7,
            functional = TRUE,
            concavity_fdiameter = 4,
+           how = "median",
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5,
            OUT_path = FALSE,
            overwrite = FALSE,
            plot = FALSE,
@@ -599,6 +693,12 @@ summary_basic_pointcloud_metrics <-
           "maxbuttressheight",
           "functional",
           "concavity_fdiameter",
+          "how",
+          "arc_min_length_cm",
+          "arc_min_angle",
+          "arc_tolerance",
+          "min_inner_buffer",
+          "inner_buffer_fraction",
           "OUT_path",
           "plot",
           "plotcolors"
@@ -624,6 +724,12 @@ summary_basic_pointcloud_metrics <-
         maxbuttressheight = maxbuttressheight,
         functional = functional,
         concavity_fdiameter = concavity_fdiameter,
+        how = how,
+        arc_min_length_cm = arc_min_length_cm,
+        arc_min_angle = arc_min_angle,
+        arc_tolerance = arc_tolerance,
+        min_inner_buffer = min_inner_buffer,
+        inner_buffer_fraction = inner_buffer_fraction,
         OUT_path = OUT_path,
         overwrite = overwrite,
         plot = plot,
@@ -650,6 +756,12 @@ summary_basic_pointcloud_metrics <-
         maxbuttressheight = maxbuttressheight,
         functional = functional,
         concavity_fdiameter = concavity_fdiameter,
+        how = how,
+        arc_min_length_cm = arc_min_length_cm,
+        arc_min_angle = arc_min_angle,
+        arc_tolerance = arc_tolerance,
+        min_inner_buffer = min_inner_buffer,
+        inner_buffer_fraction = inner_buffer_fraction,
         OUT_path = OUT_path,
         overwrite = overwrite,
         plot = plot,

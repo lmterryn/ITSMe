@@ -23,6 +23,12 @@ summary_basic_pointcloud_metrics(
   maxbuttressheight = 7,
   functional = TRUE,
   concavity_fdiameter = 4,
+  how = "median",
+  arc_min_length_cm = NULL,
+  arc_min_angle = 18,
+  arc_tolerance = 0.05,
+  min_inner_buffer = 0.06,
+  inner_buffer_fraction = 0.5,
   OUT_path = FALSE,
   overwrite = FALSE,
   plot = FALSE,
@@ -95,6 +101,36 @@ computation of the functional diameter using a concave hull based on
 \code{\link[concaveman]{concaveman}}. This concavity value is used in the
 functions \code{\link{diameter_slice_pc}}, \code{\link{dbh_pc}},
 \code{\link{dab_pc}}, and \code{\link{classify_crown_pc}}.}
+
+\item{how}{Method used to summarise point-to-centre radii when estimating
+DBH with \code{\link{dbh_pc}}. Use \code{"mean"} for the original ITSMe
+behaviour, \code{"median"} for the median radius, or a numeric value such
+as \code{10} to trim 5 percent of radii on each side before taking the
+mean. Only relevant when buttress == FALSE.}
+
+\item{arc_min_length_cm}{Optional numeric. Minimum arc length, in centimetres,
+represented by one angular sector when calculating arc coverage with
+\code{\link{dbh_pc}}. If supplied, this is converted to degrees based on
+the fitted radius. Only relevant when buttress == FALSE.}
+
+\item{arc_min_angle}{Numeric. Minimum angular sector width in degrees used
+to calculate arc coverage with \code{\link{dbh_pc}}. Default is 18,
+corresponding to 20 sectors. Only relevant when buttress == FALSE.}
+
+\item{arc_tolerance}{Numeric. Radial tolerance, in metres, around the fitted
+DBH circle. Points within radius +/- arc_tolerance are counted as
+supporting the fitted circle when calculating arc coverage with
+\code{\link{dbh_pc}}. Only relevant when buttress == FALSE.}
+
+\item{min_inner_buffer}{Numeric. Minimum buffer distance, in metres, excluded
+from the fitted DBH radius before checking whether the inner circle is
+empty with \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.}
+
+\item{inner_buffer_fraction}{Numeric. Fraction of the fitted DBH radius used
+as buffer before checking whether the inner circle is empty with
+\code{\link{dbh_pc}}. The effective buffer is
+\code{max(min_inner_buffer, inner_buffer_fraction * radius)}. Only relevant
+when buttress == FALSE.}
 
 \item{OUT_path}{A character with name of the output file (including the path
 to the folder), where the summary csv file should be saved or logical
