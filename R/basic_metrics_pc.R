@@ -1666,6 +1666,7 @@ dab_pc <-
           functional = functional,
           concavity = concavity,
           dtm = dtm,
+          how = 'mean', #original ITSMe behaviour
           r = r,
           plot = FALSE
         )
