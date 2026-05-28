@@ -2,25 +2,27 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{shedding_ratio_qsm}
 \alias{shedding_ratio_qsm}
-\title{Shedding ratio TreeQSM}
+\title{Shedding ratio QSM}
 \usage{
 shedding_ratio_qsm(branch, cylinder, treedata)
 }
 \arguments{
-\item{branch}{Branch field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{branch}{Branch field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 }
 \value{
 The shedding ratio.
 }
 \description{
-Calculates the shedding ratio from a TreeQSM.
+Calculates the shedding ratio from a TreeQSM or RCT QSM (treeinfo
+needs to have been run with --branch_data to access the required
+information).
 }
 \details{
 The shedding ratio is defined as "The number of stem branches without

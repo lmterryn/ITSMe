@@ -2,20 +2,23 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{crownset_qsm}
 \alias{crownset_qsm}
-\title{Crownset TreeQSM}
+\title{Crownset QSM}
 \usage{
 crownset_qsm(cylinder)
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
 An integer containing the indices of the cylinders belonging to the
 crownset.
 }
 \description{
-Returns the indices of the cylinders belonging to the crown of the treeQSM.
+Returns the indices of the cylinders belonging to the crown of the treeQSM or
+RCT QSM (treeinfo needs to have been run with --branch_data to access the
+required information).
 }
 \details{
 The crownset is determined based on four steps (that are designed to exclude

@@ -23,7 +23,7 @@ classify_crown_pc(
   min_inner_buffer = 0.06,
   inner_buffer_fraction = 0.5,
   plot = FALSE,
-  plotcolors = c("#08aa7c", "#fac87f")
+  plotcolors = c("#000000", "#08aa7c", "#fac87f")
 )
 }
 \arguments{
@@ -72,9 +72,9 @@ dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 is provided.}
 
 \item{how}{Method used to summarise point-to-centre radii when estimating
-DBH with \code{\link{dbh_pc}}. Use \code{"mean"} for the original ITSMe
-behaviour, \code{"median"} for the median radius, or a numeric value such
-as \code{10} to trim 5 percent of radii on each side before taking the
+DBH with \code{\link{dbh_pc}}. Use "mean" for the original ITSMe
+behaviour, "median" for the median radius, or a numeric value such
+as 10 to trim 5 percent of radii on each side before taking the
 mean. Only relevant when buttress == FALSE.}
 
 \item{arc_min_length_cm}{Optional numeric. Minimum arc length, in centimetres,
@@ -87,7 +87,7 @@ to calculate arc coverage with \code{\link{dbh_pc}}. Default is 18,
 corresponding to 20 sectors. Only relevant when buttress == FALSE.}
 
 \item{arc_tolerance}{Numeric. Radial tolerance, in metres, around the fitted
-DBH circle. Points within radius +/- arc_tolerance are counted as
+DBH circle. Points within radius plus or minus arc_tolerance are counted as
 supporting the fitted circle when calculating arc coverage with
 \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.}
 
@@ -97,16 +97,17 @@ empty with \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.}
 
 \item{inner_buffer_fraction}{Numeric. Fraction of the fitted DBH radius used
 as buffer before checking whether the inner circle is empty with
-\code{\link{dbh_pc}}. The effective buffer is
-\code{max(min_inner_buffer, inner_buffer_fraction * radius)}. Only relevant
-when buttress == FALSE.}
+\code{\link{dbh_pc}}. The effective buffer is the maximum of the
+min_inner_buffer and the inner_buffer_fraction times the radius. Only
+relevant when buttress == FALSE.}
 
 \item{plot}{Logical (default=FALSE), indicates if the classified tree is
 plotted.}
 
-\item{plotcolors}{list of two colors for plotting. Only relevant when plot =
-TRUE. The crown and trunk are colored by the first and second element of
-this list respectively.}
+\item{plotcolors}{list of three colors for plotting. Only relevant when plot
+= TRUE. The crown and trunk are colored by the first and second element of
+this list respectively. The dtm (when provided) is colored by the third
+element.}
 }
 \value{
 List with data.frame with the crown point cloud (part of the tree

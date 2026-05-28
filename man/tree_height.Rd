@@ -7,8 +7,8 @@
 tree_height(treedata, pc = NA, dtm = NA, r = 5)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}. If the point cloud is not available NA is used

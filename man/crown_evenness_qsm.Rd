@@ -2,19 +2,21 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{crown_evenness_qsm}
 \alias{crown_evenness_qsm}
-\title{Crown evenness TreeQSM}
+\title{Crown evenness QSM}
 \usage{
 crown_evenness_qsm(cylinder)
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
 The crown evenness.
 }
 \description{
-Calculates the crown evenness from a TreeQSM.
+Calculates the crown evenness from a TreeQSM or RCT QSM (treeinfo needs to have
+been run with --branch_data to access the required information).
 }
 \details{
 The crown evenness is defined as "The crown cylinders divided into 8 angular

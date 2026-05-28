@@ -18,7 +18,7 @@ plot_crown_classification_pcs(
   concavity = 4,
   dtm = NA,
   r = 5,
-  plotcolors = c("#08aa7c", "#fac87f")
+  plotcolors = c("#000000", "#08aa7c", "#fac87f")
 )
 }
 \arguments{

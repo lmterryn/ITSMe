@@ -10,16 +10,23 @@ dbh(
   buttress = FALSE,
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
+  functional = FALSE,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   concavity = 4,
   dtm = NA,
-  r = 5
+  r = 5,
+  how = "median",
+  arc_min_length_cm = NULL,
+  arc_min_angle = 18,
+  arc_tolerance = 0.05,
+  min_inner_buffer = 0.06,
+  inner_buffer_fraction = 0.5
 )
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
@@ -37,6 +44,9 @@ FALSE.}
 \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 the diameter at breast height and above buttresses. Only relevant if the
 tree point cloud is available.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
@@ -60,6 +70,31 @@ point cloud it can also be read with \code{\link{read_tree_pc}}.}
 \item{r}{Numeric value (default=5) r which determines the range taken for the
 dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 is provided.}
+
+\item{how}{Method used to summarise point-to-centre radii when estimating
+DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+for the median radius (default), or a numeric value such as \code{10} to
+trim 5 percent of radii on each side before taking the mean.}
+
+\item{arc_min_length_cm}{Optional numeric. Minimum arc length, in
+centimetres, represented by one angular sector when calculating arc
+coverage for the final DBH circle.}
+
+\item{arc_min_angle}{Numeric. Minimum angular sector width in degrees used to
+calculate arc coverage for the final DBH circle. Default is 18,
+corresponding to 20 sectors.}
+
+\item{arc_tolerance}{Numeric. Radial tolerance, in metres, around the fitted
+circle. Points within radius +/- arc_tolerance are counted as supporting
+the fitted circle when calculating arc coverage.}
+
+\item{min_inner_buffer}{Numeric. Minimum buffer distance, in metres, excluded
+from the fitted DBH radius before checking whether the inner circle is
+empty.}
+
+\item{inner_buffer_fraction}{Numeric. Fraction of the fitted DBH radius used
+as buffer before checking whether the inner circle is empty. The effective
+buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.}
 }
 \value{
 The dbh or dab in meters.
@@ -72,10 +107,10 @@ If the tree point cloud is available the calculations are based on the point
 cloud (most accurate). In this case the diameter at breast height (dbh) or
 diameter above buttresses (dab) is calculated with \code{\link{dbh_pc}} or
 \code{\link{dab_pc}} respectively. If the tree point cloud is not available
-the dbh is based on the treeQSM with \code{\link{dbh_qsm}}. When the bottom
-of the point cloud is incomplete or obstructed you can choose to add a
-digital terrain model as an input which is used to estimate lowest point of
-the point cloud in order to obtain slices at the correct height of the tree.
+the dbh is based on the QSM with \code{\link{dbh_qsm}}. When the bottom of
+the point cloud is incomplete or obstructed you can choose to add a digital
+terrain model as an input which is used to estimate lowest point of the point
+cloud in order to obtain slices at the correct height of the tree.
 }
 \examples{
 \dontrun{

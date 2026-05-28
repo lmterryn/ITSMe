@@ -2,13 +2,14 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{tree_position_qsm}
 \alias{tree_position_qsm}
-\title{TreeQSM position}
+\title{QSM position}
 \usage{
 tree_position_qsm(cylinder)
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+TRUE.}
 }
 \value{
 Numeric with the XY coordinates (location) of the tree stem.

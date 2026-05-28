@@ -2,21 +2,25 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{trunk_volume_qsm}
 \alias{trunk_volume_qsm}
-\title{Total trunk volume TreeQSM}
+\title{Total trunk volume QSM}
 \usage{
 trunk_volume_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
-The total trunk volume of the TreeQSM in liters. If the trunk was
-modelled with triangulation the total volume is the sum of the triangulated
-volume of the stem (bottom) and the volume of the stem cylinder (top).
+The total trunk volume of the TreeQSM or RCT QSM in liters. If the
+trunk was modelled with triangulation (option in TreeQSM v2.4.x) the total
+volume is the sum of the triangulated volume of the stem (bottom) and the
+volume of the stem cylinder (top).
 }
 \description{
-Extracts the total trunk volume from the treedata of a TreeQSM.
+Extracts the total trunk volume from the treedata of a TreeQSM or a RCT QSM
+(treeinfo needs to have been run with --branch_data to access the required
+information).
 }
 \examples{
 \dontrun{

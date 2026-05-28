@@ -2,7 +2,7 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{dbh_volume_ratio_qsm}
 \alias{dbh_volume_ratio_qsm}
-\title{DBH-tree volume ratio TreeQSM}
+\title{DBH-tree volume ratio QSM}
 \usage{
 dbh_volume_ratio_qsm(
   treedata,
@@ -10,20 +10,27 @@ dbh_volume_ratio_qsm(
   buttress = FALSE,
   thresholdR2 = 0.001,
   slice_thickness = 0.06,
+  functional = FALSE,
   thresholdbuttress = 0.001,
   maxbuttressheight = 7,
   concavity = 4,
   dtm = NA,
-  r = 5
+  r = 5,
+  how = "median",
+  arc_min_length_cm = NULL,
+  arc_min_angle = 18,
+  arc_tolerance = 0.05,
+  min_inner_buffer = 0.06,
+  inner_buffer_fraction = 0.5
 )
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
-\code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
-is available.}
+\code{\link{read_tree_pc}} or \code{\link{read_rct_qsm}}. Default is NA and
+indicates no tree point cloud is available.}
 
 \item{buttress}{Logical (default=FALSE), indicates if the trees have
 buttresses. Only relevant if pc is available.}
@@ -37,6 +44,9 @@ FALSE.}
 \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 the diameter at breast height and above buttresses. Only relevant if the
 tree point cloud is available.}
+
+\item{functional}{Logical (default=FALSE), indicates if the functional
+diameter should be calculated.}
 
 \item{thresholdbuttress}{Numeric value (default=0.001). Parameter of the
 \code{\link{dab_pc}} function used to calculate the diameter above
@@ -61,12 +71,37 @@ relevant when a point cloud is provided.}
 \item{r}{Numeric value (default=5) r which determines the range taken for the
 dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 is provided.}
+
+\item{how}{Method used to summarise point-to-centre radii when estimating
+DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+for the median radius (default), or a numeric value such as \code{10} to
+trim 5 percent of radii on each side before taking the mean.}
+
+\item{arc_min_length_cm}{Optional numeric. Minimum arc length, in
+centimetres, represented by one angular sector when calculating arc
+coverage for the final DBH circle.}
+
+\item{arc_min_angle}{Numeric. Minimum angular sector width in degrees used to
+calculate arc coverage for the final DBH circle. Default is 18,
+corresponding to 20 sectors.}
+
+\item{arc_tolerance}{Numeric. Radial tolerance, in metres, around the fitted
+circle. Points within radius +/- arc_tolerance are counted as supporting
+the fitted circle when calculating arc coverage.}
+
+\item{min_inner_buffer}{Numeric. Minimum buffer distance, in metres, excluded
+from the fitted DBH radius before checking whether the inner circle is
+empty.}
+
+\item{inner_buffer_fraction}{Numeric. Fraction of the fitted DBH radius used
+as buffer before checking whether the inner circle is empty. The effective
+buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.}
 }
 \value{
 DBH divided by the tree volume (trunk plus branches) in meters-2.
 }
 \description{
-Calculates DBH-tree volume ratio from a TreeQSM.
+Calculates DBH-tree volume ratio from a TreeQSM or RCT QSM.
 }
 \details{
 DBH and tree volume are calculated with \code{\link{dbh}} and

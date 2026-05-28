@@ -2,23 +2,25 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{stem_branch_cluster_size_qsm}
 \alias{stem_branch_cluster_size_qsm}
-\title{Stem branch cluster size TreeQSM}
+\title{Stem branch cluster size QSM}
 \usage{
 stem_branch_cluster_size_qsm(cylinder)
 }
 \arguments{
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 }
 \value{
 The stem branch cluster size. NaN when there are no stem branches.
 }
 \description{
-Calculates the stem branch cluster size from a TreeQSM.
+Calculates the stem branch cluster size from a TreeQSM or RCT QSM (treeinfo
+needs to have been run with --branch_data to access the required
+information).
 }
 \details{
 The stem branch cluster size is defined as "the average number of 1st order
-branches inside a 40cm height interval for 1st order branches. Each branch
+branches inside a 40 cm height interval for 1st order branches. Each branch
 can only belong to one interval" (Akerblom et al., 2017 & Terryn et al.,
 2020).
 }

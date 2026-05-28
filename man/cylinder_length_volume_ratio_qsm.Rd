@@ -2,19 +2,20 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{cylinder_length_volume_ratio_qsm}
 \alias{cylinder_length_volume_ratio_qsm}
-\title{Cylinder length-volume ratio TreeQSM}
+\title{Cylinder length-volume ratio QSM}
 \usage{
 cylinder_length_volume_ratio_qsm(treedata)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
 The cylinder length volume ratio in meters-2.
 }
 \description{
-Calculates the cylinder length volume ratio from a TreeQSM.
+Calculates the cylinder length volume ratio from a TreeQSM or RCT QSM.
 }
 \details{
 The cylinder length volume ratio is defined as "the ratio between total

@@ -2,16 +2,30 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{crown_height_qsm}
 \alias{crown_height_qsm}
-\title{Crown height TreeQSM}
+\title{Crown height QSM}
 \usage{
-crown_height_qsm(treedata, cylinder, pc = NA, dtm = NA, r = 5)
+crown_height_qsm(
+  treedata,
+  cylinder,
+  normalisation = "no",
+  pc = NA,
+  dtm = NA,
+  r = 5
+)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
+
+\item{normalisation}{Can be "treeheight". In case of "treeheight" the crown
+height is divided by tree height (Terryn et al., 2020). When something
+different than "treeheight" is given, no normalisation is done. Default is
+no normalisation.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
@@ -30,14 +44,15 @@ is provided.}
 The crown height.
 }
 \description{
-Calculates the crown height from a TreeQSM.
+Calculates the crown height from a TreeQSM or RCT QSM (treeinfo needs to have
+been run with --branch_data to access the required information).
 }
 \details{
 The crown height is defined as "the vertical distance between the highest and
 the lowest crown cylinder relative to the tree height" (Akerblom et al., 2017
-& Terryn et al., 2020). The tree height is calculated with
-\code{\link{tree_height}}. Crown cylinders are determined with
-\code{\link{crownset_qsm}}.
+& Terryn et al., 2020) but default is not to normalise by tree height. The
+tree height is calculated with \code{\link{tree_height}}. Crown cylinders are
+determined with \code{\link{crownset_qsm}}.
 }
 \examples{
 \dontrun{

@@ -9,12 +9,15 @@ read_rct_qsm(path, global = FALSE, remove_root = FALSE)
 \arguments{
 \item{path}{A character with the path to the RCT QSM txt file.}
 
-\item{global}{Logical (default=FALSE), indicates if RCT QSM components should be read into global environment.}
+\item{global}{Logical (default=FALSE), indicates if RCT QSM components should
+be read into global environment.}
 
-\item{remove_root}{Logical (default=FALSE), indicates if the root segment is removed from the data.frame.}
+\item{remove_root}{Logical (default=FALSE), indicates if the root segment is
+removed from the data.frame.}
 }
 \value{
-Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of a list of 2 components (cylinder and treedata) containing:
+Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of
+a list of 2 components (cylinder and treedata) containing:
 \describe{
 \item{cylinder}{A list containing cylinder-level attributes:
 \describe{
@@ -53,13 +56,13 @@ Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of a list of 
 }
 }
 \description{
-Reads a RayCloudTools (RCT) QSM txt file (.txt) generated using rayextract trees and treeinfo.
-This function returns its components in a list and optionally saves the RCT QSM components into
-the global environment. It can handle a file including one or multiple RCT QSMs.
+Reads a RayCloudTools (RCT) QSM txt file (.txt) generated using rayextract
+trees and treeinfo. This function returns its components in a list and
+optionally saves the RCT QSM components into the global environment. It can
+handle a file including one or multiple RCT QSMs.
 }
 \details{
-The input file contains the following fields:
-Tree-level attributes:
+The input file contains the following fields: Tree-level attributes:
 \itemize{
 \item height: Total height of the tree in meters
 \item crown_radius: Approximate radius of the tree crown, calculated as mean of bounding box extents
@@ -82,7 +85,8 @@ Segment-level attributes:
 \item children: Number of child segments (for root: mean for tree)
 }
 
-Optional branch data attributes (if treeinfo tree.txt --branch_data flag was used):
+Optional branch data attributes (if treeinfo tree.txt --branch_data flag was
+used):
 \itemize{
 \item branch: Unique branch identifier
 \item branch_order: Branch order number in hierarchy
@@ -91,10 +95,10 @@ Optional branch data attributes (if treeinfo tree.txt --branch_data flag was use
 \item segment_length: Length of individual segment
 }
 
-The first row of the cylinder list does \strong{not} represent an actual cylinder.
-Instead, it provides the starting x and y coordinates of the first cylinder
-in the model. This row should typically be excluded from analyses that operate
-on true segment (e.g. volume or length calculations).
+The first row of the cylinder list does \strong{not} represent an actual
+cylinder. Instead, it provides the starting x and y coordinates of the
+first cylinder in the model. This row should typically be excluded from
+analyses that operate on true segment (e.g. volume or length calculations).
 }
 \examples{
 \dontrun{

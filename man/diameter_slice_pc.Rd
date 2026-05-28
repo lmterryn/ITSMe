@@ -12,13 +12,13 @@ diameter_slice_pc(
   concavity = 4,
   dtm = NA,
   r = 5,
-  plot = FALSE,
   how = "median",
   arc_min_length_cm = NULL,
   arc_min_angle = 18,
   arc_tolerance = 0.05,
   min_inner_buffer = 0.06,
   inner_buffer_fraction = 0.5,
+  plot = FALSE,
   plotcolors = c("#000000", "#1c027a", "#08aa7c", "#fac87f")
 )
 }
@@ -48,13 +48,10 @@ point cloud it can also be read with \code{\link{read_tree_pc}}.}
 dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 is provided.}
 
-\item{plot}{Logical (default=FALSE), indicates if the optimized circle
-fitting is plotted.}
-
 \item{how}{Method used to summarise point-to-centre radii when estimating
-slice diameter. Use \code{"mean"} for the original ITSMe behaviour,
-\code{"median"} for the median radius, or a numeric value such as
-\code{10} to trim 5 percent of radii on each side before taking the mean.}
+slice diameter. Use "mean" for the original ITSMe behaviour,
+"median" for the median radius, or a numeric value such as
+10 to trim 5 percent of radii on each side before taking the mean.}
 
 \item{arc_min_length_cm}{Optional numeric. Minimum arc length, in
 centimetres, represented by one angular sector when calculating arc
@@ -65,7 +62,7 @@ radius.}
 to calculate arc coverage. Default is 18, corresponding to 20 sectors.}
 
 \item{arc_tolerance}{Numeric. Radial tolerance, in metres, around the fitted
-circle. Points within radius +/- arc_tolerance are counted as supporting
+circle. Points within radius plus or minus arc_tolerance are counted as supporting
 the fitted circle when calculating arc coverage.}
 
 \item{min_inner_buffer}{Numeric. Minimum buffer distance, in metres, excluded
@@ -73,7 +70,11 @@ from the fitted radius before checking whether the inner circle is empty.}
 
 \item{inner_buffer_fraction}{Numeric. Fraction of the fitted radius used as
 buffer before checking whether the inner circle is empty. The effective
-buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.}
+buffer is the maximum of min_inner_buffer and inner_buffer_fraction
+multiplied by radius.}
+
+\item{plot}{Logical (default=FALSE), indicates if the optimized circle
+fitting is plotted.}
 
 \item{plotcolors}{list of four colors for plotting. Only relevant when plot =
 TRUE. The stem points, fitted circle, the concave hull and the estimated

@@ -2,19 +2,22 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{total_branch_length_qsm}
 \alias{total_branch_length_qsm}
-\title{Total branch length TreeQSM}
+\title{Total branch length QSM}
 \usage{
 total_branch_length_qsm(treedata)
 }
 \arguments{
 \item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
-The total branch length of the TreeQSM in meters.
+The total branch length of the TreeQSM or RCT QSM in meters.
 }
 \description{
-Extracts the total branch length from the treedata of a TreeQSM.
+Extracts the total branch length from the treedata of a TreeQSM or RCT QSM
+(treeinfo needs to have been run with --branch_data to access the required
+information).
 }
 \examples{
 \dontrun{

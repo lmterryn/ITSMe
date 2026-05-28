@@ -2,16 +2,18 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{crown_diameterheight_ratio_qsm}
 \alias{crown_diameterheight_ratio_qsm}
-\title{Crown diameter height ratio TreeQSM}
+\title{Crown diameter height ratio QSM}
 \usage{
 crown_diameterheight_ratio_qsm(treedata, cylinder, pc = NA, dtm = NA, r = 5)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 
 \item{pc}{The tree point cloud as a data.frame with columns X,Y,Z. Output of
 \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
@@ -31,7 +33,9 @@ The ratio of the crown diameter and crown height.
 }
 \description{
 Calculates the ratio between the crown diameter and the crown height from a
-TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020).
+TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020) or RCT QSM (treeinfo
+needs to have been run with --branch_data to access the required information)
+cylinders.
 }
 \details{
 The crown diameter is the maximum radii of the vertical bin radius estimates

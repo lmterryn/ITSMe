@@ -2,19 +2,19 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{dbh_qsm}
 \alias{dbh_qsm}
-\title{Diameter at breast height TreeQSM}
+\title{Diameter at breast height QSM}
 \usage{
 dbh_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 }
 \value{
-The DBH of the TreeQSM in meters.
+The DBH of the TreeQSM or RCT QSM in meters.
 }
 \description{
-Extracts the DBH from the treedata of a TreeQSM.
+Extracts the DBH from the treedata of a TreeQSM or RCT QSM.
 }
 \details{
 The DBH is calculated as the diameter of the cylinder in the QSM at the right

@@ -2,22 +2,26 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{volume_below_55_qsm}
 \alias{volume_below_55_qsm}
-\title{Volume below 55 TreeQSM}
+\title{Volume below 55 QSM}
 \usage{
 volume_below_55_qsm(cylinder, treedata)
 }
 \arguments{
 \item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 
 \item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
 The volume below 55.
 }
 \description{
-Calculates the volume below 55\% from a TreeQSM.
+Calculates the volume below 55\% from a TreeQSM or RCT QSM (treeinfo
+needs to have been run with --branch_data to access the required
+information).
 }
 \details{
 The volume below 55 is defined as "the relative branch volume below 55\% of

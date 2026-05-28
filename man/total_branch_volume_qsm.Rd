@@ -2,19 +2,22 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{total_branch_volume_qsm}
 \alias{total_branch_volume_qsm}
-\title{Total branch volume TreeQSM}
+\title{Total branch volume QSM}
 \usage{
 total_branch_volume_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
-The total branch volume of the TreeQSM in liters.
+The total branch volume of the TreeQSM or RCT QSM in liters.
 }
 \description{
-Extracts the total branch volume from the treedata of a TreeQSM.
+Extracts the total branch volume from the treedata of a TreeQSM or a RCT QSM
+(treeinfo needs to have been run with --branch_data to access the required
+information).
 }
 \examples{
 \dontrun{

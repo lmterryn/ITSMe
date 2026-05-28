@@ -53,8 +53,8 @@ dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 is provided.}
 
 \item{how}{Method used to summarise point-to-centre radii when estimating
-DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
-for the median radius (default), or a numeric value such as \code{10} to trim
+DBH. Use "mean" for the original ITSMe behaviour, "median"
+for the median radius (default), or a numeric value such as 10 to trim
 5 percent of radii on each side before taking the mean.}
 
 \item{arc_min_length_cm}{Optional numeric. Minimum arc length, in
@@ -66,7 +66,7 @@ to calculate arc coverage for the final DBH circle. Default is 18,
 corresponding to 20 sectors.}
 
 \item{arc_tolerance}{Numeric. Radial tolerance, in metres, around the fitted
-circle. Points within radius +/- arc_tolerance are counted as supporting
+circle. Points within radius plus or minus arc_tolerance are counted as supporting
 the fitted circle when calculating arc coverage.}
 
 \item{min_inner_buffer}{Numeric. Minimum buffer distance, in metres, excluded
@@ -75,13 +75,14 @@ empty.}
 
 \item{inner_buffer_fraction}{Numeric. Fraction of the fitted DBH radius used
 as buffer before checking whether the inner circle is empty. The effective
-buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.}
+buffer is the maximum of min_inner_buffer and inner_buffer_fraction
+multiplied by radius.}
 
 \item{plot}{Logical (default=FALSE), indicates if the optimised circle
 fitting is plotted.}
 
-\item{plotcolors}{list of four colors for plotting. Only relevant when plot
-= TRUE. The stem points, fitted circle, the concave hull and the estimated
+\item{plotcolors}{list of four colors for plotting. Only relevant when plot =
+TRUE. The stem points, fitted circle, the concave hull and the estimated
 center are colored by the first, second and third and fourth element of
 this list respectively.}
 }
@@ -90,10 +91,10 @@ List with the diameter of the stem at breast height, the residuals on
 the fitting, the estimated center of the circle fit, and the functional
 diameter at breast height. Also optionally (plot=TRUE) plots the circle
 fitting on the horizontal slice which is then included in the list output.
-The list also contains \code{arc_coverage}, a quality-control metric between
+The list also contains arc_coverage, a quality-control metric between
 0 and 1 indicating the proportion of angular sectors around the fitted DBH
 circle that contain at least one nearby point.
-The list also contains \code{inner_circle_empty}, a logical quality-control
+The list also contains inner_circle_empty, a logical quality-control
 metric indicating whether the checked inner part of the fitted DBH circle
 contains no slice points.
 }

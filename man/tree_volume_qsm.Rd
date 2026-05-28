@@ -2,30 +2,34 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{tree_volume_qsm}
 \alias{tree_volume_qsm}
-\title{Total tree volume TreeQSM}
+\title{Total tree volume QSM}
 \usage{
 tree_volume_qsm(treedata, cylinder = NA, cylindercutoff = 0)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}, (default = NA - you do not need cylinder when
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE, (default = NA - you do not need cylinder when
 cylindercutoff == 0).}
 
 \item{cylindercutoff}{This is the cutoff radius in meters for which cylinders
-are to be included in the volume calculation.Default of 0 includes all
+are to be included in the volume calculation. Default of 0 includes all
 cylinders.}
 }
 \value{
-The total volume of the TreeQSM in liters. If the trunk was modeled
-with triangulation the total volume is the sum of the triangulated volume
-of the stem (bottom), the volume of the stem cylinder (top) and the volume
-of the branch cylinders.
+The total volume of the TreeQSM or RCT QSM in liters. If the trunk
+was modeled with triangulation (option in TreeQSM v2.4.x) the total volume
+is the sum of the triangulated volume of the stem (bottom), the volume of
+the stem cylinder (top) and the volume of the branch cylinders.
 }
 \description{
-Extracts the total tree volume from the treedata of a TreeQSM.
+Extracts the total tree volume from the treedata of a TreeQSM or RCT QSM
+(treeinfo needs to have been run with --branch_data to access the required
+information).
 }
 \examples{
 \dontrun{

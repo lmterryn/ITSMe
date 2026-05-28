@@ -2,23 +2,26 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{vertical_bin_radii_qsm}
 \alias{vertical_bin_radii_qsm}
-\title{Radii vertical bins TreeQSM}
+\title{Radii vertical bins QSM}
 \usage{
 vertical_bin_radii_qsm(treedata, cylinder)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 
-\item{cylinder}{Cylinder field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{cylinder}{Cylinder field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
 The radii of the three vertical bins.
 }
 \description{
-Calculates the radii of the three vertical bins fitted to the TreeQSM
-cylinders.
+Calculates the radii of the three vertical bins fitted to the TreeQSM or RCT
+QSM (treeinfo needs to have been run with --branch_data to access the
+required information) cylinders.
 }
 \details{
 These radii are the radii of the cylinders whose axis are vertical and goes

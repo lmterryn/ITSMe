@@ -2,20 +2,22 @@
 % Please edit documentation in R/basic_metrics_qsm.R
 \name{total_cyl_length_qsm}
 \alias{total_cyl_length_qsm}
-\title{Total cylinder length TreeQSM}
+\title{Total cylinder length QSM}
 \usage{
 total_cyl_length_qsm(treedata)
 }
 \arguments{
-\item{treedata}{Treedata field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{treedata}{Treedata field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+= TRUE.}
 }
 \value{
 The total length of all the cylinders (branch and trunk) of
-a TreeQSM in meters.
+a TreeQSM or RCT QSM in meters.
 }
 \description{
-Extracts the total cylinder length from the treedata of a TreeQSM.
+Extracts the total cylinder length from the cylinder data of a TreeQSM or the
+a RCT QSM.
 }
 \examples{
 \dontrun{
