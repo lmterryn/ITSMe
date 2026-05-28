@@ -1,11 +1,11 @@
 #' Read a RCT QSM
 #'
-#' Reads a RayCloudTools (RCT) QSM txt file (.txt) generated using rayextract trees and treeinfo.
-#' This function returns its components in a list and optionally saves the RCT QSM components into
-#' the global environment. It can handle a file including one or multiple RCT QSMs.
+#' Reads a RayCloudTools (RCT) QSM txt file (.txt) generated using rayextract
+#' trees and treeinfo. This function returns its components in a list and
+#' optionally saves the RCT QSM components into the global environment. It can
+#' handle a file including one or multiple RCT QSMs.
 #'
-#' The input file contains the following fields:
-#' Tree-level attributes:
+#' The input file contains the following fields: Tree-level attributes:
 #' - height: Total height of the tree in meters
 #' - crown_radius: Approximate radius of the tree crown, calculated as mean of bounding box extents
 #' - dimension: Fractal dimension of branch lengths (capped at 3.0)
@@ -24,7 +24,8 @@
 #' - angle: Branch angle at bifurcation points (for root: mean branch angle)
 #' - children: Number of child segments (for root: mean for tree)
 #'
-#' Optional branch data attributes (if treeinfo tree.txt --branch_data flag was used):
+#' Optional branch data attributes (if treeinfo tree.txt --branch_data flag was
+#' used):
 #' - branch: Unique branch identifier
 #' - branch_order: Branch order number in hierarchy
 #' - extension: Extension identifier for continuous branch segments
@@ -32,9 +33,12 @@
 #' - segment_length: Length of individual segment
 #'
 #' @param path A character with the path to the RCT QSM txt file.
-#' @param global Logical (default=FALSE), indicates if RCT QSM components should be read into global environment.
-#' @param remove_root Logical (default=FALSE), indicates if the root segment is removed from the data.frame.
-#' @return Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of a list of 2 components (cylinder and treedata) containing:
+#' @param global Logical (default=FALSE), indicates if RCT QSM components should
+#'   be read into global environment.
+#' @param remove_root Logical (default=FALSE), indicates if the root segment is
+#'   removed from the data.frame.
+#' @return Returns a list of QSMs (e.g. qsm_1, qsm_2, ...), each QSM consists of
+#'   a list of 2 components (cylinder and treedata) containing:
 #' \describe{
 #'   \item{cylinder}{A list containing cylinder-level attributes:
 #'     \describe{
@@ -72,11 +76,10 @@
 #'   }
 #' }
 #'
-#' @details
-#' The first row of the cylinder list does **not** represent an actual cylinder.
-#' Instead, it provides the starting x and y coordinates of the first cylinder
-#' in the model. This row should typically be excluded from analyses that operate
-#' on true segment (e.g. volume or length calculations).
+#' @details The first row of the cylinder list does **not** represent an actual
+#'   cylinder. Instead, it provides the starting x and y coordinates of the
+#'   first cylinder in the model. This row should typically be excluded from
+#'   analyses that operate on true segment (e.g. volume or length calculations).
 #'
 #' @export
 #'
@@ -132,19 +135,23 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
     cylinder_df <- as.data.frame(cylinder_matrix)
 
     # Filter out root segments (parent_id = -1)
+    root_end <- c(cylinder_df$x[1], cylinder_df$y[1], cylinder_df$z[1])
     if (remove_root == TRUE){
       cylinder_df <- cylinder_df[cylinder_df$parent_id != -1, ]
+      adjust_index <- 0
+    } else {
+      adjust_index <- 1
     }
 
     # Create cylinder component list with geometric and structural metrics
     cylinder <- list(
       "end" = cbind(cylinder_df$x, cylinder_df$y, cylinder_df$z), # 3D coordinates of segment end
       "radius" = cylinder_df$radius, # Segment radius in meters
-      "parent" = cylinder_df$parent_id + 2, # ID of parent segment (adjusted to 1-based indexing)
-      "section" = cylinder_df$section_id + 1, # Section identifier
+      "parent" = cylinder_df$parent_id + adjust_index, # ID of parent segment (adjusted to 1-based indexing)
+      "section" = cylinder_df$section_id + adjust_index, # Section identifier
       "volume" = cylinder_df$volume, # Segment volume in cubic meters
       "diameter" = cylinder_df$diameter, # Segment diameter in meters
-      "length" = cylinder_df$length/100, # Length to farthest leaf
+      "length_to_leaf" = cylinder_df$length/100, # Length to farthest leaf in meters
       "strength" = cylinder_df$strength, # Structural strength (d^0.75/l)
       "min_strength" = cylinder_df$min_strength, # Minimum strength to root
       "dominance" = cylinder_df$dominance, # Branch dominance ratio
@@ -153,13 +160,84 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
       "branch" = cylinder_df$branch, # Branch identifier
       "BranchOrder" = cylinder_df$branch_order, # Hierarchical branch order
       "extension" = cylinder_df$extension, # Branch extension identifier
-      "PositionInBranch" = cylinder_df$pos_in_branch, # Position within branch
-      "segment_length" = cylinder_df$segment_length # Individual segment length
+      "PositionInBranch" = cylinder_df$pos_in_branch + 1, # Position within branch + 1 similar to treeQSM
+      "length" = cylinder_df$segment_length # Individual segment length
     )
+
+    # Add new metrics
+    parent_idx <- cylinder$parent
+    cylinder$start <- matrix( # initialize start matrix
+      NA,
+      nrow = nrow(cylinder$end),
+      ncol = ncol(cylinder$end)
+    )
+    valid <- parent_idx != 0 # rows with valid parents
+    cylinder$start[valid, ] <- cylinder$end[parent_idx[valid], ] # copy parent endpoints
+    cylinder$start[!valid, ] <- matrix( # assign root_end to parent == 0
+      root_end,
+      nrow = sum(!valid),
+      ncol = 3,
+      byrow = TRUE
+    )
+
+    dxyz <- cylinder$end - cylinder$start # Differences in x, y, z
+    mag <- sqrt(rowSums(dxyz^2)) # Vector magnitude for each row
+    mag[mag == 0] <- NA     # Avoid division by zero
+    dir <- dxyz / mag # Normalize each row
+    dir[is.na(dir)] <- 0     # Replace NA rows (zero-length vectors) with 0
+    cylinder$axis <- round(dir, 5) # Round values
+
+    ### deal with problem of multiple branchorders in one branch id
+    new_branch_id <- max(cylinder$branch, na.rm = TRUE) + 1 # start new branch IDs after current maximum
+    problem_branches <- unique(     # branch IDs that contain multiple BranchOrders
+      cylinder$branch[
+        stats::ave(cylinder$BranchOrder,
+            cylinder$branch,
+            FUN = function(x) length(unique(x))) > 1
+      ]
+    )
+    for (b in problem_branches) {
+      orders <- sort(unique(cylinder$BranchOrder[cylinder$branch == b]))  # unique branch orders within this branch
+      keep_order <- orders[1]       # keep original ID for first/minimum order
+      for (ord in orders[-1]) {       # reassign all other orders
+        idx <- which(
+          cylinder$branch == b &
+            cylinder$BranchOrder == ord
+        )
+        cylinder$branch[idx] <- new_branch_id
+        new_branch_id <- new_branch_id + 1
+      }
+    }
+
+    # Create branchdata component list with branch-level metrics
+    branch <- list(
+      "id" = unique(cylinder$branch)
+    )
+
+    branch$order <- sapply(branch$id, function(id) {
+      min(cylinder$BranchOrder[cylinder$branch == id])
+    })
+    branch$volume <- sapply(branch$id, function(id) {
+      sum(cylinder$volume[cylinder$branch == id])
+    })
+    branch$length <- sapply(branch$id, function(id) {
+      sum(cylinder$length[cylinder$branch == id])
+    })
+    branch$parent <- sapply(branch$id, function(id) {
+      rows <- which(
+        cylinder$branch == id &
+          cylinder$PositionInBranch == 1
+      )
+      parent_row <- cylinder$parent[rows[1]]
+      if(is.na(parent_row) || parent_row == 0)
+        return(0)
+      cylinder$branch[parent_row]
+    })
+    #branch$angle needs to be implemented for stem branch angle
+
 
     # Create treedata component list with tree-level metrics
     treedata <- list(
-      "TotalVolume" = sum(cylinder_df$volume[-1]) * 1000, # Total tree volume converted to litres
       "TreeHeight" = unname(tree_data["height"]), # Total tree height in meters
       "DBHqsm" = unname(tree_data["DBH"]), # Diameter at breast height
       "CrownRadius" = unname(tree_data["crown_radius"]), # Average crown radius
@@ -168,9 +246,19 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
       "Bend" = unname(tree_data["bend"]), # Trunk bend metric
       "BranchSlope" = unname(tree_data["branch_slope"]) # Branch slope characteristics
     )
+
+    #Add new metrics
+    treedata$TotalVolume = (sum(cylinder$volume)-adjust_index*cylinder$volume[1]) * 1000 # Total tree volume converted to liters
+    treedata$TrunkVolume = (sum(cylinder$volume[cylinder$BranchOrder == 0])-adjust_index*cylinder$volume[1]) * 1000 # Total trunk volume converted to liters
+    treedata$BranchVolume = (sum(cylinder$volume[cylinder$BranchOrder > 0])) * 1000 # Total branch volume converted to liters
+    treedata$TotalLength = (sum(cylinder$length)-adjust_index*cylinder$length[1]) # Total segment length
+    treedata$BranchLength = (sum(cylinder$length[cylinder$BranchOrder > 0])) # Total branch segment length
+    treedata$TrunkLength = (sum(cylinder$length[cylinder$BranchOrder == 0])-adjust_index*cylinder$length[1]) # Total segment length of the trunk
+
     # Prepare output
     single_out <- list(
       cylinder = cylinder,
+      branch = branch,
       treedata = treedata
     )
     idx <- length(out) + 1

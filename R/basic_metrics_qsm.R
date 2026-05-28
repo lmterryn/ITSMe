@@ -1,10 +1,11 @@
-#' TreeQSM position
+#' QSM position
 #'
 #' Returns the (X,Y)-position of a treeQSM based on the start position of the
 #' first cylinder that is higher than 1.3 m above ground.
 #'
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   TRUE.
 #'
 #' @return Numeric with the XY coordinates (location) of the tree stem.
 #' @export
@@ -25,15 +26,17 @@ tree_position_qsm <- function(cylinder) {
   return(c(x_location, y_location))
 }
 
-#' Total cylinder length TreeQSM
+#' Total cylinder length QSM
 #'
-#' Extracts the total cylinder length from the treedata of a TreeQSM.
+#' Extracts the total cylinder length from the cylinder data of a TreeQSM or the
+#' a RCT QSM.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return The total length of all the cylinders (branch and trunk) of
-#'   a TreeQSM in meters.
+#'   a TreeQSM or RCT QSM in meters.
 #'
 #' @export
 #'
@@ -44,26 +47,30 @@ tree_position_qsm <- function(cylinder) {
 #' tot_len <- total_cyl_length_qsm(treedata = qsm$treedata)
 #' }
 total_cyl_length_qsm <- function(treedata) {
-  return(treedata$TotalLength[1])
+    return(treedata$TotalLength[1])
 }
 
-#' Total tree volume TreeQSM
+#' Total tree volume QSM
 #'
-#' Extracts the total tree volume from the treedata of a TreeQSM.
+#' Extracts the total tree volume from the treedata of a TreeQSM or RCT QSM
+#' (treeinfo needs to have been run with --branch_data to access the required
+#' information).
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}, (default = NA - you do not need cylinder when
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE, (default = NA - you do not need cylinder when
 #'   cylindercutoff == 0).
 #' @param cylindercutoff This is the cutoff radius in meters for which cylinders
-#'   are to be included in the volume calculation.Default of 0 includes all
+#'   are to be included in the volume calculation. Default of 0 includes all
 #'   cylinders.
 #'
-#' @return The total volume of the TreeQSM in liters. If the trunk was modeled
-#'   with triangulation the total volume is the sum of the triangulated volume
-#'   of the stem (bottom), the volume of the stem cylinder (top) and the volume
-#'   of the branch cylinders.
+#' @return The total volume of the TreeQSM or RCT QSM in liters. If the trunk
+#'   was modeled with triangulation (option in TreeQSM v2.4.x) the total volume
+#'   is the sum of the triangulated volume of the stem (bottom), the volume of
+#'   the stem cylinder (top) and the volume of the branch cylinders.
 #'
 #' @export
 #'
@@ -84,8 +91,12 @@ tree_volume_qsm <-
       trunk_vol <- trunk_volume_qsm(treedata)
       cylinder_ind <- which(cylinder$BranchOrder > 0 &
                               cylinder$radius > cylindercutoff)
-      branch_vol <- sum((cylinder$radius[cylinder_ind]) ^ 2 * pi *
+      if (is.null(cylinder$volume)){
+        branch_vol <- sum((cylinder$radius[cylinder_ind]) ^ 2 * pi *
                           (cylinder$length[cylinder_ind])) * 1000
+      } else {
+        branch_vol <- sum(cylinder$volume[cylinder_ind]) * 1000
+      }
       volume <- trunk_vol + branch_vol
     } else {
       if (length(treedata) > 83) {
@@ -97,16 +108,20 @@ tree_volume_qsm <-
     return(volume)
   }
 
-#' Total trunk volume TreeQSM
+#' Total trunk volume QSM
 #'
-#' Extracts the total trunk volume from the treedata of a TreeQSM.
+#' Extracts the total trunk volume from the treedata of a TreeQSM or a RCT QSM
+#' (treeinfo needs to have been run with --branch_data to access the required
+#' information).
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
-#' @return The total trunk volume of the TreeQSM in liters. If the trunk was
-#'   modelled with triangulation the total volume is the sum of the triangulated
-#'   volume of the stem (bottom) and the volume of the stem cylinder (top).
+#' @return The total trunk volume of the TreeQSM or RCT QSM in liters. If the
+#' trunk was modelled with triangulation (option in TreeQSM v2.4.x) the total
+#' volume is the sum of the triangulated volume of the stem (bottom) and the
+#' volume of the stem cylinder (top).
 #'
 #' @export
 #'
@@ -125,14 +140,17 @@ trunk_volume_qsm <- function(treedata) {
   return(volume)
 }
 
-#' Total branch volume TreeQSM
+#' Total branch volume QSM
 #'
-#' Extracts the total branch volume from the treedata of a TreeQSM.
+#' Extracts the total branch volume from the treedata of a TreeQSM or a RCT QSM
+#' (treeinfo needs to have been run with --branch_data to access the required
+#' information).
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
-#' @return The total branch volume of the TreeQSM in liters.
+#' @return The total branch volume of the TreeQSM or RCT QSM in liters.
 #'
 #' @export
 #'
@@ -146,14 +164,17 @@ total_branch_volume_qsm <- function(treedata) {
   return(treedata$BranchVolume[1])
 }
 
-#' Total branch length TreeQSM
+#' Total branch length QSM
 #'
-#' Extracts the total branch length from the treedata of a TreeQSM.
+#' Extracts the total branch length from the treedata of a TreeQSM or RCT QSM
+#' (treeinfo needs to have been run with --branch_data to access the required
+#' information).
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
-#' @return The total branch length of the TreeQSM in meters.
+#' @return The total branch length of the TreeQSM or RCT QSM in meters.
 #'
 #' @export
 #'
@@ -167,14 +188,14 @@ total_branch_length_qsm <- function(treedata) {
   return(treedata$BranchLength[1])
 }
 
-#' Tree height TreeQSM
+#' Tree height QSM
 #'
-#' Extracts the tree height from the treedata of a TreeQSM.
+#' Extracts the tree height from the treedata of a TreeQSM or RCT QSM.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #'
-#' @return The tree height of the TreeQSM in meters.
+#' @return The tree height of the TreeQSM or RCT QSM in meters.
 #'
 #' @export
 #'
@@ -188,18 +209,18 @@ tree_height_qsm <- function(treedata) {
   return(treedata$TreeHeight[1])
 }
 
-#' Diameter at breast height TreeQSM
+#' Diameter at breast height QSM
 #'
-#' Extracts the DBH from the treedata of a TreeQSM.
+#' Extracts the DBH from the treedata of a TreeQSM or RCT QSM.
 #'
 #' The DBH is calculated as the diameter of the cylinder in the QSM at the right
 #' height (cylinder at 1.3 m). If the trunk was modeled with triangulation the
 #' DBH is calculated as mean length of the diagonals in the triangulation.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #'
-#' @return The DBH of the TreeQSM in meters.
+#' @return The DBH of the TreeQSM or RCT QSM in meters.
 #'
 #' @export
 #'
@@ -241,11 +262,11 @@ crown_area_alpha_qsm <- function(treedata) {
   return(treedata$CrownAreaAlpha)
 }
 
-#' Trunk height TreeQSM
+#' Trunk length QSM
 #'
-#' Extracts the trunk height from the treedata of a TreeQSM. For stems without
-#' and with trangulation it selects the TrunkLenght and TriaTrunkLength object
-#' from treedata respectively.
+#' Extracts the trunk length from the treedata of a TreeQSM or RCT QSM. For
+#' stems without and with trangulation (option in TreeQSM v2.4.x) it selects the
+#' TrunkLenght and TriaTrunkLength object from treedata respectively.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}}.
@@ -260,7 +281,7 @@ crown_area_alpha_qsm <- function(treedata) {
 #' qsm <- read_tree_qsm(QSM_path = "path/to/qsm.mat")
 #' trunk_height <- trunk_height_qsm(treedata = qsm$treedata)
 #' }
-trunk_height_qsm <- function(treedata) {
+trunk_length_qsm <- function(treedata) {
   if (length(treedata) > 83) {
     th <- treedata$TriaTrunkLength[1]
   } else {

@@ -6,13 +6,13 @@
 #' cloud (most accurate). In this case the diameter at breast height (dbh) or
 #' diameter above buttresses (dab) is calculated with \code{\link{dbh_pc}} or
 #' \code{\link{dab_pc}} respectively. If the tree point cloud is not available
-#' the dbh is based on the treeQSM with \code{\link{dbh_qsm}}. When the bottom
-#' of the point cloud is incomplete or obstructed you can choose to add a
-#' digital terrain model as an input which is used to estimate lowest point of
-#' the point cloud in order to obtain slices at the correct height of the tree.
+#' the dbh is based on the QSM with \code{\link{dbh_qsm}}. When the bottom of
+#' the point cloud is incomplete or obstructed you can choose to add a digital
+#' terrain model as an input which is used to estimate lowest point of the point
+#' cloud in order to obtain slices at the correct height of the tree.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
 #'   is available.
@@ -26,6 +26,8 @@
 #'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
 #'   tree point cloud is available.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point cloud is available and buttress
@@ -44,6 +46,25 @@
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to
+#'   trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #'
 #' @return The dbh or dab in meters.
 #' @export
@@ -61,11 +82,18 @@ dbh <-
            buttress = FALSE,
            thresholdR2 = 0.001,
            slice_thickness = 0.06,
+           functional = FALSE,
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            concavity = 4,
            dtm = NA,
-           r = 5) {
+           r = 5,
+           how = "median", #'mean": original ITSMe behaviour
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5) {
     if (!is.data.frame(pc)) {
       return(dbh_qsm(treedata))
     } else {
@@ -76,22 +104,40 @@ dbh <-
             thresholdbuttress = thresholdbuttress,
             maxbuttressheight = maxbuttressheight,
             slice_thickness = slice_thickness,
+            functional = functional,
             concavity = concavity,
             dtm = dtm,
             r = r
           )
-        return(out$dab)
+        if(functional){
+          d <- out$fdab
+        } else {
+          d <- out$dab
+        }
+        return(d)
       } else {
         out <-
           dbh_pc(
             pc = pc,
             thresholdR2 = thresholdR2,
             slice_thickness = slice_thickness,
+            functional = functional, #
             concavity = concavity,
             dtm = dtm,
-            r = r
+            r = r,
+            how = how, #
+            arc_min_length_cm = arc_min_length_cm, #
+            arc_min_angle = arc_min_angle, #
+            arc_tolerance = arc_tolerance, #
+            min_inner_buffer = min_inner_buffer, #
+            inner_buffer_fraction = inner_buffer_fraction, #
           )
-        return(out$dbh)
+        if(functional){
+          d <- out$fdbh
+        } else {
+          d <- out$dbh
+        }
+        return(d)
       }
     }
   }
@@ -108,8 +154,8 @@ dbh <-
 #' input which is used to estimate lowest point of the point cloud in order to
 #' obtain slices at the correct height of the tree.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. If the point cloud is not available NA is used
 #'   as input (default=NA).
@@ -185,17 +231,19 @@ stem_branch_angle_qsm <- function(branch) {
   return(sba)
 }
 
-#' Stem branch cluster size TreeQSM
+#' Stem branch cluster size QSM
 #'
-#' Calculates the stem branch cluster size from a TreeQSM.
+#' Calculates the stem branch cluster size from a TreeQSM or RCT QSM (treeinfo
+#' needs to have been run with --branch_data to access the required
+#' information).
 #'
 #' The stem branch cluster size is defined as "the average number of 1st order
-#' branches inside a 40cm height interval for 1st order branches. Each branch
+#' branches inside a 40 cm height interval for 1st order branches. Each branch
 #' can only belong to one interval" (Akerblom et al., 2017 & Terryn et al.,
 #' 2020).
 #'
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #'
 #' @return The stem branch cluster size. NaN when there are no stem branches.
 #'
@@ -249,19 +297,20 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
   return(sbcs)
 }
 
-#' Stem branch radius TreeQSM
+#' Stem branch radius QSM
 #'
-#' Calculates the stem branch radius from a TreeQSM.
+#' Calculates the stem branch radius from a TreeQSM or RCT QSM (treeinfo needs
+#' to have been run with --branch_data to access the required information).
 #'
 #' The stem branch radius is defined as "Mean of the 10 largest 1st order
 #' branches measured at the base. Can be normalised by the tree height or the
 #' the stem radius at respective height" (Akerblom et al., 2017 & Terryn et al.,
 #' 2020). Tree height is calculated with \code{\link{tree_height}}.
 #'
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}}  or \code{\link{read_rct_qsm}}.
 #' @param normalisation Can be either "treeheight" or "parentcylinder". In case
 #'   of "treeheight" the mean radius of the 10 biggest branches is divided by
 #'   the tree height (Terryn et al., 2020). In case of "parentcylinder" the mean
@@ -357,9 +406,10 @@ stem_branch_radius_qsm <- function(cylinder,
   return(sbr)
 }
 
-#' Stem branch length TreeQSM
+#' Stem branch length QSM
 #'
-#' Calculates the stem branch length from a TreeQSM.
+#' Calculates the stem branch length from a TreeQSM or RCT QSM (treeinfo needs
+#' to have been run with --branch_data to access the required information).
 #'
 #' The stem branch length is defined as "the average length of 1st order
 #' branches. Can be normalised by DBH or tree height" (Akerblom et al., 2017 &
@@ -367,9 +417,9 @@ stem_branch_radius_qsm <- function(cylinder,
 #' \code{\link{dbh}} and \code{\link{tree_height}}.
 #'
 #' @param branch Branch field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #' @param normalisation Can be either "dbh" or "treeheight". In case of "dbh"
 #'   the mean of the lengths of the stem branches are divided by the DBH
 #'   (Akerblom et al., 2017). In case of "treeheight" the mean is divided by the
@@ -390,6 +440,8 @@ stem_branch_radius_qsm <- function(cylinder,
 #'   \code{\link{dbh_pc}} function used to calculate the diameter at breast
 #'   height. Only relevant if the tree point cloud is available and buttress ==
 #'   FALSE.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
@@ -409,6 +461,25 @@ stem_branch_radius_qsm <- function(cylinder,
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to
+#'   trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #'
 #'
 #' @return The stem branch length. Unitless with normalisation, in meters
@@ -461,11 +532,18 @@ stem_branch_length_qsm <- function(branch,
                                    buttress = FALSE,
                                    thresholdR2 = 0.001,
                                    slice_thickness = 0.06,
+                                   functional = FALSE,
                                    thresholdbuttress = 0.001,
                                    maxbuttressheight = 7,
                                    concavity = 4,
                                    dtm = NA,
-                                   r = 5) {
+                                   r = 5,
+                                   how = "median", #'mean": original ITSMe behaviour
+                                   arc_min_length_cm = NULL,
+                                   arc_min_angle = 18,
+                                   arc_tolerance = 0.05,
+                                   min_inner_buffer = 0.06,
+                                   inner_buffer_fraction = 0.5) {
   ind_stem_branches <- which(branch$order == 1)
   if (length(ind_stem_branches) > 0) {
     branch_len <- branch$length[ind_stem_branches]
@@ -476,12 +554,19 @@ stem_branch_length_qsm <- function(branch,
         buttress = buttress,
         thresholdR2 = thresholdR2,
         slice_thickness = slice_thickness,
+        functional = functional,
         thresholdbuttress = thresholdbuttress,
         maxbuttressheight = maxbuttressheight,
         concavity = concavity,
         dtm = dtm,
-        r = r
-      )
+        r = r,
+        how = how,
+        arc_min_length_cm = arc_min_length_cm,
+        arc_min_angle = arc_min_angle,
+        arc_tolerance = arc_tolerance,
+        min_inner_buffer = min_inner_buffer,
+        inner_buffer_fraction = inner_buffer_fraction
+        )
       sbl <- mean(branch_len) / dbh
     } else if (normalisation == "treeheight") {
       tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
@@ -527,6 +612,8 @@ stem_branch_length_qsm <- function(branch,
 #'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
 #'   tree point cloud is available.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point cloud is available and buttress
@@ -546,6 +633,25 @@ stem_branch_length_qsm <- function(branch,
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to
+#'   trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #'
 #' @return The stem branch distance. Unitless with normalisation, in meters
 #'   without normalisation. NaN when there are no stem branches.
@@ -594,11 +700,18 @@ stem_branch_distance_qsm <-
            buttress = FALSE,
            thresholdR2 = 0.001,
            slice_thickness = 0.06,
+           functional = FALSE,
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            concavity = 4,
            dtm = NA,
-           r = 5) {
+           r = 5,
+           how = "median", #'mean": original ITSMe behaviour
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5) {
     ind_stem_cyl <- which(cylinder$PositionInBranch == 1 &
                             cylinder$BranchOrder == 1)
     cyl_heights <- cylinder$start[ind_stem_cyl, 3]
@@ -630,11 +743,18 @@ stem_branch_distance_qsm <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         sbd <- mean(average_distance) / dbh
       } else {
@@ -647,18 +767,18 @@ stem_branch_distance_qsm <-
     return(sbd)
   }
 
-#' DBH-tree height ratio TreeQSM
+#' DBH-tree height ratio QSM
 #'
-#' Calculates DBH-tree height ratio from a TreeQSM.
+#' Calculates DBH-tree height ratio from a TreeQSM or RCT QSM.
 #'
 #' DBH and tree height are calculated with \code{\link{dbh}} and
 #' \code{\link{tree_height}}.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
-#'   is available.
+#'   \code{\link{read_tree_pc}} or \code{\link{read_rct_qsm}}. Default is NA and
+#'   indicates no tree point cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
 #' @param thresholdR2 Numeric value (default=0.001). Parameter of the
@@ -669,6 +789,8 @@ stem_branch_distance_qsm <-
 #'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
 #'   tree point cloud is available.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point cloud is available and buttress
@@ -688,6 +810,25 @@ stem_branch_distance_qsm <-
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to
+#'   trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #'
 #' @return DBH divided by the tree height.
 #'
@@ -722,39 +863,53 @@ dbh_height_ratio_qsm <-
            buttress = FALSE,
            thresholdR2 = 0.001,
            slice_thickness = 0.06,
+           functional = FALSE,
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            concavity = 4,
            dtm = NA,
-           r = 5) {
+           r = 5,
+           how = "median", #'mean": original ITSMe behaviour
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5) {
     dbh <- dbh(
       treedata = treedata,
       pc = pc,
       buttress = buttress,
       thresholdR2 = thresholdR2,
       slice_thickness = slice_thickness,
+      functional = functional,
       thresholdbuttress = thresholdbuttress,
       maxbuttressheight = maxbuttressheight,
       concavity = concavity,
       dtm = dtm,
-      r = r
+      r = r,
+      how = how,
+      arc_min_length_cm = arc_min_length_cm,
+      arc_min_angle = arc_min_angle,
+      arc_tolerance = arc_tolerance,
+      min_inner_buffer = min_inner_buffer,
+      inner_buffer_fraction = inner_buffer_fraction
     )
     tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
     return(dbh / tree_height)
   }
 
-#' DBH-tree volume ratio TreeQSM
+#' DBH-tree volume ratio QSM
 #'
-#' Calculates DBH-tree volume ratio from a TreeQSM.
+#' Calculates DBH-tree volume ratio from a TreeQSM or RCT QSM.
 #'
 #' DBH and tree volume are calculated with \code{\link{dbh}} and
 #' \code{\link{tree_volume_qsm}}.
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
-#'   is available.
+#'   \code{\link{read_tree_pc}} or \code{\link{read_rct_qsm}}. Default is NA and
+#'   indicates no tree point cloud is available.
 #' @param buttress Logical (default=FALSE), indicates if the trees have
 #'   buttresses. Only relevant if pc is available.
 #' @param thresholdR2 Numeric value (default=0.001). Parameter of the
@@ -765,6 +920,8 @@ dbh_height_ratio_qsm <-
 #'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
 #'   tree point cloud is available.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point cloud is available and buttress
@@ -784,6 +941,25 @@ dbh_height_ratio_qsm <-
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to
+#'   trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #'
 #' @return DBH divided by the tree volume (trunk plus branches) in meters-2.
 #'
@@ -818,38 +994,56 @@ dbh_volume_ratio_qsm <-
            buttress = FALSE,
            thresholdR2 = 0.001,
            slice_thickness = 0.06,
+           functional = FALSE,
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            concavity = 4,
            dtm = NA,
-           r = 5) {
+           r = 5,
+           how = "median", #'mean": original ITSMe behaviour
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5) {
     dbh <- dbh(
       treedata = treedata,
       pc = pc,
       buttress = buttress,
       thresholdR2 = thresholdR2,
       slice_thickness = slice_thickness,
+      functional = functional,
       thresholdbuttress = thresholdbuttress,
       maxbuttressheight = maxbuttressheight,
       concavity = concavity,
       dtm = dtm,
-      r = r
+      r = r,
+      how = how,
+      arc_min_length_cm = arc_min_length_cm,
+      arc_min_angle = arc_min_angle,
+      arc_tolerance = arc_tolerance,
+      min_inner_buffer = min_inner_buffer,
+      inner_buffer_fraction = inner_buffer_fraction
     )
     volume <- tree_volume_qsm(treedata) / 1000
     return(dbh / volume)
   }
 
-#' Volume below 55 TreeQSM
+#' Volume below 55 QSM
 #'
-#' Calculates the volume below 55% from a TreeQSM.
+#' Calculates the volume below 55% from a TreeQSM or RCT QSM (treeinfo
+#' needs to have been run with --branch_data to access the required
+#' information).
 #'
 #' The volume below 55 is defined as "the relative branch volume below 55% of
 #' tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
 #'
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return The volume below 55.
 #'
@@ -879,22 +1073,27 @@ volume_below_55_qsm <- function(cylinder, treedata) {
   height_at_55 <- tree_height * 0.55 + min(cylinder$start[, 3])
   ind_branch_cyl_u55 <- which(cylinder$start[, 3] < height_at_55 &
                                 cylinder$BranchOrder != 0)
-  vol_branch_cyl_u55 <- cylinder$length[ind_branch_cyl_u55] * pi %*%
-    cylinder$radius[ind_branch_cyl_u55] ** 2
+  if (is.null(cylinder$volume)){
+    vol_branch_cyl_u55 <- cylinder$length[ind_branch_cyl_u55] * pi %*%
+      cylinder$radius[ind_branch_cyl_u55] ** 2
+  } else {
+    vol_branch_cyl_u55 <- cylinder$volume[ind_branch_cyl_u55]
+  }
   vb55 <- sum(vol_branch_cyl_u55) / volume_branches
   return(vb55)
 }
 
-#' Cylinder length-volume ratio TreeQSM
+#' Cylinder length-volume ratio QSM
 #'
-#' Calculates the cylinder length volume ratio from a TreeQSM.
+#' Calculates the cylinder length volume ratio from a TreeQSM or RCT QSM.
 #'
 #' The cylinder length volume ratio is defined as "the ratio between total
 #' length and volume of the branch cylinders" (Akerblom et al., 2017 & Terryn et
 #' al., 2020).
 #'
 #' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return The cylinder length volume ratio in meters-2.
 #'
@@ -921,20 +1120,22 @@ cylinder_length_volume_ratio_qsm <- function(treedata) {
   return(total_branch_length / total_branch_volume)
 }
 
-#' Shedding ratio TreeQSM
+#' Shedding ratio QSM
 #'
-#' Calculates the shedding ratio from a TreeQSM.
+#' Calculates the shedding ratio from a TreeQSM or RCT QSM (treeinfo
+#' needs to have been run with --branch_data to access the required
+#' information).
 #'
 #' The shedding ratio is defined as "The number of stem branches without
 #' children divided by the number of all branches in the bottom third" (Akerblom
 #' et al., 2017 & Terryn et al., 2020).
 #'
-#' @param branch Branch field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param branch Branch field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #'
 #' @return The shedding ratio.
 #'
@@ -1032,18 +1233,20 @@ branch_angle_ratio_qsm <- function(branch) {
   return(bar)
 }
 
-#' Relative volume ratio TreeQSM
+#' Relative volume ratio QSM
 #'
-#' Calculates the relative volume ratio from a TreeQSM.
+#' Calculates the relative volume ratio from a TreeQSM or RCT QSM.
 #'
 #' The relative volume ratio is defined as "Ratio of the percentage volume
 #' within 80 to 90% of the tree height and the percentage volume within 0 to 10%
 #' of the tree height" (Terryn et al., 2020).
 #'
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}}  or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return The relative volume ratio.
 #'
@@ -1075,18 +1278,24 @@ relative_volume_ratio_qsm <- function(cylinder, treedata) {
     interval_end <- interval_start + interval
     ind_cyl_in_interval <- which(cyl_z_coo >= interval_start &
                                    cyl_z_coo < interval_end)
-    vol_cyl_in_interval <-
-      sum(cylinder$length[ind_cyl_in_interval] * pi %*%
-            cylinder$radius[ind_cyl_in_interval] ** 2)
+    if (is.null(cylinder$volume)){
+      vol_cyl_in_interval <-
+        sum(cylinder$length[ind_cyl_in_interval] * pi %*%
+              cylinder$radius[ind_cyl_in_interval] ** 2)
+    } else {
+      vol_cyl_in_interval <- sum(cylinder$volume[ind_cyl_in_interval])
+    }
     vol_dist <- append(vol_dist, vol_cyl_in_interval)
   }
   rel_vol_dist <- vol_dist
   return(rel_vol_dist[10] / rel_vol_dist[2])
 }
 
-#' Crownset TreeQSM
+#' Crownset QSM
 #'
-#' Returns the indices of the cylinders belonging to the crown of the treeQSM.
+#' Returns the indices of the cylinders belonging to the crown of the treeQSM or
+#' RCT QSM (treeinfo needs to have been run with --branch_data to access the
+#' required information).
 #'
 #' The crownset is determined based on four steps (that are designed to exclude
 #' dead branches at the bottom of the stem) according to Akerblom et al. (2017).
@@ -1100,7 +1309,8 @@ relative_volume_ratio_qsm <- function(cylinder, treedata) {
 #' child cylinders of the crown set.
 #'
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return An integer containing the indices of the cylinders belonging to the
 #'   crownset.
@@ -1164,22 +1374,30 @@ crownset_qsm <- function(cylinder) {
   return(crownset)
 }
 
-#' Crown start height TreeQSM
+#' Crown start height QSM
 #'
-#' Calculates the crown start height from a TreeQSM.
+#' Calculates the crown start height from a TreeQSM or RCT QSM (treeinfo needs
+#' to have been run with --branch_data to access the required information).
 #'
 #' The crown start height is defined as "The height of the first stem branch in
 #' the tree crown relative to the tree height" (Akerblom et al., 2017 & Terryn
-#' et al., 2020). The tree height is calculated with \code{\link{tree_height}}.
-#' Crown cylinders are determined with \code{\link{crownset_qsm}}.
+#' et al., 2020) but default is not to normalise by tree height. The tree height
+#' is calculated with \code{\link{tree_height}}. Crown cylinders are determined
+#' with \code{\link{crownset_qsm}}.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param normalisation Can be "treeheight". In case of "treeheight" the crown
+#'   start height is divided by tree height (Terryn et al., 2020). When
+#'   something different than "treeheight" is given, no normalisation is done.
+#'   Default is no normalisation.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
-#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
-#'   cloud is available.
+#'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
+#'   is available.
 #' @param dtm The digital terrain model as a data.frame with columns X,Y,Z
 #'   (default = NA). If the digital terrain model is in the same format as a
 #'   point cloud it can also be read with \code{\link{read_tree_pc}}. only
@@ -1219,36 +1437,48 @@ crownset_qsm <- function(cylinder) {
 crown_start_height_qsm <-
   function(treedata,
            cylinder,
+           normalisation = "no",
            pc = NA,
            dtm = NA,
            r = 5) {
     crownset <- crownset_qsm(cylinder)
     if (length(crownset) > 0) {
-      tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
       crownset_parent0 <- crownset[cylinder$BranchOrder
                                    [cylinder$parent[crownset]] == 0]
       min_height <- min(cylinder$start[crownset_parent0, 3])
-      sh <- (min_height - min(cylinder$start[, 3])) / tree_height
+      if(normalisation == "treeheight"){
+        tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
+        sh <- (min_height - min(cylinder$start[, 3])) / tree_height
+      } else {
+        sh <- (min_height - min(cylinder$start[, 3]))
+      }
     } else {
       sh <- NaN
     }
     return(sh)
   }
 
-#' Crown height TreeQSM
+#' Crown height QSM
 #'
-#' Calculates the crown height from a TreeQSM.
+#' Calculates the crown height from a TreeQSM or RCT QSM (treeinfo needs to have
+#' been run with --branch_data to access the required information).
 #'
 #' The crown height is defined as "the vertical distance between the highest and
 #' the lowest crown cylinder relative to the tree height" (Akerblom et al., 2017
-#' & Terryn et al., 2020). The tree height is calculated with
-#' \code{\link{tree_height}}. Crown cylinders are determined with
-#' \code{\link{crownset_qsm}}.
+#' & Terryn et al., 2020) but default is not to normalise by tree height. The
+#' tree height is calculated with \code{\link{tree_height}}. Crown cylinders are
+#' determined with \code{\link{crownset_qsm}}.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param normalisation Can be "treeheight". In case of "treeheight" the crown
+#'   height is divided by tree height (Terryn et al., 2020). When something
+#'   different than "treeheight" is given, no normalisation is done. Default is
+#'   no normalisation.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
@@ -1288,35 +1518,42 @@ crown_start_height_qsm <-
 crown_height_qsm <-
   function(treedata,
            cylinder,
+           normalisation = "no",
            pc = NA,
            dtm = NA,
            r = 5) {
     crownset <- crownset_qsm(cylinder)
-    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
     if (length(crownset) > 0) {
       minz_crown <- min(cylinder$start[crownset, 3])
       maxz_crown <- max(cylinder$start[crownset, 3])
       x <- which(cylinder$start[, 3] == maxz_crown)
       maxz_crown <-
         maxz_crown + cylinder$length[x] * cylinder$axis[x, 3]
-      ch <- (maxz_crown - minz_crown) / tree_height
+      if(normalisation == "treeheight"){
+        tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
+        ch <- (maxz_crown - minz_crown) / tree_height
+      } else {
+        ch <- (maxz_crown - minz_crown)
+      }
     } else {
       ch <- NaN
     }
     return(ch)
   }
 
-#' Crown evenness TreeQSM
+#' Crown evenness QSM
 #'
-#' Calculates the crown evenness from a TreeQSM.
+#' Calculates the crown evenness from a TreeQSM or RCT QSM (treeinfo needs to have
+#' been run with --branch_data to access the required information).
 #'
 #' The crown evenness is defined as "The crown cylinders divided into 8 angular
 #' bins. Ratio between the minimum heights of the highest and lowest bin."
 #' (Akerblom et al., 2017 & Terryn et al., 2020). Crown cylinders are determined
 #' with \code{\link{crownset_qsm}}.
 #'
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return The crown evenness.
 #'
@@ -1384,10 +1621,11 @@ crown_evenness_qsm <- function(cylinder) {
   return(ce)
 }
 
-#' Radii vertical bins TreeQSM
+#' Radii vertical bins QSM
 #'
-#' Calculates the radii of the three vertical bins fitted to the TreeQSM
-#' cylinders.
+#' Calculates the radii of the three vertical bins fitted to the TreeQSM or RCT
+#' QSM (treeinfo needs to have been run with --branch_data to access the
+#' required information) cylinders.
 #'
 #' These radii are the radii of the cylinders whose axis are vertical and goes
 #' through the bin centre point, and which contains approximately 90% of the
@@ -1397,10 +1635,12 @@ crown_evenness_qsm <- function(cylinder) {
 #' cylinders the centre of the previous bin is used (Akerblom et al., 2017 &
 #' Terryn et al., 2020).
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #'
 #' @return The radii of the three vertical bins.
 #'
@@ -1563,10 +1803,12 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
   return(c(r1, r2, r3))
 }
 
-#' Crown diameter height ratio TreeQSM
+#' Crown diameter height ratio QSM
 #'
 #' Calculates the ratio between the crown diameter and the crown height from a
-#' TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020).
+#' TreeQSM (Akerblom et al., 2017 & Terryn et al., 2020) or RCT QSM (treeinfo
+#' needs to have been run with --branch_data to access the required information)
+#' cylinders.
 #'
 #' The crown diameter is the maximum radii of the vertical bin radius estimates
 #' that are calculated with \code{\link{vertical_bin_radii_qsm}}. The crown
@@ -1574,10 +1816,12 @@ vertical_bin_radii_qsm <- function(treedata, cylinder) {
 #' cylinder and is obtained from \code{\link{crown_height_qsm}} multiplied with
 #' the tree_height.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point
 #'   cloud is available.
@@ -1632,10 +1876,11 @@ crown_diameterheight_ratio_qsm <-
     return(diameter / height)
   }
 
-#' DBH minimum tree radius ratio TreeQSM
+#' DBH minimum tree radius ratio QSM
 #'
 #' Calculates the ratio between the dbh and the minimum tree radius from a
-#' TreeQSM.
+#' TreeQSM or RCT QSM (treeinfo needs to have been run with --branch_data to
+#' access the required information) cylinders.
 #'
 #' This ratio is defined as "Ratio between the DBH and the minimum of the
 #' vertical bin radius estimates" (Akerblom et al., 2017 & Terryn et al., 2020).
@@ -1643,10 +1888,12 @@ crown_diameterheight_ratio_qsm <-
 #' \code{\link{vertical_bin_radii_qsm}}. DBH is calculated with
 #' \code{\link{dbh}}.
 #'
-#' @param treedata Treedata field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
-#' @param cylinder Cylinder field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param treedata Treedata field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
 #' @param pc The tree point cloud as a data.frame with columns X,Y,Z. Output of
 #'   \code{\link{read_tree_pc}}. Default is NA and indicates no tree point cloud
 #'   is available.
@@ -1660,6 +1907,8 @@ crown_diameterheight_ratio_qsm <-
 #'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
 #'   tree point cloud is available.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point cloud is available and buttress
@@ -1679,6 +1928,25 @@ crown_diameterheight_ratio_qsm <-
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm. Should be at least the resolution of the dtm. Only relevant when a dtm
 #'   is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating
+#'   DBH. Use \code{"mean"} for the original ITSMe behaviour, \code{"median"}
+#'   for the median radius (default), or a numeric value such as \code{10} to
+#'   trim 5 percent of radii on each side before taking the mean.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage for the final DBH circle.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage for the final DBH circle. Default is 18,
+#'   corresponding to 20 sectors.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   circle. Points within radius +/- arc_tolerance are counted as supporting
+#'   the fitted circle when calculating arc coverage.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty. The effective
+#'   buffer is \code{max(min_inner_buffer, inner_buffer_fraction * radius)}.
 #'
 #' @return The ratio of the dbh and the minimum tree radius.
 #'
@@ -1720,11 +1988,18 @@ dbh_minradius_ratio_qsm <- function(treedata,
                                     buttress = FALSE,
                                     thresholdR2 = 0.001,
                                     slice_thickness = 0.06,
+                                    functional = FALSE,
                                     thresholdbuttress = 0.001,
                                     maxbuttressheight = 7,
                                     concavity = 4,
                                     dtm = NA,
-                                    r = 5) {
+                                    r = 5,
+                                    how = "median", #'mean": original ITSMe behaviour
+                                    arc_min_length_cm = NULL,
+                                    arc_min_angle = 18,
+                                    arc_tolerance = 0.05,
+                                    min_inner_buffer = 0.06,
+                                    inner_buffer_fraction = 0.5) {
   radii <- vertical_bin_radii_qsm(treedata, cylinder)
   diameter <- min(radii) * 2
   dbh <- dbh(
@@ -1733,11 +2008,18 @@ dbh_minradius_ratio_qsm <- function(treedata,
     buttress = buttress,
     thresholdR2 = thresholdR2,
     slice_thickness = slice_thickness,
+    functional = functional,
     thresholdbuttress = thresholdbuttress,
     maxbuttressheight = maxbuttressheight,
     concavity = concavity,
     dtm = dtm,
-    r = r
+    r = r,
+    how = how,
+    arc_min_length_cm = arc_min_length_cm,
+    arc_min_angle = arc_min_angle,
+    arc_tolerance = arc_tolerance,
+    min_inner_buffer = min_inner_buffer,
+    inner_buffer_fraction = inner_buffer_fraction
   )
   return(dbh / diameter)
 }
