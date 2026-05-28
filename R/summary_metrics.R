@@ -333,7 +333,7 @@ summary_basic_pointcloud_metrics_pertree <-
           min_inner_buffer = min_inner_buffer,
           inner_buffer_fraction = inner_buffer_fraction,
           plot = plot,
-          plotcolors = plotcolors[c(4:5)]
+          plotcolors = plotcolors[c(3:5)]
         )
       }, error = function(cond) {
         message(
@@ -364,22 +364,34 @@ summary_basic_pointcloud_metrics_pertree <-
       pc <- classify_out$crownpoints
       if (plot == TRUE & "tree height" %in% metrics) {
         hxz_plot <- classify_out$plotXZ +
-          ggplot2::ggtitle(paste("H = ", as.character(round(h, 2)), " m", sep = ""))
-        hyz_plot <- classify_out$plotYZ
+          ggplot2::ggtitle(paste("H = ", as.character(round(h, 2)), " m", sep = ""))+
+          ggplot2::theme(
+            plot.title = ggtext::element_markdown(size = 14.5, face = 'bold'),
+            legend.position = "bottom",
+            legend.direction = "vertical"
+          )
+        hyz_plot <- classify_out$plotYZ +
+          ggplot2::theme(legend.position = "none",
+                         axis.text.y = ggplot2::element_blank(),
+                         axis.title.y = ggplot2::element_blank(),
+                         axis.ticks.y = ggplot2::element_blank())
         height_fig <- patchwork::wrap_elements((hxz_plot |
-                                                  hyz_plot) +
-                                                 patchwork::plot_layout(guides = 'collect') &
-                                                 ggplot2::theme(
-                                                   legend.position = 'bottom',
-                                                   legend.key =
-                                                     ggplot2::element_blank()
-                                                 )
+                                                  hyz_plot)
         )
       }
     } else if (plot == TRUE & "tree height" %in% metrics) {
       hxz_plot <- h_out$plotXZ +
-        ggplot2::ggtitle(paste("H = ", as.character(round(h, 2)), " m", sep = ""))
-      hyz_plot <- h_out$plotYZ
+        ggplot2::ggtitle(paste("H = ", as.character(round(h, 2)), " m", sep = "")) +
+        ggplot2::theme(
+          plot.title = ggtext::element_markdown(size = 14.5, face = 'bold'),
+          legend.position = "bottom",
+          legend.direction = "vertical"
+        )
+      hyz_plot <- h_out$plotYZ +
+        ggplot2::theme(legend.position = "none",
+                       axis.text.y = ggplot2::element_blank(),
+                       axis.title.y = ggplot2::element_blank(),
+                       axis.ticks.y = ggplot2::element_blank())
       height_fig <- patchwork::wrap_elements(hxz_plot | hyz_plot)
     }
 
@@ -497,8 +509,26 @@ summary_basic_pointcloud_metrics_pertree <-
           dpi = 600
         )
       }
-      utils::write.table(tree, file = paste0(OUT_path, "summary_basic_metrics.csv"), sep = ",", row.names = FALSE,
-                  col.names = !file.exists(paste0(OUT_path, "summary_basic_metrics.csv")), append = TRUE)
+      outfile <- paste0(OUT_path, "summary_basic_metrics.csv")
+
+      if (!file.exists(outfile)) {
+        utils::write.table(
+          tree,
+          file = outfile,
+          sep = ",",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+      } else {
+        utils::write.table(
+          tree,
+          file = outfile,
+          sep = ",",
+          row.names = FALSE,
+          col.names = FALSE,
+          append = TRUE
+        )
+      }
     }
     return(tree)
     gc()
@@ -847,6 +877,8 @@ summary_basic_pointcloud_metrics <-
 #'   \code{\link{dbh_pc}} and \code{\link{dab_pc}} functions used to calculate
 #'   the diameter at breast height and above buttresses. Only relevant if the
 #'   tree point cloud is available.
+#' @param functional Logical (default=FALSE), indicates if the functional
+#'   diameter should be calculated.
 #' @param thresholdbuttress Numeric value (default=0.001). Parameter of the
 #'   \code{\link{dab_pc}} function used to calculate the diameter above
 #'   buttresses. Only relevant if the tree point clouds are available and
@@ -866,6 +898,29 @@ summary_basic_pointcloud_metrics <-
 #' @param dtm The digital terrain model from \code{\link{tree_height_pc}}.
 #' @param r Numeric value (default=5) r which determines the range taken for the
 #'   dtm from \code{\link{tree_height_pc}}. Only relevant if a dtm is provided.
+#' @param how Method used to summarise point-to-centre radii when estimating DBH
+#'   with \code{\link{dbh_pc}}. Use \code{"mean"} for the original ITSMe
+#'   behaviour, \code{"median"} for the median radius, or a numeric value such
+#'   as \code{10} to trim 5 percent of radii on each side before taking the
+#'   mean. Only relevant when buttress == FALSE.
+#' @param arc_min_length_cm Optional numeric. Minimum arc length, in
+#'   centimetres, represented by one angular sector when calculating arc
+#'   coverage with \code{\link{dbh_pc}}. If supplied, this is converted to
+#'   degrees based on the fitted radius. Only relevant when buttress == FALSE.
+#' @param arc_min_angle Numeric. Minimum angular sector width in degrees used to
+#'   calculate arc coverage with \code{\link{dbh_pc}}. Default is 18,
+#'   corresponding to 20 sectors. Only relevant when buttress == FALSE.
+#' @param arc_tolerance Numeric. Radial tolerance, in metres, around the fitted
+#'   DBH circle. Points within radius +/- arc_tolerance are counted as
+#'   supporting the fitted circle when calculating arc coverage with
+#'   \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param min_inner_buffer Numeric. Minimum buffer distance, in metres, excluded
+#'   from the fitted DBH radius before checking whether the inner circle is
+#'   empty with \code{\link{dbh_pc}}. Only relevant when buttress == FALSE.
+#' @param inner_buffer_fraction Numeric. Fraction of the fitted DBH radius used
+#'   as buffer before checking whether the inner circle is empty with
+#'   \code{\link{dbh_pc}}. The effective buffer is \code{max(min_inner_buffer,
+#'   inner_buffer_fraction * radius)}. Only relevant when buttress == FALSE.
 #' @param OUT_path A character with name of the output file (including the path
 #'   to the folder), where the summary csv file should be saved or logical
 #'   (default=FALSE) in this case no csv file is produced.
@@ -922,11 +977,18 @@ summary_qsm_metrics <-
            buttress = FALSE,
            thresholdR2 = 0.001,
            slice_thickness = 0.06,
+           functional = FALSE,
            thresholdbuttress = 0.001,
            maxbuttressheight = 7,
            concavity = 4,
            dtm = NA,
            r = 5,
+           how = "median",
+           arc_min_length_cm = NULL,
+           arc_min_angle = 18,
+           arc_tolerance = 0.05,
+           min_inner_buffer = 0.06,
+           inner_buffer_fraction = 0.5,
            OUT_path = FALSE) {
     filenames <-
       list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
@@ -999,11 +1061,18 @@ summary_qsm_metrics <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         tree_height <- tree_height(
           treedata = qsm$treedata,
@@ -1018,7 +1087,7 @@ summary_qsm_metrics <-
         )
         trunk_vol <- trunk_volume_qsm(treedata = qsm$treedata)
         branch_len <- total_branch_length_qsm(treedata = qsm$treedata)
-        trunk_height <- trunk_height_qsm(treedata = qsm$treedata)
+        trunk_height <- trunk_length_qsm(treedata = qsm$treedata)
         sba <- stem_branch_angle_qsm(branch = qsm$branch)
         sbcs <- stem_branch_cluster_size_qsm(cylinder = qsm$cylinder)
         sbr <- stem_branch_radius_qsm(
@@ -1037,11 +1106,18 @@ summary_qsm_metrics <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         sbd <- stem_branch_distance_qsm(
           cylinder = qsm$cylinder,
@@ -1051,11 +1127,18 @@ summary_qsm_metrics <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         dhr <- dbh_height_ratio_qsm(
           treedata = qsm$treedata,
@@ -1063,11 +1146,18 @@ summary_qsm_metrics <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         dvr <- dbh_volume_ratio_qsm(
           treedata = qsm$treedata,
@@ -1075,11 +1165,18 @@ summary_qsm_metrics <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         vb55 <- volume_below_55_qsm(cylinder = qsm$cylinder,
                                     treedata = qsm$treedata)
@@ -1122,11 +1219,18 @@ summary_qsm_metrics <-
           buttress = buttress,
           thresholdR2 = thresholdR2,
           slice_thickness = slice_thickness,
+          functional = functional,
           thresholdbuttress = thresholdbuttress,
           maxbuttressheight = maxbuttressheight,
           concavity = concavity,
           dtm = dtm,
-          r = r
+          r = r,
+          how = how,
+          arc_min_length_cm = arc_min_length_cm,
+          arc_min_angle = arc_min_angle,
+          arc_tolerance = arc_tolerance,
+          min_inner_buffer = min_inner_buffer,
+          inner_buffer_fraction = inner_buffer_fraction
         )
         tree <- data.frame(
           "X_position" = X_position,
