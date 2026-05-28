@@ -26,7 +26,6 @@ Imports:
     nabor,
     graphics,
     lidR,
-    nabor,
     R.matlab,
     rgl,
     Rvcg,
@@ -34,7 +33,8 @@ Imports:
     stats,
     utils,
     patchwork,
-    ggtext
+    ggtext,
+    rlang
 URL: https://github.com/lmterryn/ITSMe,
     https://lmterryn.github.io/ITSMe/
 BugReports: https://github.com/lmterryn/ITSMe/issues 
@@ -48,3 +48,4 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3
