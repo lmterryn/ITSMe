@@ -13,6 +13,7 @@ summary_qsm_metrics(
   sbl_normalisation = "treeheight",
   sbd_normalisation = "no",
   cylindercutoff = 0,
+  radius_bin_size = 0.01,
   PCs_path = NA,
   extension = ".txt",
   buttress = FALSE,
@@ -47,7 +48,8 @@ or "RCT") that was used to produce the QSMs. TreeQSM is the default.}
 
 \item{version}{A character indicating the version of TreeQSM that was used to
 produce the QSMs (Default = "2.4.1"). Other possible versions are "2.4.0",
-"2.0", "2.3.0", "2.3.1" and "2.3.2". Only required for QSMs made by TreeQSM.}
+"2.0", "2.3.0", "2.3.1" and "2.3.2". Only required for QSMs made by
+TreeQSM.}
 
 \item{multiple}{Logical (default = FALSE), indicates if a single .mat file
 for one tree holds multiple QSMs at once. Set this TRUE for RCT QSMs.}
@@ -61,17 +63,22 @@ parameter of \code{\link{stem_branch_length_qsm}}.}
 \item{sbd_normalisation}{Character (default="no"). Normalisation parameter of
 \code{\link{stem_branch_distance_qsm}}.}
 
-\item{cylindercutoff}{This is the cutoff radius in meters for which cylinders
-are to be included in the total tree volume calculation. Default of 0
-includes all cylinders.}
+\item{cylindercutoff}{Numeric. This is the cutoff radius in meters for which
+cylinders are to be included in the total tree volume calculation. Default
+of 0 includes all cylinders.}
+
+\item{radius_bin_size}{Numeric. The radius_bin_size determines the size that
+the bins should be in metres. A value of 0.01 will divide the cylinders in
+1 cm bins and count up the volumes of all cylinders in that size bin. 1 cm
+is the default.}
 
 \item{PCs_path}{A character with the path to the folder that contains the
 tree point clouds. Default is NA when the point clouds are not available.
 The point clouds are used to determine the DBH, tree height, projected
 crown area and crown volume. The DBH and tree height obtained from the tree
 point clouds are then used for the normalisation of the other features. The
-point cloud files have to be of the format xxx_pc in order to link the tree
-point cloud to its' respective treeQSM.}
+point cloud files have to have the tree_id in order to link the tree point
+cloud to its' respective treeQSM.}
 
 \item{extension}{A character refering to the file extension of the point
 cloud files (default=".txt"). Can be ".txt", ".ply" or ".las". Only
