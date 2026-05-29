@@ -156,7 +156,8 @@ summary_basic_pointcloud_metrics_pertree <-
     print(paste("processing ", basename(PC_path)))
 
     safe_extract <- function(x, name, default = NA) {
-      if (is.null(x) || is.null(x[[name]])) return(default)
+      if (is.null(x) || is.null(x[[name]]))
+        return(default)
       x[[name]]
     }
 
@@ -218,17 +219,12 @@ summary_basic_pointcloud_metrics_pertree <-
       print("calculating stem diameter")
 
       if (!("tree height" %in% metrics)) {
-        h_out <- tree_height_pc(
-          pc = pc,
-          dtm = dtm,
-          r = r
-        )
+        h_out <- tree_height_pc(pc = pc, dtm = dtm, r = r)
       }
 
       diameter_out <- NULL
 
       if (buttress & (h_out$h > h_cutoff)) {
-
         diameter_out <- tryCatch({
           dab_pc(
             pc = pc,
@@ -244,15 +240,17 @@ summary_basic_pointcloud_metrics_pertree <-
           )
         }, error = function(cond) {
           message(cond)
-          return(list(
-            "dab" = NaN,
-            "R2" = NaN,
-            "fdab" = NaN,
-            "h" = NaN,
-            "arc_coverage" = NA_real_,
-            "inner_circle_empty" = NA,
-            "plot" = empty_plot
-          ))
+          return(
+            list(
+              "dab" = NaN,
+              "R2" = NaN,
+              "fdab" = NaN,
+              "h" = NaN,
+              "arc_coverage" = NA_real_,
+              "inner_circle_empty" = NA,
+              "plot" = empty_plot
+            )
+          )
         })
 
         tree$stem_diameter_m <- dab <- diameter_out$dab
@@ -261,7 +259,6 @@ summary_basic_pointcloud_metrics_pertree <-
         tree$height_stem_diameter_m <- diameter_out$h
 
       } else {
-
         diameter_out <- tryCatch({
           dbh_pc(
             pc = pc,
@@ -282,14 +279,16 @@ summary_basic_pointcloud_metrics_pertree <-
           )
         }, error = function(cond) {
           message(cond)
-          return(list(
-            "dbh" = NaN,
-            "R2" = NaN,
-            "fdbh" = NaN,
-            "arc_coverage" = NA_real_,
-            "inner_circle_empty" = NA,
-            "plot" = empty_plot
-          ))
+          return(
+            list(
+              "dbh" = NaN,
+              "R2" = NaN,
+              "fdbh" = NaN,
+              "arc_coverage" = NA_real_,
+              "inner_circle_empty" = NA,
+              "plot" = empty_plot
+            )
+          )
         })
 
         tree$stem_diameter_m <- dbh <- diameter_out$dbh
@@ -364,20 +363,21 @@ summary_basic_pointcloud_metrics_pertree <-
       pc <- classify_out$crownpoints
       if (plot == TRUE & "tree height" %in% metrics) {
         hxz_plot <- classify_out$plotXZ +
-          ggplot2::ggtitle(paste("H = ", as.character(round(h, 2)), " m", sep = ""))+
+          ggplot2::ggtitle(paste("H = ", as.character(round(h, 2)), " m", sep = "")) +
           ggplot2::theme(
             plot.title = ggtext::element_markdown(size = 14.5, face = 'bold'),
             legend.position = "bottom",
             legend.direction = "vertical"
           )
         hyz_plot <- classify_out$plotYZ +
-          ggplot2::theme(legend.position = "none",
-                         axis.text.y = ggplot2::element_blank(),
-                         axis.title.y = ggplot2::element_blank(),
-                         axis.ticks.y = ggplot2::element_blank())
+          ggplot2::theme(
+            legend.position = "none",
+            axis.text.y = ggplot2::element_blank(),
+            axis.title.y = ggplot2::element_blank(),
+            axis.ticks.y = ggplot2::element_blank()
+          )
         height_fig <- patchwork::wrap_elements((hxz_plot |
-                                                  hyz_plot)
-        )
+                                                  hyz_plot))
       }
     } else if (plot == TRUE & "tree height" %in% metrics) {
       hxz_plot <- h_out$plotXZ +
@@ -388,10 +388,12 @@ summary_basic_pointcloud_metrics_pertree <-
           legend.direction = "vertical"
         )
       hyz_plot <- h_out$plotYZ +
-        ggplot2::theme(legend.position = "none",
-                       axis.text.y = ggplot2::element_blank(),
-                       axis.title.y = ggplot2::element_blank(),
-                       axis.ticks.y = ggplot2::element_blank())
+        ggplot2::theme(
+          legend.position = "none",
+          axis.text.y = ggplot2::element_blank(),
+          axis.title.y = ggplot2::element_blank(),
+          axis.ticks.y = ggplot2::element_blank()
+        )
       height_fig <- patchwork::wrap_elements(hxz_plot | hyz_plot)
     }
 
@@ -419,8 +421,12 @@ summary_basic_pointcloud_metrics_pertree <-
         text_pa <- paste0("**PA = ", round(pa, 2), " m<sup>2</sup>**")#bquote(PA == .(round(pa, 2)) ~ m^2)
         if ("alpha volume" %in% metrics) {
           text_pa_av <- paste0(
-            "**PA = ", round(pa, 2), " m<sup>2</sup>**<br>",
-            "**AV = ", round(av, 2), " m<sup>3</sup>**"
+            "**PA = ",
+            round(pa, 2),
+            " m<sup>2</sup>**<br>",
+            "**AV = ",
+            round(av, 2),
+            " m<sup>3</sup>**"
           )
           pa_plot <- pa_out$plot +
             ggplot2::ggtitle(text_pa_av) +
@@ -814,7 +820,8 @@ summary_basic_pointcloud_metrics <-
 #' Returns a summary data.frame containing all the metrics defined by Terryn et
 #' al. (2020). Also contains: X and Y-position, dbh, tree height, tree volume
 #' and trunk volume. When tree point clouds are provided, dbh and tree height
-#' are based on the point cloud instead of the QSM.
+#' are based on the point cloud instead of the QSM. Works for QSMs from treeQSM
+#' or RayCloudTools (RCT).
 #'
 #' Metrics Terryn et al. (2020): stem branch angle (sba,
 #' \code{\link{stem_branch_angle_qsm}}), stem branch cluster size (sbcs,
@@ -842,11 +849,13 @@ summary_basic_pointcloud_metrics <-
 #'   in this case set parameter multiple TRUE. When multiple QSMs are present
 #'   for one tree the mean of the values of the different QSMs is taken for that
 #'   tree as a final value for a certain feature.
+#' @param algorithm A character indicating the QSM algorithm (either "TreeQSM"
+#'   or "RCT") that was used to produce the QSMs. TreeQSM is the default.
 #' @param version A character indicating the version of TreeQSM that was used to
 #'   produce the QSMs (Default = "2.4.1"). Other possible versions are "2.4.0",
-#'   "2.0", "2.3.0", "2.3.1" and "2.3.2".
+#'   "2.0", "2.3.0", "2.3.1" and "2.3.2". Only required for QSMs made by TreeQSM.
 #' @param multiple Logical (default = FALSE), indicates if a single .mat file
-#'   for one tree holds multiple QSMs at once.
+#'   for one tree holds multiple QSMs at once. Set this TRUE for RCT QSMs.
 #' @param sbr_normalisation Character (default="treeheight"). Normalisation
 #'   parameter of \code{\link{stem_branch_radius_qsm}}.
 #' @param sbl_normalisation Character (default="treeheight"). Normalisation
@@ -966,6 +975,7 @@ summary_basic_pointcloud_metrics <-
 #' }
 summary_qsm_metrics <-
   function(QSMs_path,
+           algorithm = "TreeQSM",
            version = "2.4.1",
            multiple = FALSE,
            sbr_normalisation = "treeheight",
@@ -990,12 +1000,18 @@ summary_qsm_metrics <-
            min_inner_buffer = 0.06,
            inner_buffer_fraction = 0.5,
            OUT_path = FALSE) {
-    filenames <-
-      list.files(QSMs_path, pattern = "*.mat", full.names = FALSE)
+    ext <- c(TreeQSM = "mat", RCT = "txt")[algorithm]
+    name_pattern <- c(TreeQSM = "_qsm", RCT = "_raycloud")[algorithm]
+    if (is.na(ext)) {
+      stop("not a valid algorithm")
+    }
+    filenames <- list.files(QSMs_path,
+                            pattern = paste0("\\.", ext, "$"),
+                            full.names = FALSE)
     unique_tree_ids <- c()
     tree_ids <- c()
     for (i in 1:length(filenames)) {
-      id <- strsplit(filenames[i], "_qsm")[[1]][1]
+      id <- strsplit(filenames[i], name_pattern)[[1]][1]
       if (!(id %in% tree_ids)) {
         unique_tree_ids <- append(unique_tree_ids, id)
       }
@@ -1008,6 +1024,7 @@ summary_qsm_metrics <-
       "tree_height_m" = double(),
       "tree_vol_L" = double(),
       "trunk_vol_L" = double(),
+      "branch_vol_L" = double(),
       "branch_len" = double(),
       "trunk_h" = double(),
       "sba_degrees" = double(),
@@ -1029,9 +1046,10 @@ summary_qsm_metrics <-
       "dmr" = double()
     )
     summary <- summary_means <- summary_sds <- cbind(tree_id = character(), results)
+    #for tree id
     for (i in 1:length(unique_tree_ids)) {
       print(paste("processing ", unique_tree_ids[i]))
-      qsms <- filenames[tree_ids == unique_tree_ids[i]]
+      qsms <- filenames[tree_ids == unique_tree_ids[i]] #list of all files with that id
       if (!is.na(PCs_path)) {
         pc <-
           read_tree_pc(paste(PCs_path, unique_tree_ids[i], "_pc", extension, sep = ""))
@@ -1040,17 +1058,29 @@ summary_qsm_metrics <-
       }
       trees <- df
       id <- unique_tree_ids[i]
+      #if there are multiple qsms in 1 file/not multiple files for an id
       if (multiple) {
-        all_qsms <-
-          read_tree_qsm(paste(QSMs_path, qsms[1], sep = ""), version)
+        if (algorithm == "TreeQSM") {
+          all_qsms <-
+            read_tree_qsm(paste(QSMs_path, qsms[1], sep = ""), version)
+          qsms <- all_qsms
+        } else if (algorithm == "RCT")
+          all_qsms <-
+            read_rct_qsm(paste(QSMs_path, qsms[1], sep = ""))
         qsms <- all_qsms
       }
+      #list of all qsms for 1 id
       for (j in 1:length(qsms)) {
         print(paste("processing ", unique_tree_ids[i], as.character(j)))
         if (multiple) {
           qsm <- qsms[[j]]
         } else {
-          qsm <- read_tree_qsm(paste(QSMs_path, qsms[j], sep = ""), version)
+          if (algorithm == "TreeQSM") {
+            qsm <- read_tree_qsm(paste(QSMs_path, qsms[j], sep = ""), version)
+          } else if (algorithm == "RCT") {
+            qsm_list <- read_rct_qsm(paste(QSMs_path, qsms[j], sep = ""))
+            qsm <- qsm_list$qsm1
+          }
         }
         position <- tree_position_qsm(qsm$cylinder)
         X_position <- position[1]
@@ -1086,9 +1116,16 @@ summary_qsm_metrics <-
           cylindercutoff = cylindercutoff
         )
         trunk_vol <- trunk_volume_qsm(treedata = qsm$treedata)
+        branch_vol <- total_branch_volume_qsm(treedata = qsm$treedata)
         branch_len <- total_branch_length_qsm(treedata = qsm$treedata)
         trunk_height <- trunk_length_qsm(treedata = qsm$treedata)
-        sba <- stem_branch_angle_qsm(branch = qsm$branch)
+        if (algorithm == "RCT") {
+          sba <- NA
+          bar <- NA
+        } else {
+          sba <- stem_branch_angle_qsm(branch = qsm$branch)
+          bar <- branch_angle_ratio_qsm(branch = qsm$branch)
+        }
         sbcs <- stem_branch_cluster_size_qsm(cylinder = qsm$cylinder)
         sbr <- stem_branch_radius_qsm(
           cylinder = qsm$cylinder,
@@ -1186,7 +1223,6 @@ summary_qsm_metrics <-
           cylinder = qsm$cylinder,
           treedata = qsm$treedata
         )
-        bar <- branch_angle_ratio_qsm(branch = qsm$branch)
         rvr <- relative_volume_ratio_qsm(cylinder = qsm$cylinder,
                                          treedata = qsm$treedata)
         csh <- crown_start_height_qsm(
@@ -1239,6 +1275,7 @@ summary_qsm_metrics <-
           "tree_height_m" = tree_height,
           "tree_vol_L" = tree_vol,
           "trunk_vol_L" = trunk_vol,
+          "branch_vol_L" = branch_vol,
           "branch_len" = branch_len,
           "trunk_h" = trunk_height,
           "sba_degrees" = sba,

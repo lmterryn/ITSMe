@@ -6,6 +6,7 @@
 \usage{
 summary_qsm_metrics(
   QSMs_path,
+  algorithm = "TreeQSM",
   version = "2.4.1",
   multiple = FALSE,
   sbr_normalisation = "treeheight",
@@ -41,12 +42,15 @@ in this case set parameter multiple TRUE. When multiple QSMs are present
 for one tree the mean of the values of the different QSMs is taken for that
 tree as a final value for a certain feature.}
 
+\item{algorithm}{A character indicating the QSM algorithm (either "TreeQSM"
+or "RCT") that was used to produce the QSMs. TreeQSM is the default.}
+
 \item{version}{A character indicating the version of TreeQSM that was used to
 produce the QSMs (Default = "2.4.1"). Other possible versions are "2.4.0",
-"2.0", "2.3.0", "2.3.1" and "2.3.2".}
+"2.0", "2.3.0", "2.3.1" and "2.3.2". Only required for QSMs made by TreeQSM.}
 
 \item{multiple}{Logical (default = FALSE), indicates if a single .mat file
-for one tree holds multiple QSMs at once.}
+for one tree holds multiple QSMs at once. Set this TRUE for RCT QSMs.}
 
 \item{sbr_normalisation}{Character (default="treeheight"). Normalisation
 parameter of \code{\link{stem_branch_radius_qsm}}.}
@@ -160,7 +164,8 @@ respectively.
 Returns a summary data.frame containing all the metrics defined by Terryn et
 al. (2020). Also contains: X and Y-position, dbh, tree height, tree volume
 and trunk volume. When tree point clouds are provided, dbh and tree height
-are based on the point cloud instead of the QSM.
+are based on the point cloud instead of the QSM. Works for QSMs from treeQSM
+or RayCloudTools (RCT).
 }
 \details{
 Metrics Terryn et al. (2020): stem branch angle (sba,
