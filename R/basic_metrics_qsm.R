@@ -164,6 +164,84 @@ total_branch_volume_qsm <- function(treedata) {
   return(treedata$BranchVolume[1])
 }
 
+#' Branch volume by order QSM
+#'
+#' Extracts the branch volumes by branching order from the cylinder data of a
+#' TreeQSM or a RCT QSM (treeinfo needs to have been run with --branch_data to
+#' access the required information).
+#'
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#'
+#' @return A data frame with the branching orders of the TreeQSM or RCT QSM and
+#'   their total volumes in liters.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read tree qsm and extract branch volumes by order
+#' qsm <- read_rct_qsm(QSM_path = "path/to/qsm.mat")
+#' branchvol_byorder <- branch_volume_byorder_qsm(cylinder = qsm$qsm1$cylinder)
+#' }
+branch_volume_byorder_qsm <- function(cylinder) {
+  if (is.null(cylinder$volume)) {
+    cylinder$volume <- cylinder$radius ^ 2 * pi * cylinder$length * 1000
+  }
+  cylinder <- as.data.frame(cylinder)
+  result <- stats::aggregate(volume ~ BranchOrder, data = cylinder, sum)
+  out <- as.data.frame(t(result$volume))
+  colnames(out) <- paste0("branchorder_", result$BranchOrder)
+  return(out)
+}
+
+
+#' Cylinder volume by radius size QSM
+#'
+#' Extracts the total cylinder volumes by radius size from the cylinder data of
+#' a TreeQSM or a RCT QSM (treeinfo needs to have been run with --branch_data to
+#' access the required information).
+#'
+#' @param cylinder Cylinder field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
+#'   = TRUE.
+#' @param radius_bin_size Numeric. The radius_bin_size determines the size that
+#'   the bins should be in metres. A value of 0.01 will divide the cylinders in
+#'   1 cm bins and count up the volumes of all cylinders in that size bin. 1 cm
+#'   is the default.
+#'
+#' @return A data frame with the radius ranges of the TreeQSM or RCT QSM and
+#'   their total volumes in liters.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Read tree qsm and extract branch volumes by order
+#' qsm <- read_rct_qsm(QSM_path = "path/to/qsm.mat")
+#' cylvol_byradius <- cylinder_volume_byradius_qsm(cylinder = qsm$qsm1$cylinder)
+#' }
+cylinder_volume_byradius_qsm <- function(cylinder, radius_bin_size = 0.01) {
+  if (is.null(cylinder$volume)) {
+    cylinder$volume <- cylinder$radius ^ 2 * pi * cylinder$length * 1000
+  }
+  cylinder <- as.data.frame(cylinder)
+  cylinder$radius_bin <- cut(
+    cylinder$radius,
+    breaks = seq(
+      floor(min(cylinder$radius) / radius_bin_size) * radius_bin_size,
+      ceiling(max(cylinder$radius) / radius_bin_size) * radius_bin_size,
+      by = radius_bin_size
+    ),
+    include.lowest = TRUE
+  )
+  result <- stats::aggregate(volume ~ radius_bin, data = cylinder, sum)
+  out <- as.data.frame(t(result$volume))
+  colnames(out) <- paste0("radius_", gsub("\\]|\\(|\\[", "", result$radius_bin))
+  return(out)
+}
+
+
 #' Total branch length QSM
 #'
 #' Extracts the total branch length from the treedata of a TreeQSM or RCT QSM
