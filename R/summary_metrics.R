@@ -805,6 +805,46 @@ summary_basic_pointcloud_metrics <-
   }
 
 
+#' Row-bind two data frames while filling missing columns with zeros
+#'
+#' Combines two data frames that may contain different columns. Columns
+#' present in one data frame but absent in the other are added and filled
+#' with zeros before row-binding. The output contains the union of columns
+#' from both inputs.
+#'
+#' This is useful when summarising tree metrics where some trees contain
+#' additional branch-order or radius-bin metrics that are absent from
+#' other trees.
+#'
+#' @param x A data.frame.
+#' @param y A data.frame.
+#'
+#' @return A data.frame containing all rows from \code{x} and \code{y},
+#'   with missing columns added and filled with zeros.
+#'
+#' @examples
+#' x <- data.frame(a = 1, b = 2)
+#' y <- data.frame(a = 3, c = 4)
+#'
+#' rbind_fill0(x, y)
+#' #   a b c
+#' # 1 1 2 0
+#' # 2 3 0 4
+rbind_fill0 <- function(x, y) {
+  all_cols <- union(names(x), names(y))
+
+  for (col in all_cols) {
+    if (!col %in% names(x)) x[[col]] <- 0
+    if (!col %in% names(y)) y[[col]] <- 0
+  }
+
+  x <- x[, all_cols, drop = FALSE]
+  y <- y[, all_cols, drop = FALSE]
+
+  rbind(x, y)
+}
+
+
 #' Summary structural metrics from QSMs
 #'
 #' Returns a summary data.frame containing all the metrics defined by Terryn et
@@ -1013,34 +1053,34 @@ summary_qsm_metrics <-
       }
       tree_ids <- append(tree_ids, id)
     }
-    df <- results <- data.frame(
-      "X_position" = double(),
-      "Y_position" = double(),
-      "dbh_m" = double(),
-      "tree_height_m" = double(),
-      "tree_vol_L" = double(),
-      "trunk_vol_L" = double(),
-      "branch_vol_L" = double(),
-      "branch_len" = double(),
-      "trunk_h" = double(),
-      "sba_degrees" = double(),
-      "sbcs" = double(),
-      "sbr" = double(),
-      "sbl" = double(),
-      "sbd" = double(),
-      "dhr" = double(),
-      "dvr_m-2" = double(),
-      "vb55" = double(),
-      "clvr_m-2" = double(),
-      "sr" = double(),
-      "bar" = double(),
-      "rvr" = double(),
-      "csh" = double(),
-      "ch" = double(),
-      "ce" = double(),
-      "cdhr" = double(),
-      "dmr" = double()
-    )
+    # df <- results <- data.frame(
+    #   "X_position" = double(),
+    #   "Y_position" = double(),
+    #   "dbh_m" = double(),
+    #   "tree_height_m" = double(),
+    #   "tree_vol_L" = double(),
+    #   "trunk_vol_L" = double(),
+    #   "branch_vol_L" = double(),
+    #   "branch_len" = double(),
+    #   "trunk_h" = double(),
+    #   "sba_degrees" = double(),
+    #   "sbcs" = double(),
+    #   "sbr" = double(),
+    #   "sbl" = double(),
+    #   "sbd" = double(),
+    #   "dhr" = double(),
+    #   "dvr_m-2" = double(),
+    #   "vb55" = double(),
+    #   "clvr_m-2" = double(),
+    #   "sr" = double(),
+    #   "bar" = double(),
+    #   "rvr" = double(),
+    #   "csh" = double(),
+    #   "ch" = double(),
+    #   "ce" = double(),
+    #   "cdhr" = double(),
+    #   "dmr" = double()
+    # )
     summary <- summary_means <- summary_sds <- cbind(tree_id = character(), results)
     #for tree id
     for (i in 1:length(unique_tree_ids)) {
@@ -1057,7 +1097,7 @@ summary_qsm_metrics <-
       } else {
         pc <- NA
       }
-      trees <- df
+      #trees <- df
       id <- unique_tree_ids[i]
       #if there are multiple qsms in 1 file/not multiple files for an id
       if (multiple) {
@@ -1271,9 +1311,9 @@ summary_qsm_metrics <-
           min_inner_buffer = min_inner_buffer,
           inner_buffer_fraction = inner_buffer_fraction
         )
-        #branchvols <- branch_volume_byorder_qsm(cylinder = qsm$cylinder)
-        #radiusvols <- cylinder_volume_byradius_qsm(cylinder = qsm$cylinder,
-        #                                           radius_bin_size = radius_bin_size)
+        branchvols <- branch_volume_byorder_qsm(cylinder = qsm$cylinder)
+        radiusvols <- cylinder_volume_byradius_qsm(cylinder = qsm$cylinder,
+                                                   radius_bin_size = radius_bin_size)
         tree <- data.frame(
           "X_position" = X_position,
           "Y_position" = Y_position,
@@ -1302,18 +1342,39 @@ summary_qsm_metrics <-
           "cdhr" = cdhr,
           "dmr" = dmr
         )
-        trees <- rbind(trees, tree)
+        tree <- cbind(
+          tree,
+          branchvols,
+          radiusvols
+        )
+        if (nrow(trees) == 0) {
+          trees <- tree
+        } else {
+          trees <- rbind_fill0(trees, tree)
+        }
       }
       results <- cbind(tree_id = id, trees)
-      summary <- rbind(summary, results)
+      if (nrow(summary) == 0) {
+        summary <- results
+      } else {
+        summary <- rbind_fill0(summary, results)
+      }
       if (length(qsms) > 1) {
         m <- as.data.frame.list(colMeans(trees))
         s <-
           as.data.frame.list(sapply(trees, stats::sd, na.rm = TRUE))
         results_means <- cbind(tree_id = id, m)
         results_sds <- cbind(tree_id = id, s)
-        summary_means <- rbind(summary_means, results_means)
-        summary_sds <- rbind(summary_sds, results_sds)
+        if (nrow(summary_means) == 0) {
+          summary_means <- results_means
+        } else {
+          summary_means <- rbind_fill0(summary_means, results_means)
+        }
+        if (nrow(summary_sds) == 0) {
+          summary_sds <- results_sds
+        } else {
+          summary_sds <- rbind_fill0(summary_sds, results_sds)
+        }
         summaries <- list("summary" = summary,
                           "means" = summary_means,
                           "sds" = summary_sds)
