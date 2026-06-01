@@ -1271,9 +1271,9 @@ summary_qsm_metrics <-
           min_inner_buffer = min_inner_buffer,
           inner_buffer_fraction = inner_buffer_fraction
         )
-        branchvols <- branch_volume_byorder_qsm(cylinder = qsm$cylinder)
-        radiusvols <- cylinder_volume_byradius_qsm(cylinder = qsm$cylinder,
-                                                   radius_bin_size = radius_bin_size)
+        #branchvols <- branch_volume_byorder_qsm(cylinder = qsm$cylinder)
+        #radiusvols <- cylinder_volume_byradius_qsm(cylinder = qsm$cylinder,
+        #                                           radius_bin_size = radius_bin_size)
         tree <- data.frame(
           "X_position" = X_position,
           "Y_position" = Y_position,
@@ -1301,11 +1301,6 @@ summary_qsm_metrics <-
           "ce" = ce,
           "cdhr" = cdhr,
           "dmr" = dmr
-        )
-        tree <- cbind(
-          tree,
-          branchvols,
-          radiusvols
         )
         trees <- rbind(trees, tree)
       }
