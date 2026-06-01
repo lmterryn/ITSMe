@@ -826,10 +826,7 @@ summary_basic_pointcloud_metrics <-
 #' x <- data.frame(a = 1, b = 2)
 #' y <- data.frame(a = 3, c = 4)
 #'
-#' rbind_fill0(x, y)
-#' #   a b c
-#' # 1 1 2 0
-#' # 2 3 0 4
+#' @noRd
 rbind_fill0 <- function(x, y) {
   all_cols <- union(names(x), names(y))
 
@@ -1053,34 +1050,34 @@ summary_qsm_metrics <-
       }
       tree_ids <- append(tree_ids, id)
     }
-    # df <- results <- data.frame(
-    #   "X_position" = double(),
-    #   "Y_position" = double(),
-    #   "dbh_m" = double(),
-    #   "tree_height_m" = double(),
-    #   "tree_vol_L" = double(),
-    #   "trunk_vol_L" = double(),
-    #   "branch_vol_L" = double(),
-    #   "branch_len" = double(),
-    #   "trunk_h" = double(),
-    #   "sba_degrees" = double(),
-    #   "sbcs" = double(),
-    #   "sbr" = double(),
-    #   "sbl" = double(),
-    #   "sbd" = double(),
-    #   "dhr" = double(),
-    #   "dvr_m-2" = double(),
-    #   "vb55" = double(),
-    #   "clvr_m-2" = double(),
-    #   "sr" = double(),
-    #   "bar" = double(),
-    #   "rvr" = double(),
-    #   "csh" = double(),
-    #   "ch" = double(),
-    #   "ce" = double(),
-    #   "cdhr" = double(),
-    #   "dmr" = double()
-    # )
+    df <- results <- data.frame(
+      "X_position" = double(),
+      "Y_position" = double(),
+      "dbh_m" = double(),
+      "tree_height_m" = double(),
+      "tree_vol_L" = double(),
+      "trunk_vol_L" = double(),
+      "branch_vol_L" = double(),
+      "branch_len" = double(),
+      "trunk_h" = double(),
+      "sba_degrees" = double(),
+      "sbcs" = double(),
+      "sbr" = double(),
+      "sbl" = double(),
+      "sbd" = double(),
+      "dhr" = double(),
+      "dvr_m-2" = double(),
+      "vb55" = double(),
+      "clvr_m-2" = double(),
+      "sr" = double(),
+      "bar" = double(),
+      "rvr" = double(),
+      "csh" = double(),
+      "ch" = double(),
+      "ce" = double(),
+      "cdhr" = double(),
+      "dmr" = double()
+    )
     summary <- summary_means <- summary_sds <- cbind(tree_id = character(), results)
     #for tree id
     for (i in 1:length(unique_tree_ids)) {
@@ -1097,7 +1094,7 @@ summary_qsm_metrics <-
       } else {
         pc <- NA
       }
-      #trees <- df
+      trees <- df
       id <- unique_tree_ids[i]
       #if there are multiple qsms in 1 file/not multiple files for an id
       if (multiple) {
