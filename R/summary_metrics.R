@@ -202,6 +202,8 @@ summary_basic_pointcloud_metrics_pertree <-
           plot = FALSE,
           plotcolors = plotcolors[c(1, 4:5)]
         )
+      tree$tree_height_m <- h <- h_out$h
+      tree$lowest_point <- lp <- h_out$lp
     } else if ("tree height" %in% metrics) {
       print("calculating tree height")
       h_out <-
@@ -212,14 +214,16 @@ summary_basic_pointcloud_metrics_pertree <-
           plot = plot,
           plotcolors = plotcolors[c(1, 4:5)]
         )
+      tree$tree_height_m <- h <- h_out$h
+      tree$lowest_point <- lp <- h_out$lp
     }
-    tree$tree_height_m <- h <- h_out$h
-    tree$lowest_point <- lp <- h_out$lp
     #calculate stem diameter
     if ("stem diameter" %in% metrics) {
       print("calculating stem diameter")
       if (!("tree height" %in% metrics)) {
         h_out <- tree_height_pc(pc = pc, dtm = dtm, r = r)
+        tree$tree_height_m <- h <- h_out$h
+        tree$lowest_point <- lp <- h_out$lp
       }
       diameter_out <- NULL
       if (buttress & (h_out$h > h_cutoff)) {
