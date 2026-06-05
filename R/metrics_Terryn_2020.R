@@ -371,7 +371,7 @@ stem_branch_cluster_size_qsm <- function(cylinder) {
 #' }
 stem_branch_radius_qsm <- function(cylinder,
                                    treedata,
-                                   normalisation = "treeheight",
+                                   normalisation = "no",
                                    pc = NA,
                                    dtm = NA,
                                    r = 5) {
@@ -528,7 +528,7 @@ stem_branch_radius_qsm <- function(cylinder,
 #' }
 stem_branch_length_qsm <- function(branch,
                                    treedata,
-                                   normalisation = "treeheight",
+                                   normalisation = "no",
                                    pc = NA,
                                    buttress = FALSE,
                                    thresholdR2 = 0.001,
@@ -1037,7 +1037,9 @@ dbh_volume_ratio_qsm <-
 #' information).
 #'
 #' The volume below 55 is defined as "the relative branch volume below 55% of
-#' tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
+#' tree height" (Akerblom et al., 2017 & Terryn et al., 2020). It is calculated
+#' by dividing the volume of branches below 55% of the tree height by the total
+#' branch volume.
 #'
 #' @param cylinder Cylinder field of a TreeQSM that is returned by
 #'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}} with remove_root
@@ -1872,9 +1874,7 @@ crown_diameterheight_ratio_qsm <-
            r = 5) {
     radii <- vertical_bin_radii_qsm(treedata, cylinder)
     diameter <- max(radii) * 2
-    ch <- crown_height_qsm(treedata, cylinder)
-    tree_height <- tree_height(treedata, pc, dtm = dtm, r = r)
-    height <- ch * tree_height
+    height <- crown_height_qsm(treedata, cylinder, normalisation = "no")
     return(diameter / height)
   }
 

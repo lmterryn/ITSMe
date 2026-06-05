@@ -25,7 +25,9 @@ information).
 }
 \details{
 The volume below 55 is defined as "the relative branch volume below 55\% of
-tree height" (Akerblom et al., 2017 & Terryn et al., 2020).
+tree height" (Akerblom et al., 2017 & Terryn et al., 2020). It is calculated
+by dividing the volume of branches below 55\% of the tree height by the total
+branch volume.
 }
 \examples{
 \dontrun{

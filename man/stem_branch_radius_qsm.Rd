@@ -7,7 +7,7 @@
 stem_branch_radius_qsm(
   cylinder,
   treedata,
-  normalisation = "treeheight",
+  normalisation = "no",
   pc = NA,
   dtm = NA,
   r = 5
