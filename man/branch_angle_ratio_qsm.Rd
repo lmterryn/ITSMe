@@ -2,19 +2,20 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{branch_angle_ratio_qsm}
 \alias{branch_angle_ratio_qsm}
-\title{Branch angle ratio TreeQSM}
+\title{Branch angle ratio QSM}
 \usage{
 branch_angle_ratio_qsm(branch)
 }
 \arguments{
-\item{branch}{Branch field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{branch}{Branch field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 }
 \value{
 The branch angle ratio. NaN when there are no branches.
 }
 \description{
-Calculates the branch angle ratio from a TreeQSM.
+Calculates the branch angle ratio from a TreeQSM or RCT QSM (treeinfo needs
+to have been run with --branch_data to access the required information).
 }
 \details{
 The branch angle ratio is defined as "Ratio of the medians of the branching

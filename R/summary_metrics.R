@@ -1163,13 +1163,8 @@ summary_qsm_metrics <-
         branch_vol <- total_branch_volume_qsm(treedata = qsm$treedata)
         branch_len <- total_branch_length_qsm(treedata = qsm$treedata)
         trunk_height <- trunk_length_qsm(treedata = qsm$treedata)
-        if (algorithm == "RCT") {
-          sba <- NA
-          bar <- NA
-        } else {
-          sba <- stem_branch_angle_qsm(branch = qsm$branch)
-          bar <- branch_angle_ratio_qsm(branch = qsm$branch)
-        }
+        sba <- stem_branch_angle_qsm(branch = qsm$branch)
+        bar <- branch_angle_ratio_qsm(branch = qsm$branch)
         sbcs <- stem_branch_cluster_size_qsm(cylinder = qsm$cylinder)
         sbr <- stem_branch_radius_qsm(
           cylinder = qsm$cylinder,

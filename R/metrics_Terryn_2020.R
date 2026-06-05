@@ -189,16 +189,17 @@ tree_height <- function(treedata,
   }
 }
 
-#' Stem branch angle TreeQSM
+#' Stem branch angle QSM
 #'
-#' Calculates the stem branch angle from a TreeQSM.
+#' Calculates the stem branch angle from a TreeQSM or RCT QSM (treeinfo needs
+#' to have been run with --branch_data to access the required information).
 #'
 #' The stem branch angle is defined as "the median of the branching angles of
 #' the 1st order branches in degrees. 0 is upwards and 180 downwards (parallel
 #' with the trunk)" (Akerblom et al., 2017 & Terryn et al., 2020).
 #'
-#' @param branch Branch field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param branch Branch field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #'
 #' @return The stem branch angle in degrees. NaN when there are no stem
 #'   branches.
@@ -1193,16 +1194,17 @@ shedding_ratio_qsm <- function(branch, cylinder, treedata) {
   return(sr)
 }
 
-#' Branch angle ratio TreeQSM
+#' Branch angle ratio QSM
 #'
-#' Calculates the branch angle ratio from a TreeQSM.
+#' Calculates the branch angle ratio from a TreeQSM or RCT QSM (treeinfo needs
+#' to have been run with --branch_data to access the required information).
 #'
 #' The branch angle ratio is defined as "Ratio of the medians of the branching
 #' angles of the 1st order branches and 2nd order branches" (Terryn et al.,
 #' 2020).
 #'
-#' @param branch Branch field of a TreeQSM that is returned by
-#'   \code{\link{read_tree_qsm}}.
+#' @param branch Branch field of a TreeQSM or RCT QSM that is returned by
+#'   \code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.
 #'
 #' @return The branch angle ratio. NaN when there are no branches.
 #'

@@ -2,20 +2,21 @@
 % Please edit documentation in R/metrics_Terryn_2020.R
 \name{stem_branch_angle_qsm}
 \alias{stem_branch_angle_qsm}
-\title{Stem branch angle TreeQSM}
+\title{Stem branch angle QSM}
 \usage{
 stem_branch_angle_qsm(branch)
 }
 \arguments{
-\item{branch}{Branch field of a TreeQSM that is returned by
-\code{\link{read_tree_qsm}}.}
+\item{branch}{Branch field of a TreeQSM or RCT QSM that is returned by
+\code{\link{read_tree_qsm}} or \code{\link{read_rct_qsm}}.}
 }
 \value{
 The stem branch angle in degrees. NaN when there are no stem
 branches.
 }
 \description{
-Calculates the stem branch angle from a TreeQSM.
+Calculates the stem branch angle from a TreeQSM or RCT QSM (treeinfo needs
+to have been run with --branch_data to access the required information).
 }
 \details{
 The stem branch angle is defined as "the median of the branching angles of

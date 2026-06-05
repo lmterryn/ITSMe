@@ -48,17 +48,30 @@
 #'       \item{section}{Integer vector. Section identifier.}
 #'       \item{volume}{Numeric vector. Segment volume in cubic meters.}
 #'       \item{diameter}{Numeric vector. Segment diameter in meters.}
-#'       \item{length}{Numeric vector. Length to the farthest leaf (converted from cm to m).}
+#'       \item{length_to_leaf}{Numeric vector. Length to the farthest leaf (converted from cm to m).}
 #'       \item{strength}{Numeric vector. Structural strength (d^0.75 / l).}
 #'       \item{min_strength}{Numeric vector. Minimum strength to the root.}
 #'       \item{dominance}{Numeric vector. Branch dominance ratio.}
-#'       \item{angle}{Numeric vector. Branch angle at bifurcation.}
+#'       \item{angle}{Numeric vector. Angle between the branch and the parent branch it splits from.}
 #'       \item{children}{Integer vector. Number of child segments.}
 #'       \item{branch}{Integer vector. Branch identifier.}
 #'       \item{BranchOrder}{Integer vector. Hierarchical branch order.}
 #'       \item{extension}{Integer vector. Branch extension identifier.}
 #'       \item{PositionInBranch}{Integer vector. Position within the branch.}
-#'       \item{segment_length}{Numeric vector. Individual segment length.}
+#'       \item{length}{Numeric vector. Individual segment length.}
+#'       \item{start}{Matrix (n x 3). 3D coordinates (x, y, z) of the segment start points.}
+#'       \item{axis}{Matrix (n x 3). (x, y, z) of the segment axis.}
+#'     }
+#'   }
+#'
+#'   \item{branch}{A list containing branch-level attributes:
+#'     \describe{
+#'       \item{id}{Integer vector. ID of the branch.}
+#'       \item{order}{Integer vector. Hierarchical branch order.}
+#'       \item{volume}{Numeric vector. Branch volume in cubic meters.}
+#'       \item{length}{Numeric vector. Total branch length.}
+#'       \item{parent}{Integer vector. ID of the parent branch (adjusted to 1-based indexing)}
+#'       \item{angle}{Numeric vector. Angle between the branch and the parent branch it splits from.}
 #'     }
 #'   }
 #'
@@ -155,7 +168,7 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
       "strength" = cylinder_df$strength, # Structural strength (d^0.75/l)
       "min_strength" = cylinder_df$min_strength, # Minimum strength to root
       "dominance" = cylinder_df$dominance, # Branch dominance ratio
-      "angle" = cylinder_df$angle, # Branch angle at bifurcation
+      "angle" = cylinder_df$branch_angle, # Angle between the branch and the trunk it splits from
       "children" = cylinder_df$children, # Number of child segments
       "branch" = cylinder_df$branch, # Branch identifier
       "BranchOrder" = cylinder_df$branch_order, # Hierarchical branch order
@@ -164,7 +177,7 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
       "length" = cylinder_df$segment_length # Individual segment length
     )
 
-    # Add new metrics
+    # Add new metrics start and axis
     parent_idx <- cylinder$parent
     cylinder$start <- matrix( # initialize start matrix
       NA,
@@ -187,29 +200,7 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
     dir[is.na(dir)] <- 0     # Replace NA rows (zero-length vectors) with 0
     cylinder$axis <- round(dir, 5) # Round values
 
-    ### deal with problem of multiple branchorders in one branch id
-    new_branch_id <- max(cylinder$branch, na.rm = TRUE) + 1 # start new branch IDs after current maximum
-    problem_branches <- unique(     # branch IDs that contain multiple BranchOrders
-      cylinder$branch[
-        stats::ave(cylinder$BranchOrder,
-            cylinder$branch,
-            FUN = function(x) length(unique(x))) > 1
-      ]
-    )
-    for (b in problem_branches) {
-      orders <- sort(unique(cylinder$BranchOrder[cylinder$branch == b]))  # unique branch orders within this branch
-      keep_order <- orders[1]       # keep original ID for first/minimum order
-      for (ord in orders[-1]) {       # reassign all other orders
-        idx <- which(
-          cylinder$branch == b &
-            cylinder$BranchOrder == ord
-        )
-        cylinder$branch[idx] <- new_branch_id
-        new_branch_id <- new_branch_id + 1
-      }
-    }
-
-    # Create branchdata component list with branch-level metrics
+    # Create branch data component list with branch-level metrics
     branch <- list(
       "id" = unique(cylinder$branch)
     )
@@ -233,8 +224,9 @@ read_rct_qsm <- function(path, global = FALSE, remove_root = FALSE) {
         return(0)
       cylinder$branch[parent_row]
     })
-    #branch$angle needs to be implemented for stem branch angle
-
+    branch$angle <- sapply(branch$id, function(id) {
+      max(cylinder$angle[cylinder$branch == id])
+    })
 
     # Create treedata component list with tree-level metrics
     treedata <- list(

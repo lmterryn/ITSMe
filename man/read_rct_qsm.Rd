@@ -27,17 +27,30 @@ a list of 2 components (cylinder and treedata) containing:
 \item{section}{Integer vector. Section identifier.}
 \item{volume}{Numeric vector. Segment volume in cubic meters.}
 \item{diameter}{Numeric vector. Segment diameter in meters.}
-\item{length}{Numeric vector. Length to the farthest leaf (converted from cm to m).}
+\item{length_to_leaf}{Numeric vector. Length to the farthest leaf (converted from cm to m).}
 \item{strength}{Numeric vector. Structural strength (d^0.75 / l).}
 \item{min_strength}{Numeric vector. Minimum strength to the root.}
 \item{dominance}{Numeric vector. Branch dominance ratio.}
-\item{angle}{Numeric vector. Branch angle at bifurcation.}
+\item{angle}{Numeric vector. Angle between the branch and the parent branch it splits from.}
 \item{children}{Integer vector. Number of child segments.}
 \item{branch}{Integer vector. Branch identifier.}
 \item{BranchOrder}{Integer vector. Hierarchical branch order.}
 \item{extension}{Integer vector. Branch extension identifier.}
 \item{PositionInBranch}{Integer vector. Position within the branch.}
-\item{segment_length}{Numeric vector. Individual segment length.}
+\item{length}{Numeric vector. Individual segment length.}
+\item{start}{Matrix (n x 3). 3D coordinates (x, y, z) of the segment start points.}
+\item{axis}{Matrix (n x 3). (x, y, z) of the segment axis.}
+}
+}
+
+\item{branch}{A list containing branch-level attributes:
+\describe{
+\item{id}{Integer vector. ID of the branch.}
+\item{order}{Integer vector. Hierarchical branch order.}
+\item{volume}{Numeric vector. Branch volume in cubic meters.}
+\item{length}{Numeric vector. Total branch length.}
+\item{parent}{Integer vector. ID of the parent branch (adjusted to 1-based indexing)}
+\item{angle}{Numeric vector. Angle between the branch and the parent branch it splits from.}
 }
 }
 
